@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Creational">
+      <UniqueIdentifier>{8061f1e6-0e2a-4d74-b635-4dacaa25a1ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Structural">
+      <UniqueIdentifier>{5b4e163e-6260-4770-9d6b-7868ce1b8738}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Behavioral">
+      <UniqueIdentifier>{d5fcf209-7738-4ec5-9a47-1a28d868a06a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Creational\Headers">
+      <UniqueIdentifier>{19edf7d0-16e2-45d6-aad7-200dfcd70660}</UniqueIdentifier>
+      <Extensions>.h;.hpp</Extensions>
+    </Filter>
+    <Filter Include="Creational\Source">
+      <UniqueIdentifier>{e4a3308b-73c2-428e-a086-dcd402127292}</UniqueIdentifier>
+      <Extensions>.cpp</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="design-patterns.cpp" />
+    <ClCompile Include="src\command.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\command.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
