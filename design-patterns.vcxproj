@@ -73,10 +73,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\bin\obj\$(Configuration)\</IntDir>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\bin\obj\$(Configuration)\</IntDir>
+    <EnableClangTidyCodeAnalysis>true</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -139,10 +141,44 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="design-patterns.cpp" />
-    <ClCompile Include="src\command.cpp" />
+    <ClCompile Include="src\architectural\mvc.cpp" />
+    <ClCompile Include="src\behavioral\command.cpp" />
+    <ClCompile Include="src\behavioral\observer.cpp" />
+    <ClCompile Include="src\behavioral\state.cpp" />
+    <ClCompile Include="src\behavioral\strategy.cpp" />
+    <ClCompile Include="src\concurrency\mvc.cpp" />
+    <ClCompile Include="src\creational\abstract-factory.cpp" />
+    <ClCompile Include="src\creational\builder.cpp" />
+    <ClCompile Include="src\creational\factory-method.cpp" />
+    <ClCompile Include="src\creational\lazy-initialization.cpp" />
+    <ClCompile Include="src\creational\object-pool.cpp" />
+    <ClCompile Include="src\creational\prototype.cpp" />
+    <ClCompile Include="src\creational\singleton.cpp" />
+    <ClCompile Include="src\structural\adapter.cpp" />
+    <ClCompile Include="src\structural\decorator.cpp" />
+    <ClCompile Include="src\structural\facade.cpp" />
+    <ClCompile Include="src\structural\flyweight.cpp" />
+    <ClCompile Include="src\structural\proxy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\command.hpp" />
+    <ClInclude Include="include\architectural\mvc.hpp" />
+    <ClInclude Include="include\behavioral\command.hpp" />
+    <ClInclude Include="include\behavioral\observer.hpp" />
+    <ClInclude Include="include\behavioral\state.hpp" />
+    <ClInclude Include="include\behavioral\strategy.hpp" />
+    <ClInclude Include="include\concurrency\mvc.hpp" />
+    <ClInclude Include="include\creational\abstract-factory.hpp" />
+    <ClInclude Include="include\creational\builder.hpp" />
+    <ClInclude Include="include\creational\factory-method.hpp" />
+    <ClInclude Include="include\creational\lazy-initialization.hpp" />
+    <ClInclude Include="include\creational\object-pool.hpp" />
+    <ClInclude Include="include\creational\prototype.hpp" />
+    <ClInclude Include="include\creational\singleton.hpp" />
+    <ClInclude Include="include\structural\adapter.hpp" />
+    <ClInclude Include="include\structural\decorator.hpp" />
+    <ClInclude Include="include\structural\facade.hpp" />
+    <ClInclude Include="include\structural\flyweight.hpp" />
+    <ClInclude Include="include\structural\proxy.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

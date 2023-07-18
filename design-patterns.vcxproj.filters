@@ -18,16 +18,156 @@
       <UniqueIdentifier>{e4a3308b-73c2-428e-a086-dcd402127292}</UniqueIdentifier>
       <Extensions>.cpp</Extensions>
     </Filter>
+    <Filter Include="Structural\Headers">
+      <UniqueIdentifier>{8349a49c-4bb0-4900-a3fc-3d7e5bc9df3d}</UniqueIdentifier>
+      <Extensions>.h;.hpp</Extensions>
+    </Filter>
+    <Filter Include="Structural\Source">
+      <UniqueIdentifier>{a8144210-3603-4703-bd6c-4072c4faab6a}</UniqueIdentifier>
+      <Extensions>.cpp</Extensions>
+    </Filter>
+    <Filter Include="Behavioral\Headers">
+      <UniqueIdentifier>{745581bf-306c-4d77-bbda-3b7c519d8ab5}</UniqueIdentifier>
+      <Extensions>.h;.hpp</Extensions>
+    </Filter>
+    <Filter Include="Behavioral\Source">
+      <UniqueIdentifier>{39a074e4-d244-41ba-b198-ad435c6d118d}</UniqueIdentifier>
+      <Extensions>.cpp</Extensions>
+    </Filter>
+    <Filter Include="Architectural">
+      <UniqueIdentifier>{31ac2d1e-f5bb-4fea-913e-6485b1ef0d1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Concurrency">
+      <UniqueIdentifier>{c11a77e9-6546-4d2d-8908-bebdb255db92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Architectural\Headers">
+      <UniqueIdentifier>{f3a245c0-19e0-4539-9718-d45c7b044a1b}</UniqueIdentifier>
+      <Extensions>.hpp;.h</Extensions>
+    </Filter>
+    <Filter Include="Architectural\Source">
+      <UniqueIdentifier>{9d22ac90-35d4-445f-b096-cc96db9ed50e}</UniqueIdentifier>
+      <Extensions>.cpp</Extensions>
+    </Filter>
+    <Filter Include="Concurrency\Headers">
+      <UniqueIdentifier>{b187e404-79de-44bb-8b74-1ce761ecdceb}</UniqueIdentifier>
+      <Extensions>.hpp;.h</Extensions>
+    </Filter>
+    <Filter Include="Concurrency\Source">
+      <UniqueIdentifier>{485d31f6-6c24-493d-9bdc-3a6b694312a8}</UniqueIdentifier>
+      <Extensions>.cpp</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="design-patterns.cpp" />
-    <ClCompile Include="src\command.cpp">
+    <ClCompile Include="src\behavioral\command.cpp">
+      <Filter>Behavioral\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\architectural\mvc.cpp">
+      <Filter>Architectural\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\concurrency\mvc.cpp">
+      <Filter>Concurrency\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structural\adapter.cpp">
+      <Filter>Structural\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structural\decorator.cpp">
+      <Filter>Structural\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structural\facade.cpp">
+      <Filter>Structural\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structural\flyweight.cpp">
+      <Filter>Structural\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structural\proxy.cpp">
+      <Filter>Structural\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\abstract-factory.cpp">
       <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\builder.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\factory-method.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\lazy-initialization.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\object-pool.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\prototype.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creational\singleton.cpp">
+      <Filter>Creational\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\behavioral\observer.cpp">
+      <Filter>Behavioral\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\behavioral\state.cpp">
+      <Filter>Behavioral\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\behavioral\strategy.cpp">
+      <Filter>Behavioral\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\command.hpp">
+    <ClInclude Include="include\behavioral\command.hpp">
+      <Filter>Behavioral\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\architectural\mvc.hpp">
+      <Filter>Architectural\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\concurrency\mvc.hpp">
+      <Filter>Concurrency\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structural\adapter.hpp">
+      <Filter>Structural\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structural\decorator.hpp">
+      <Filter>Structural\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structural\facade.hpp">
+      <Filter>Structural\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structural\flyweight.hpp">
+      <Filter>Structural\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\structural\proxy.hpp">
+      <Filter>Structural\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\abstract-factory.hpp">
       <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\builder.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\factory-method.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\lazy-initialization.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\object-pool.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\prototype.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\creational\singleton.hpp">
+      <Filter>Creational\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\behavioral\observer.hpp">
+      <Filter>Behavioral\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\behavioral\state.hpp">
+      <Filter>Behavioral\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\behavioral\strategy.hpp">
+      <Filter>Behavioral\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
