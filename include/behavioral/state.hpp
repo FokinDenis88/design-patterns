@@ -1,12 +1,12 @@
-#ifndef COMMAND_HPP
-#define COMMAND_HPP
+#ifndef STATE_HPP
+#define STATE_HPP
 
 #include <memory>
 
 /** Software Design Patterns */
 namespace pattern {
 	namespace behavioral {
-		namespace state {
+		namespace observer_state_ {
 
 			class IState {
 			public:
@@ -39,16 +39,16 @@ namespace pattern {
 			class Client {
 			public:
 				void Request() {
-					state_->Handle();
+					observer_state_->Handle();
 				};
 			private:
-				std::unique_ptr<IState> state_{};
+				std::unique_ptr<IState> observer_state_{};
 			};
 
 			void Run();
 
-		} // !namespace state
+		} // !namespace observer_state_
 	} // !namespace behavioral
 } // !namespace pattern
 
-#endif // !COMMAND_HPP
+#endif // !STATE_HPP

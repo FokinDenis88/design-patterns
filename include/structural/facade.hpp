@@ -1,64 +1,36 @@
-#ifndef COMMAND_HPP
-#define COMMAND_HPP
+#ifndef FACADE_HPP
+#define FACADE_HPP
 
-#include <iostream>
+#include <memory>
+#include <utility>
 
 /** Software Design Patterns */
 namespace pattern {
-	namespace creational {
-		//class Receiver {
-		//public:
-		//	int Add(int a, int b) { return a + b; }
-		//	int Sub(int a, int b) { return a - b; }
-		//};
+	namespace structural {
+		namespace facade {
+			// https://en.wikipedia.org/wiki/Facade_pattern
 
-		//class Client {
-		//public:
-		//	int add_result{};
-		//	int sub_result{};
-		//};
+			class ComplexClass {
+			public:
+				void Action_1() {};
+				void Action_2() {};
+				void Action_3() {};
+				void Action_4() {};
+				void Action_5() {};
+			};
 
-		///** Interface of. Abstract class*/
-		//class ICommand {
-		//public:
-		//	ICommand() = default;
-		//	virtual ~ICommand() = default;
+			class Facade {
+			public:
+				void Action_1_2() {};
+				void Action_3_4() {};
+			};
 
-		//	virtual void execute() = 0;
-		//};
+			inline void Run() {
 
-		//struct CommandSampleParams{
-		//	int a{};
-		//	int b{};
-		//};
+			};
 
-		//class CommandConcrete : public ICommand {
-		//public:
-		//	CommandConcrete(Receiver* const reciever_p, const CommandSampleParams& params_p, Client* const client_p)
-		//		: receiver{ reciever_p },
-		//		params{ params_p },
-		//		action{ &Receiver::Add },
-		//		client{ client_p } {
-		//	};
+		} // !namespace facade
+	} // !namespace creational
+} // !namespace pattern
 
-		//	void execute() override {
-		//		client->add_result = (receiver->*action)(params.a, params.b);
-		//	};
-
-		//private:
-		//	Receiver* receiver{};
-		//	CommandSampleParams params{};
-		//	int (Receiver::* action)(int, int){};
-		//	Client* client{};
-		//};
-
-		//class Invoker {
-		//public:
-		//	ICommand* command_ptr{};
-		//};
-
-		//void Command();
-	}
-}
-
-#endif // !COMMAND_HPP
+#endif // !FACADE_HPP

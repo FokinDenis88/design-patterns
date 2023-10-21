@@ -1,64 +1,35 @@
-#ifndef COMMAND_HPP
-#define COMMAND_HPP
+#ifndef LAZY_INITIALIZATION_HPP
+#define LAZY_INITIALIZATION_HPP
 
-#include <iostream>
+#include <memory>
 
 /** Software Design Patterns */
 namespace pattern {
 	namespace creational {
-		//class Receiver {
-		//public:
-		//	int Add(int a, int b) { return a + b; }
-		//	int Sub(int a, int b) { return a - b; }
-		//};
+		namespace lazy_initialization {
+			class LazyObject {
+			public:
+				int a() {
+					if (!a_) {
+						a_ = std::make_unique<int>();
+					}
+					return *a_;
+				};
+				void set_a(int a_p) {
+					if (!a_) {
+						a_ = std::make_unique<int>();
+					}
+					*a_ = a_p;
+				};
 
-		//class Client {
-		//public:
-		//	int add_result{};
-		//	int sub_result{};
-		//};
+			private:
+				std::unique_ptr<int> a_{};
+			};
 
-		///** Interface of. Abstract class*/
-		//class ICommand {
-		//public:
-		//	ICommand() = default;
-		//	virtual ~ICommand() = default;
+			inline void Run() {};
 
-		//	virtual void execute() = 0;
-		//};
+		} // !namespace lazy_initialization
+	} // !namespace creational
+} // !namespace pattern
 
-		//struct CommandSampleParams{
-		//	int a{};
-		//	int b{};
-		//};
-
-		//class CommandConcrete : public ICommand {
-		//public:
-		//	CommandConcrete(Receiver* const reciever_p, const CommandSampleParams& params_p, Client* const client_p)
-		//		: receiver{ reciever_p },
-		//		params{ params_p },
-		//		action{ &Receiver::Add },
-		//		client{ client_p } {
-		//	};
-
-		//	void execute() override {
-		//		client->add_result = (receiver->*action)(params.a, params.b);
-		//	};
-
-		//private:
-		//	Receiver* receiver{};
-		//	CommandSampleParams params{};
-		//	int (Receiver::* action)(int, int){};
-		//	Client* client{};
-		//};
-
-		//class Invoker {
-		//public:
-		//	ICommand* command_ptr{};
-		//};
-
-		//void Command();
-	}
-}
-
-#endif // !COMMAND_HPP
+#endif // !LAZY_INITIALIZATION_HPP

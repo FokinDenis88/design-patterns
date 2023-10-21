@@ -15,10 +15,11 @@ namespace pattern {
 				/** Get the only one instance of class */
 				static Singleton& Get() {
 					static Singleton instance{};
-					if (instance.data) {
+					if (!instance.data) {
 						instance.data = std::make_unique<DataType>();
 					}
-					return instance;
+					// int i = i + 1;
+					return (instance);
 				}
 
 				/** Data to be stored in singleton */
@@ -29,15 +30,15 @@ namespace pattern {
 				Singleton() = default;
 				Singleton(const Singleton&) = delete;
 				Singleton& operator=(const Singleton&) = delete;
-				~Singleton() = default;
+				//~Singleton() = default;
 			};
 
 
 
 			template<typename SingletonType>
-			SingletonType SingletonFunction() {
-				static const SingletonType singleton{};
-				return singleton;
+			SingletonType& SingletonFunction() {
+				static SingletonType singleton{};
+				return (singleton);
 			}
 
 
@@ -62,6 +63,7 @@ namespace pattern {
 			public:
 				Singleton_2(const Singleton_2&) = delete;
 				Singleton_2& operator=(const Singleton_2&) = delete;
+
 				~Singleton_2() {
 					instance_.reset();
 				};
@@ -71,7 +73,7 @@ namespace pattern {
 					if (!instance_) {
 						instance_ = std::make_unique<Singleton_2>();
 					}
-					return instance_->get();
+					return (instance_->get());
 				}
 
 				/** Data to be stored in singleton */

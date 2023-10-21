@@ -7,6 +7,9 @@
 namespace pattern {
 	namespace creational {
 		namespace abstract_factory {
+			// https://en.wikipedia.org/wiki/Abstract_factory_pattern
+			// Patterns Friends: Factory Method (CreateFunctions), Prototype (CreateFunctions), Singleton (Factory Instance)
+
 			class IProduct {
 			public:
 				virtual ~IProduct() = default;
@@ -54,7 +57,8 @@ namespace pattern {
 			};
 
 
-			void Run();
+			inline void Run() {
+			};
 
 		} // !namespace abstract_factory
 	} // !namespace creational

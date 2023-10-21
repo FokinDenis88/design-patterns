@@ -12,28 +12,33 @@ namespace pattern {
 			public:
 				virtual ~IPrototype() = default;
 
-				virtual std::unique_ptr<IPrototype> Clone() = 0;
+				virtual std::unique_ptr<IPrototype> Clone() const noexcept = 0;
 			};
 
 			class PrototypeA : public IPrototype {
 			public:
 				PrototypeA() = default;
-				explicit PrototypeA(int state_p) : state{ state_p } {
+				explicit PrototypeA(int state_p) noexcept : observer_state_{ state_p } {
 				};
 
-				inline std::unique_ptr<IPrototype> Clone() override {
-					return std::make_unique<PrototypeA>(PrototypeA(state));
+				inline std::unique_ptr<IPrototype> Clone() const noexcept override {
+					return std::make_unique<PrototypeA>(observer_state_);
 				};
+
 			private:
-				int state{};
+				int observer_state_{};
 			};
 
 			class Client {
 			public:
-				std::unique_ptr<IPrototype> creator{};
+				std::unique_ptr<IPrototype> creator_{};
 			};
 
-			void Run();
+			inline void Run() {
+				Client client{};
+				client.creator_ = std::make_unique<PrototypeA>();
+				client.creator_->Clone();
+			};
 		} // !namespace prototype
 	} // !namespace creational
 } // !namespace pattern

@@ -1,5 +1,5 @@
-#ifndef COMMAND_HPP
-#define COMMAND_HPP
+#ifndef MVC_2_HPP
+#define MVC_2_HPP
 
 #include <iostream>
 
@@ -32,33 +32,33 @@ namespace pattern {
 			int b{};
 		};
 
-		class CommandConcrete : public ICommand {
+		class Command : public ICommand {
 		public:
-			CommandConcrete(Receiver* const reciever_p, const CommandSampleParams& params_p, Client* const client_p)
-				: receiver{ reciever_p },
-				params{ params_p },
-				action{ &Receiver::Add },
+			Command(Receiver* const reciever_p, const CommandSampleParams& params_p, Client* const client_p)
+				: receiver_{ reciever_p },
+				params_{ params_p },
+				action_{ &Receiver::Add },
 				client{ client_p } {
 			};
 
 			void execute() override {
-				client->add_result = (receiver->*action)(params.a, params.b);
+				client->add_result = (receiver_->*action_)(params_.a, params_.b);
 			};
 
 		private:
-			Receiver* receiver{};
-			CommandSampleParams params{};
-			int (Receiver::* action)(int, int){};
+			Receiver* receiver_{};
+			CommandSampleParams params_{};
+			int (Receiver::* action_)(int, int){};
 			Client* client{};
 		};
 
 		class Invoker {
 		public:
-			ICommand* command_ptr{};
+			ICommand* command_{};
 		};
 
 		void Command();
 	}
 }
 
-#endif // !COMMAND_HPP
+#endif // !MVC_2_HPP
