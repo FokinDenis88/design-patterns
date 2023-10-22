@@ -26,7 +26,9 @@ set(TARGET_NAME ${PROJECT_NAME})
 #=================================================================================
 
 
-set(INCLUDES include)
+set(INCLUDES
+	include
+	external/cpp-general/include)
 
 # Project Source Files Structure:
 # Architectural

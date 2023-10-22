@@ -9,66 +9,68 @@ Software Design Patterns
 * mvc - **Not realized**.
 
 **Behavioral:**
-* chain-of-responsibility
-* command
-* interpreter
-* iterator
-* mediator
-* memento
-* null-object
-* observer
-* state
-* strategy
-* template-method
-* visitor
+* Chain-of-Responsibility
+* Command
+* Interpreter
+* Iterator
+* Mediator
+* Memento
+* Null-Object
+* Observer
+* State
+* Strategy
+* Template-Method
+* Visitor
 
 **Concurrency:**
-**Not realized**
+* **Not realized**
 
 **Cpp-Idioms:**
 * d-pointer
-* opaque-pointer
+* Opaque-Pointer
 * pimpl
 
 **Creational:**
-* abstract-factory
-* builder
-* dependency-injection
-* factory-method
-* lazy-initialization
-* object-pool
-* prototype
-* singleton
+* Abstract-Factory
+* Builder
+* Dependency-Injection
+* Factory-Method
+* Lazy-Initialization
+* Object-Pool
+* Prototype
+* Singleton
 
 **Database:**
+* **Not realized**
 
 **Distributed-System:**
+* **Not realized**
 
 **GameDev:**
 * **Nothing is Done in GameDev patterns. Only empty class stubs.**
-* bytecode
-* component
-* data-locality
-* dirty-flag
-* double-buffer
-* event-queue
-* game-loop
-* service-locator
-* spatial-partition
-* subclass-sandbox
-* type-object
-* update-method)
+* Bytecode
+* Component
+* Data-Locality
+* Dirty-Flag
+* Double-Buffer
+* Event-Queue
+* Game-Loop
+* Service-Locator
+* Spatial-Partition
+* Subclass-Sandbox
+* Type-Object
+* Update-Method
 
 **Structural:**
-* adapter
-* bridge
-* composite
-* decorator
-* delegation
-* facade
-* flyweight
-* marker
-* proxy)
+* Adapter
+* Bridge
+* Composite
+* Decorator
+* Delegation
+* Facade
+* Flyweight
+* Marker
+* Proxy
 
 **UI:**
 * **Not realized**.

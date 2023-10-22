@@ -9,6 +9,8 @@
 #include <utility>
 #include <concepts>
 
+#include "tuple.hpp"
+
 
 /** Software Design Patterns */
 namespace pattern {
@@ -230,7 +232,7 @@ namespace pattern {
 				inline void Execute_11() {
 					if (!receiver_.expired()) {
 						std::function<STDFunctionType> action_fn = std::bind_front(action_, receiver_.lock().get());
-						ApplyTuple(action_fn, action_args_);
+						cpp::ApplyTuple(action_fn, action_args_);
 					}
 				};
 
