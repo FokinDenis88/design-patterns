@@ -65,11 +65,8 @@ namespace pattern {
 			class HandlerConcrete2 final : public HandlerAbstract {
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace chain_of_responsibility
+
 	} // !namespace behavioral
 } // !namespace pattern
 

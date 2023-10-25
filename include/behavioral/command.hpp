@@ -8,6 +8,7 @@
 #include <memory>
 #include <utility>
 #include <concepts>
+#include <functional>
 
 #include "tuple.hpp"
 
@@ -158,7 +159,7 @@ namespace pattern {
 				}
 
 				std::function<ActionType> action_with_args_{};
-			};
+			};	// !class CommandSTDFunction
 
 
 			/**
@@ -248,7 +249,7 @@ namespace pattern {
 				std::weak_ptr<ReceiverType> receiver_{};
 				ActionType action_{};
 				ArgsTupleTypes action_args_{};
-			};
+			};	// !class Command
 
 
 
@@ -315,12 +316,12 @@ namespace pattern {
 				std::shared_ptr<ICommand> command_{};
 
 				std::unique_ptr<Invoker> invoker_{};
-			};
+			};	// !class Client
 
 
 			/** Execute sequence of commands. May be Composite pattern. */
 			template<typename CommandType>
-			requires std::derived_from<CommandType, ICommand>
+			//requires std::derived_from<CommandType, ICommand>
 			class MacroCommand : public ICommand {
 			public:
 				void Execute() override {
@@ -334,48 +335,6 @@ namespace pattern {
 			private:
 				std::list<std::unique_ptr<ICommand>> commands_{};
 			};
-
-
-			/** Main function of pattern module */
-			inline void Run() {
-// CommandFunction==============================================
-				//TestClass<decltype(Receiver::Add)> test{};
-				//int a = 66 - 44;
-
-				std::shared_ptr<Receiver> receiver{ std::make_shared<Receiver>() };
-				//std::function<CommandSTDFunction::ActionType> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
-				auto command{ std::make_shared<CommandSTDFunction>(&Receiver::Add, *receiver, 40, 50) };
-				std::unique_ptr<Invoker> invoker{ std::make_unique<Invoker>() };
-
-
-				/*Client client{};
-				client.set_receiver(receiver);
-				client.set_command(command);
-				client.set_invoker(std::move(invoker));*/
-
-				//std::cout << "Add_result: " << client.InvokeCommand() << '\n';
-
-
-// Command======================================================
-				Receiver receiver_test{};
-				//auto fn{ &Receiver::Add };
-				//int (Receiver::*fn)(int, int){ &Receiver::Add };
-				//(receiver_test.*fn)(20, 30);
-				//auto res_2{ *fn(&receiver_test, 20, 50) };
-				//auto res_2{ receiver_test.*fn(20, 30) };
-				std::shared_ptr<Receiver> receiver_2{ std::make_shared<Receiver>() };
-				//std::function<CommandFunction::ActionType> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
-				using CommandType = Command<Receiver, int, int, int>;
-				auto command_2{ std::make_shared<CommandType>(receiver_2, &Receiver::Add, 40, 50) };
-				command_2->Execute();
-				std::unique_ptr<Invoker> invoker_2{ std::make_unique<Invoker>() };
-
-
-				/*Client client{};
-				client.set_receiver(receiver);
-				client.set_command(command);
-				client.set_invoker(std::move(invoker));*/
-			}
 
 		} // !namespace command
 

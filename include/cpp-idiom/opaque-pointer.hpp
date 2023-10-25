@@ -22,6 +22,7 @@ namespace pattern {
 			};
 
 		} // !namespace opaque_pointer
+
 	} // !namespace cpp_idiom
 } // !namespace pattern
 

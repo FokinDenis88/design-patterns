@@ -3,6 +3,8 @@ Software Design Patterns
 
 ## Installation
 1) git clone --branch develop --recurse-submodules https://gitlab.com/FokinDenis88/design-patterns.git
+2) (From the working dir = design-patterns)  cmake -B build/visual-studio
+ 
 
 ## Realized Design Patterns
 **Architectural:**

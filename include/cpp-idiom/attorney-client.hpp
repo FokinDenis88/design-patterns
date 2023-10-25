@@ -1,5 +1,5 @@
-#ifndef PIMPL_HPP
-#define PIMPL_HPP
+#ifndef ATTORNEY_CLIENT_HPP
+#define ATTORNEY_CLIENT_HPP
 
 #include <memory>
 #include <utility>
@@ -7,7 +7,7 @@
 /** C++ Idioms */
 namespace pattern {
 	namespace cpp_idiom {
-		namespace pimpl {
+		namespace attorney_client {
 			// https://en.cppreference.com/w/cpp/language/pimpl
 
 			class Widget {
@@ -26,8 +26,9 @@ namespace pattern {
 				std::unique_ptr<Impl> pImpl_;
 			};
 
-		} // !namespace pimpl
+		} // !namespace attorney_client
+
 	} // !namespace cpp_idiom
 } // !namespace pattern
 
-#endif // !PIMPL_HPP
+#endif // !ATTORNEY_CLIENT_HPP

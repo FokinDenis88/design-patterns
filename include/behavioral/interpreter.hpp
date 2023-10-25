@@ -79,11 +79,8 @@ namespace pattern {
 				std::forward_list<std::unique_ptr<AbstractExpression>> child_expressions_{};
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace interpreter
+
 	} // !namespace behavioral
 } // !namespace pattern
 

@@ -1,5 +1,5 @@
-#ifndef PIMPL_HPP
-#define PIMPL_HPP
+#ifndef NON_VIRTUAL_INTERFACE_HPP
+#define NON_VIRTUAL_INTERFACE_HPP
 
 #include <memory>
 #include <utility>
@@ -7,7 +7,7 @@
 /** C++ Idioms */
 namespace pattern {
 	namespace cpp_idiom {
-		namespace pimpl {
+		namespace non_virtual_interface {
 			// https://en.cppreference.com/w/cpp/language/pimpl
 
 			class Widget {
@@ -26,8 +26,9 @@ namespace pattern {
 				std::unique_ptr<Impl> pImpl_;
 			};
 
-		} // !namespace pimpl
+		} // !namespace non_virtual_interface
+
 	} // !namespace cpp_idiom
 } // !namespace pattern
 
-#endif // !PIMPL_HPP
+#endif // !NON_VIRTUAL_INTERFACE_HPP

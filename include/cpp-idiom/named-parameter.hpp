@@ -1,5 +1,5 @@
-#ifndef PIMPL_HPP
-#define PIMPL_HPP
+#ifndef NAMED_PARAMETER_HPP
+#define NAMED_PARAMETER_HPP
 
 #include <memory>
 #include <utility>
@@ -7,7 +7,7 @@
 /** C++ Idioms */
 namespace pattern {
 	namespace cpp_idiom {
-		namespace pimpl {
+		namespace named_parameter{
 			// https://en.cppreference.com/w/cpp/language/pimpl
 
 			class Widget {
@@ -26,8 +26,9 @@ namespace pattern {
 				std::unique_ptr<Impl> pImpl_;
 			};
 
-		} // !namespace pimpl
+		} // !namespace named_parameter
+
 	} // !namespace cpp_idiom
 } // !namespace pattern
 
-#endif // !PIMPL_HPP
+#endif // !NAMED_PARAMETER_HPP

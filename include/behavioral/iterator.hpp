@@ -54,9 +54,8 @@ namespace pattern {
 				int index_{};
 			};
 
-			void Run();
-
 		} // !namespace iterator
+
 	} // !namespace behavioral
 } // !namespace pattern
 

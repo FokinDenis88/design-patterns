@@ -12,23 +12,28 @@ set(TARGET_NAME ${PROJECT_NAME})
 #============================Google Test========================================
 # http://google.github.io/googletest/quickstart-cmake.html
 # GoogleTest requires at least C++14
-#set(CMAKE_CXX_STANDARD 14)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#include(FetchContent)
-#FetchContent_Declare(
-  #googletest
-  #URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-#)
+include(FetchContent)
+FetchContent_Declare(
+	googletest
+	GIT_REPOSITORY https://github.com/google/googletest.git
+	GIT_TAG        origin/main		# Branch name, tag name or tag hash
+)
+
 # For Windows: Prevent overriding the parent project's compiler/linker settings
-#set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-#FetchContent_MakeAvailable(googletest)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+set(GTEST_INCLUDE_DIR ${gtest_SOURCE_DIR}/include)
 #=================================================================================
 
 
-set(INCLUDES
+include_directories(
 	include
-	external/cpp-general/include)
+	external/cpp-general/include
+	${GTEST_INCLUDE_DIR}
+)
 
 # Project Source Files Structure:
 # Architectural
@@ -67,14 +72,19 @@ set(HEADERS_FILTER_CONCURRENCY)
 set(SOURCES_FILTER_CONCURRENCY)
 
 set(HEADERS_FILTER_CPP-IDIOMS
+	include/cpp-idiom/attorney-client.hpp
+	include/cpp-idiom/copy-n-swap.hpp
+	include/cpp-idiom/crtp.hpp
 	include/cpp-idiom/d-pointer.hpp
+	include/cpp-idiom/named-parameter.hpp
+	include/cpp-idiom/non-virtual-interface.hpp
 	include/cpp-idiom/opaque-pointer.hpp
 	include/cpp-idiom/pimpl.hpp
-	include/cpp-idiom/pimpl-example.hpp)
+	include/cpp-idiom/pimpl-macros.hpp)
 set(SOURCES_FILTER_CPP-IDIOMS
 	src/cpp-idiom/d-pointer.cpp
 	src/cpp-idiom/opaque-pointer.cpp
-	src/cpp-idiom/pimpl-example.cpp)
+	src/cpp-idiom/pimpl.cpp)
 
 set(HEADERS_FILTER_CREATIONAL
 	include/creational/abstract-factory.hpp
@@ -131,6 +141,9 @@ set(HEADERS_FILTER_UI)
 set(SOURCES_FILTER_UI)
 
 
+set(SOURCES_FILTER_TESTS
+	test/general/general-test.cpp)
+
 set(SOURCES
 	design-patterns.cpp
 	${SOURCES_FILTER_ARCHITECTURAL}
@@ -158,7 +171,7 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_UI})
 set(DOC_FILTER
     #doc/to-do.txt
-	)
+)
 
 
 #find_package(OpenMP REQUIRED)
@@ -202,6 +215,7 @@ source_group("Distributed-System/Source" FILES ${SOURCES_FILTER_DISTRIBUTED-SYST
 source_group("GameDev/Source" FILES ${SOURCES_FILTER_GAMEDEV})
 source_group("Structural/Source" FILES ${SOURCES_FILTER_STRUCTURAL})
 source_group("UI/Source" FILES ${SOURCES_FILTER_UI})
+source_group("Tests" FILES ${SOURCES_FILTER_TESTS})
 
 
 SET(ECLIPSE_GCC_STATIC_ANALYSIS -g -pedantic -Wall -Wextra -Wconversion -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Weffc++ -Wfloat-equal -c -fmessage-length=0)
@@ -219,6 +233,24 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET ${TARGET_NAME} PROPERTY C_STANDARD 17)
 endif()
 set_property(TARGET ${TARGET_NAME} PROPERTY SUBSYSTEM CONSOLE)
+
+
+#============================Google Test========================================
+# Enable Google Tests
+set(TEST_TARGET_NAME general-test)
+enable_testing()
+
+add_executable(
+  ${TEST_TARGET_NAME}
+  ${SOURCES_FILTER_TESTS})
+
+target_link_libraries(
+  ${TEST_TARGET_NAME}
+  GTest::gtest_main)
+
+include(GoogleTest)
+gtest_discover_tests(${TEST_TARGET_NAME})
+#================================================================================
 
 
 

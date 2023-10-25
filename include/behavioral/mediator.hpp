@@ -54,9 +54,8 @@ namespace pattern {
 				void Action1() {};
 			};
 
-			void Run();
-
 		} // !namespace mediator
+
 	} // !namespace behavioral
 } // !namespace pattern
 

@@ -1,4 +1,4 @@
-#include "cpp-idiom/pimpl-example.hpp"
+#include "cpp-idiom/pimpl.hpp"
 
 namespace pattern {
 	namespace cpp_idiom {
