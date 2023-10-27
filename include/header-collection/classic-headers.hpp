@@ -1,6 +1,10 @@
 #ifndef CLASSIC_HEADERS_HPP
 #define CLASSIC_HEADERS_HPP
 
+// https://en.wikipedia.org/wiki/Software_design_pattern
+// https://sourcemaking.com/design_patterns
+
+
 // Creational
 #include "creational/factory-method.hpp"
 #include "creational/abstract-factory.hpp"

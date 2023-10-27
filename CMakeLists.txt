@@ -29,13 +29,9 @@ set(GTEST_INCLUDE_DIR ${gtest_SOURCE_DIR}/include)
 #=================================================================================
 
 
-include_directories(
-	include
-	external/cpp-general/include
-	${GTEST_INCLUDE_DIR}
-)
-
 # Project Source Files Structure:
+# AI
+# Anti-Pattern
 # Architectural
 # Behavioral
 # Concurrency
@@ -48,53 +44,62 @@ include_directories(
 # Structural
 # UI
 
+set(HEADERS_FILTER_AI)
+set(SOURCES_FILTER_AI)
+
+set(HEADERS_FILTER_ANTI_PATTERN)
+set(SOURCES_FILTER_ANTI_PATTERN)
+
 set(HEADERS_FILTER_ARCHITECTURAL
 	include/architectural/mvc.hpp)
 set(SOURCES_FILTER_ARCHITECTURAL)
 
+set(INCLUDE_BEHAVIORAL include/behavioral/)
 set(HEADERS_FILTER_BEHAVIORAL
-	include/behavioral/chain-of-responsibility.hpp
-	include/behavioral/command.hpp
-	include/behavioral/interpreter.hpp
-	include/behavioral/iterator.hpp
-	include/behavioral/mediator.hpp
-	include/behavioral/memento.hpp
-	include/behavioral/null-object.hpp
-	include/behavioral/observer.hpp
-	include/behavioral/state.hpp
-	include/behavioral/strategy.hpp
-	include/behavioral/template-method.hpp
-	include/behavioral/visitor.hpp)
+	${INCLUDE_BEHAVIORAL}chain-of-responsibility.hpp
+	${INCLUDE_BEHAVIORAL}command.hpp
+	${INCLUDE_BEHAVIORAL}interpreter.hpp
+	${INCLUDE_BEHAVIORAL}iterator.hpp
+	${INCLUDE_BEHAVIORAL}mediator.hpp
+	${INCLUDE_BEHAVIORAL}memento.hpp
+	${INCLUDE_BEHAVIORAL}null-object.hpp
+	${INCLUDE_BEHAVIORAL}observer.hpp
+	${INCLUDE_BEHAVIORAL}state.hpp
+	${INCLUDE_BEHAVIORAL}strategy.hpp
+	${INCLUDE_BEHAVIORAL}template-method.hpp
+	${INCLUDE_BEHAVIORAL}visitor.hpp)
 set(SOURCES_FILTER_BEHAVIORAL
 	src/behavioral/observer.cpp)
 
 set(HEADERS_FILTER_CONCURRENCY)
 set(SOURCES_FILTER_CONCURRENCY)
 
+set(INCLUDE_CPP_IDIOM include/cpp-idiom/)
 set(HEADERS_FILTER_CPP-IDIOMS
-	include/cpp-idiom/attorney-client.hpp
-	include/cpp-idiom/copy-n-swap.hpp
-	include/cpp-idiom/crtp.hpp
-	include/cpp-idiom/d-pointer.hpp
-	include/cpp-idiom/named-parameter.hpp
-	include/cpp-idiom/non-virtual-interface.hpp
-	include/cpp-idiom/opaque-pointer.hpp
-	include/cpp-idiom/pimpl.hpp
-	include/cpp-idiom/pimpl-macros.hpp)
+	${INCLUDE_CPP_IDIOM}attorney-client.hpp
+	${INCLUDE_CPP_IDIOM}copy-n-swap.hpp
+	${INCLUDE_CPP_IDIOM}crtp.hpp
+	${INCLUDE_CPP_IDIOM}d-pointer.hpp
+	${INCLUDE_CPP_IDIOM}named-parameter.hpp
+	${INCLUDE_CPP_IDIOM}non-virtual-interface.hpp
+	${INCLUDE_CPP_IDIOM}opaque-pointer.hpp
+	${INCLUDE_CPP_IDIOM}pimpl.hpp
+	${INCLUDE_CPP_IDIOM}pimpl-macros.hpp)
 set(SOURCES_FILTER_CPP-IDIOMS
 	src/cpp-idiom/d-pointer.cpp
 	src/cpp-idiom/opaque-pointer.cpp
 	src/cpp-idiom/pimpl.cpp)
 
+set(INCLUDE_CREATIONAL include/creational/)
 set(HEADERS_FILTER_CREATIONAL
-	include/creational/abstract-factory.hpp
-	include/creational/builder.hpp
-	include/creational/dependency-injection.hpp
-	include/creational/factory-method.hpp
-	include/creational/lazy-initialization.hpp
-	include/creational/object-pool.hpp
-	include/creational/prototype.hpp
-	include/creational/singleton.hpp)
+	${INCLUDE_CREATIONAL}abstract-factory.hpp
+	${INCLUDE_CREATIONAL}builder.hpp
+	${INCLUDE_CREATIONAL}dependency-injection.hpp
+	${INCLUDE_CREATIONAL}factory-method.hpp
+	${INCLUDE_CREATIONAL}lazy-initialization.hpp
+	${INCLUDE_CREATIONAL}object-pool.hpp
+	${INCLUDE_CREATIONAL}prototype.hpp
+	${INCLUDE_CREATIONAL}singleton.hpp)
 set(SOURCES_FILTER_CREATIONAL)
 
 set(HEADERS_FILTER_DATABASE)
@@ -103,46 +108,58 @@ set(SOURCES_FILTER_DATABASE)
 set(HEADERS_FILTER_DISTRIBUTED-SYSTEM)
 set(SOURCES_FILTER_DISTRIBUTED-SYSTEM)
 
+set(INCLUDE_GAMEDEV include/gamedev/)
 set(HEADERS_FILTER_GAMEDEV
-	include/gamedev/bytecode.hpp
-	include/gamedev/component.hpp
-	include/gamedev/data-locality.hpp
-	include/gamedev/dirty-flag.hpp
-	include/gamedev/double-buffer.hpp
-	include/gamedev/event-queue.hpp
-	include/gamedev/game-loop.hpp
-	include/gamedev/service-locator.hpp
-	include/gamedev/spatial-partition.hpp
-	include/gamedev/subclass-sandbox.hpp
-	include/gamedev/type-object.hpp
-	include/gamedev/update-method.hpp)
+	${INCLUDE_GAMEDEV}bytecode.hpp
+	${INCLUDE_GAMEDEV}component.hpp
+	${INCLUDE_GAMEDEV}data-locality.hpp
+	${INCLUDE_GAMEDEV}dirty-flag.hpp
+	${INCLUDE_GAMEDEV}double-buffer.hpp
+	${INCLUDE_GAMEDEV}event-queue.hpp
+	${INCLUDE_GAMEDEV}game-loop.hpp
+	${INCLUDE_GAMEDEV}service-locator.hpp
+	${INCLUDE_GAMEDEV}spatial-partition.hpp
+	${INCLUDE_GAMEDEV}subclass-sandbox.hpp
+	${INCLUDE_GAMEDEV}type-object.hpp
+	${INCLUDE_GAMEDEV}update-method.hpp)
 set(SOURCES_FILTER_GAMEDEV)
 
-set(HEADERS_FILTER_INCLUDE
-	include/headers/all-headers.hpp
-	include/headers/architectural-headers.hpp
-	include/headers/classic-headers.hpp
-	include/headers/cpp-idioms-headers.hpp
-	include/headers/gamedev-headers.hpp)
-
+set(INCLUDE_STRUCTURAL include/structural/)
 set(HEADERS_FILTER_STRUCTURAL
-	include/structural/adapter.hpp
-	include/structural/bridge.hpp
-	include/structural/composite.hpp
-	include/structural/decorator.hpp
-	include/structural/delegation.hpp
-	include/structural/facade.hpp
-	include/structural/flyweight.hpp
-	include/structural/marker.hpp
-	include/structural/proxy.hpp)
+	${INCLUDE_STRUCTURAL}adapter.hpp
+	${INCLUDE_STRUCTURAL}bridge.hpp
+	${INCLUDE_STRUCTURAL}composite.hpp
+	${INCLUDE_STRUCTURAL}decorator.hpp
+	${INCLUDE_STRUCTURAL}delegation.hpp
+	${INCLUDE_STRUCTURAL}facade.hpp
+	${INCLUDE_STRUCTURAL}flyweight.hpp
+	${INCLUDE_STRUCTURAL}marker.hpp
+	${INCLUDE_STRUCTURAL}proxy.hpp)
 set(SOURCES_FILTER_STRUCTURAL)
 
 set(HEADERS_FILTER_UI)
 set(SOURCES_FILTER_UI)
 
 
-set(SOURCES
+set(INCLUDE_HEADER_COLLECTION include/header-collection/)
+set(HEADERS_FILTER_HEADER_COLLECTION
+	${INCLUDE_HEADER_COLLECTION}ai-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}all-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}anti-pattern-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}architectural-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}classic-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}concurrency-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}cpp-idioms-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}database-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}distributed-system-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}gamedev-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}ui-headers.hpp
+)
+
+set(ALL_SOURCES
 	design-patterns.cpp
+	${SOURCES_FILTER_AI}
+	${SOURCES_FILTER_ANTI_PATTERN}
 	${SOURCES_FILTER_ARCHITECTURAL}
 	${SOURCES_FILTER_BEHAVIORAL}
 	${SOURCES_FILTER_CONCURRENCY}
@@ -155,6 +172,8 @@ set(SOURCES
 	${SOURCES_FILTER_UI})
 
 set(ALL_HEADERS_FILTER
+	${HEADERS_FILTER_AI}
+	${HEADERS_FILTER_ANTI_PATTERN}
 	${HEADERS_FILTER_ARCHITECTURAL}
     ${HEADERS_FILTER_BEHAVIORAL}
 	${HEADERS_FILTER_CONCURRENCY}
@@ -163,10 +182,12 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_DATABASE}
 	${HEADERS_FILTER_DISTRIBUTED-SYSTEM}
 	${HEADERS_FILTER_GAMEDEV}
-	${HEADERS_FILTER_INCLUDE}
+	${HEADERS_FILTER_HEADER_COLLECTION}
 	${HEADERS_FILTER_STRUCTURAL}
 	${HEADERS_FILTER_UI})
+
 set(DOC_FILTER
+	README.md
     #doc/general/to-do.txt
 	#doc/general/commit.txt
 )
@@ -179,10 +200,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 
 # Add source to this project's executable.
-add_executable(${TARGET_NAME} ${SOURCES} ${ALL_HEADERS_FILTER} ${DOC_FILTER})
+add_executable(${TARGET_NAME} ${ALL_SOURCES} ${ALL_HEADERS_FILTER} ${DOC_FILTER})
 
 # Include Directories
-target_include_directories(${TARGET_NAME} PUBLIC ${INCLUDES})
+set(INCLUDES
+	include
+	external/cpp-general/include
+	${GTEST_INCLUDE_DIR}	# for "gtest/gtest.h"
+)
+#target_include_directories(${TARGET_NAME} PUBLIC ${INCLUDES})
+include_directories(PUBLIC ${INCLUDES})
 #target_link_libraries(${TARGET_NAME} PRIVATE OpenMP::OpenMP_CXX)
 
 #add_custom_command()
@@ -190,30 +217,36 @@ target_include_directories(${TARGET_NAME} PUBLIC ${INCLUDES})
 
 # Filters for Grouping files in project
 # Headers
-source_group("Architectural/Headers" FILES ${HEADERS_FILTER_ARCHITECTURAL})
-source_group("Behavioral/Headers" FILES ${HEADERS_FILTER_BEHAVIORAL})
-source_group("Concurrency/Headers" FILES ${HEADERS_FILTER_CONCURRENCY})
-source_group("Cpp-Idioms/Headers" FILES ${HEADERS_FILTER_CPP-IDIOMS})
-source_group("Creational/Headers" FILES ${HEADERS_FILTER_CREATIONAL})
-source_group("Database/Headers" FILES ${HEADERS_FILTER_DATABASE})
-source_group("Distributed-System/Headers" FILES ${HEADERS_FILTER_DISTRIBUTED-SYSTEM})
-source_group("GameDev/Headers" FILES ${HEADERS_FILTER_GAMEDEV})
-source_group("Include" FILES ${HEADERS_FILTER_INCLUDE})
-source_group("Structural/Headers" FILES ${HEADERS_FILTER_STRUCTURAL})
-source_group("UI/Headers" FILES ${HEADERS_FILTER_UI})
+source_group("AI/Headers"					FILES ${HEADERS_FILTER_AI})
+source_group("Anti-Pattern/Headers"			FILES ${HEADERS_FILTER_ANTI_PATTERN})
+source_group("Architectural/Headers"		FILES ${HEADERS_FILTER_ARCHITECTURAL})
+source_group("Behavioral/Headers"			FILES ${HEADERS_FILTER_BEHAVIORAL})
+source_group("Concurrency/Headers"			FILES ${HEADERS_FILTER_CONCURRENCY})
+source_group("Cpp-Idioms/Headers"			FILES ${HEADERS_FILTER_CPP-IDIOMS})
+source_group("Creational/Headers"			FILES ${HEADERS_FILTER_CREATIONAL})
+source_group("Database/Headers"				FILES ${HEADERS_FILTER_DATABASE})
+source_group("Distributed-System/Headers"	FILES ${HEADERS_FILTER_DISTRIBUTED-SYSTEM})
+source_group("GameDev/Headers"				FILES ${HEADERS_FILTER_GAMEDEV})
+source_group("Header Collection"			FILES ${HEADERS_FILTER_HEADER_COLLECTION})
+source_group("Structural/Headers"			FILES ${HEADERS_FILTER_STRUCTURAL})
+source_group("UI/Headers"					FILES ${HEADERS_FILTER_UI})
 
 # Sources
-source_group("Architectural/Source" FILES ${SOURCES_FILTER_ARCHITECTURAL})
-source_group("Behavioral/Source" FILES ${SOURCES_FILTER_BEHAVIORAL})
-source_group("Concurrency/Source" FILES ${SOURCES_FILTER_CONCURRENCY})
-source_group("Cpp-Idioms/Source" FILES ${SOURCES_FILTER_CPP-IDIOMS})
-source_group("Creational/Source" FILES ${SOURCES_FILTER_CREATIONAL})
-source_group("Database/Source" FILES ${SOURCES_FILTER_DATABASE})
-source_group("Distributed-System/Source" FILES ${SOURCES_FILTER_DISTRIBUTED-SYSTEM})
-source_group("GameDev/Source" FILES ${SOURCES_FILTER_GAMEDEV})
-source_group("Structural/Source" FILES ${SOURCES_FILTER_STRUCTURAL})
-source_group("UI/Source" FILES ${SOURCES_FILTER_UI})
+source_group("AI/Source"					FILES ${SOURCES_FILTER_AI})
+source_group("Anti-Pattern/Source"			FILES ${SOURCES_FILTER_ANTI_PATTERN})
+source_group("Architectural/Source"			FILES ${SOURCES_FILTER_ARCHITECTURAL})
+source_group("Behavioral/Source"			FILES ${SOURCES_FILTER_BEHAVIORAL})
+source_group("Concurrency/Source"			FILES ${SOURCES_FILTER_CONCURRENCY})
+source_group("Cpp-Idioms/Source"			FILES ${SOURCES_FILTER_CPP-IDIOMS})
+source_group("Creational/Source"			FILES ${SOURCES_FILTER_CREATIONAL})
+source_group("Database/Source"				FILES ${SOURCES_FILTER_DATABASE})
+source_group("Distributed-System/Source"	FILES ${SOURCES_FILTER_DISTRIBUTED-SYSTEM})
+source_group("GameDev/Source"				FILES ${SOURCES_FILTER_GAMEDEV})
+source_group("Structural/Source"			FILES ${SOURCES_FILTER_STRUCTURAL})
+source_group("UI/Source"					FILES ${SOURCES_FILTER_UI})
 
+# Other groups
+source_group("Doc" FILES ${DOC_FILTER})
 
 
 SET(ECLIPSE_GCC_STATIC_ANALYSIS -g -pedantic -Wall -Wextra -Wconversion -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Weffc++ -Wfloat-equal -c -fmessage-length=0)

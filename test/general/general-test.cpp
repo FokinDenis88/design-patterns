@@ -2,12 +2,15 @@
 
 #include <functional>
 
-#include "headers/all-headers.hpp"
+#include "header-collection/all-headers.hpp"
 //#include "cpp-idiom/pimpl.cpp"
 
 
 namespace {
 	namespace pattern {
+		namespace ai {} // !namespace ai
+		namespace anti_pattern{} // !namespace anti_pattern
+
 		namespace architectural {
 			namespace mvc {
 

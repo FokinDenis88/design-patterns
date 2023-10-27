@@ -1,4 +1,9 @@
+#ifndef GAMEDEV_HEADERS_HPP
+#define GAMEDEV_HEADERS_HPP
+
+
 // Book: Robert Nistrem. Game Programming Patterns
+// https://gameprogrammingpatterns.com/
 
 /*
 Creational
@@ -40,8 +45,6 @@ Optimization Patterns
 */
 
 
-#ifndef GAMEDEV_HEADERS_HPP
-#define GAMEDEV_HEADERS_HPP
 
 // Sequencing Patterns
 #include "gamedev/double-buffer.hpp"

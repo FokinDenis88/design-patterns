@@ -1,5 +1,5 @@
-# Design Patterns
-Software Design Patterns
+# Software Design Patterns
+
 
 ## Installation
 1) git clone --branch develop --recurse-submodules https://gitlab.com/FokinDenis88/design-patterns.git
@@ -7,6 +7,12 @@ Software Design Patterns
  
 
 ## Realized Design Patterns
+**AI:**
+* **Not realized**
+
+**Anti-Pattern:**
+* **Not realized**
+
 **Architectural:**
 * mvc - **Not realized**.
 
