@@ -75,8 +75,6 @@ namespace pattern {
 				};
 			};
 
-			void Run();
-
 		} // !namespace factory_method
 
 
@@ -319,7 +317,6 @@ namespace pattern {
 					return std::make_unique<ProductType>();
 				};
 			};
-
 
 		} // !namespace factory_method_4
 

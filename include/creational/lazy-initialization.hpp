@@ -26,9 +26,8 @@ namespace pattern {
 				std::unique_ptr<int> a_{};
 			};
 
-			inline void Run() {};
-
 		} // !namespace lazy_initialization
+
 	} // !namespace creational
 } // !namespace pattern
 

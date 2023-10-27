@@ -85,11 +85,8 @@ namespace pattern {
 				std::forward_list<std::unique_ptr<AbstractExpression>> composite_;
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace composite
+
 	} // !namespace structural
 } // !namespace pattern
 

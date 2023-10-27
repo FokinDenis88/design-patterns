@@ -56,11 +56,8 @@ namespace pattern {
 				};
 			};
 
-
-			inline void Run() {
-			};
-
 		} // !namespace abstract_factory
+
 	} // !namespace creational
 } // !namespace pattern
 

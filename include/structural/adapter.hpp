@@ -53,8 +53,8 @@ namespace pattern {
 				};
 			};
 
-			inline void Run() {};
 		} // !namespace adapter
+
 	} // !namespace structural
 } // !namespace pattern
 

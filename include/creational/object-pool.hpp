@@ -126,58 +126,7 @@ namespace pattern {
 
 
 
-			inline void Run() {
-				/*auto pool{ ObjectPool::GetInstance() };
-				auto r{ pool.GetResourceFromPool() };
-				if (auto ptr{ r.lock() }) {
-					dynamic_cast<ObjectPoolResource&>(*ptr).SetValue(77);
-				} else {
-					std::cout << "resource expired\n";
-				}*/
-				//pool.ReturnResourceToPool(std::move(r));
-				int a = 0;
-
-				int* a_origin_ptr{ new int() };
-				//std::unique_ptr<int> a_ptr{ std::make_unique<int>() };
-				//std::unique_ptr<int> a_ptr(a_origin_ptr);
-				std::shared_ptr<int> a_ptr(a_origin_ptr);
-				std::weak_ptr<int> a_weak_ptr(a_ptr);
-
-				//delete a_ptr.get();
-				delete a_origin_ptr;
-
-				bool flag{};
-				if (a_ptr) {
-					flag = true;
-					std::cout << "owned object alive\n";
-				} else {
-					flag = false;
-					std::cout << "owned object dead\n";
-				}
-
-				std::cout << "Weak ptr:\n";
-				if (a_weak_ptr.expired()) {
-					std::cout << "owned object dead\n";
-				} else {
-					std::cout << "owned object alive\n";
-				}
-
-				if (a_origin_ptr == nullptr) {
-					std::cout << "origin ptr is nullptr\n";
-				}
-				else {
-					std::cout << "origin ptr is not nullptr\n";
-				}
-
-				std::shared_ptr<int> test_a{ std::make_shared<int>(66) };
-				std::shared_ptr<int> test_b{ test_a };
-				test_a.reset(new int(10));
-				if (test_b) {
-					std::cout << "test_b ptr is nullptr\n";
-				} else {
-					std::cout << "test_b ptr is not nullptr\n";
-				}
-			};
+			
 
 		} // !namespace pattern
 	} // !namespace creational

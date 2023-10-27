@@ -69,16 +69,6 @@ namespace pattern {
 			};
 
 
-			inline void Run() {
-				FlyweightFabric<int, FlyweightShared, int> flyweight_fabric{};
-				{
-					std::shared_ptr<FlyweightShared> my_flyweight{ flyweight_fabric.GetFlyweight(0) };
-					std::shared_ptr<FlyweightShared> my_flyweight_2{ flyweight_fabric.GetFlyweight(0) };
-					int b = 1 + 66;
-				}
-				int a = 1 + 66;
-			};
-
 			// Deleter for cleaning cache
 			//auto deleter = [this](CachedFlyweightType* cached_flyweight_ptr) {
 			//	auto search_ptr = std::find_if(this->cache_.begin(), this->cache_.end(),
@@ -98,6 +88,7 @@ namespace pattern {
 			//};
 
 		} // !namespace flyweight
+
 	} // !namespace structural
 } // !namespace pattern
 

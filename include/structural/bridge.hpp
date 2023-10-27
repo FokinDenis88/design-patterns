@@ -71,11 +71,8 @@ namespace pattern {
 
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace bridge
+
 	} // !namespace structural
 } // !namespace pattern
 

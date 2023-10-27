@@ -58,11 +58,8 @@ namespace pattern {
 				std::unique_ptr<ISubject> real_subject_;
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace proxy
+
 	} // !namespace creational
 } // !namespace pattern
 

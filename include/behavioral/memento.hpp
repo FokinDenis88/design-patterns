@@ -112,20 +112,12 @@ namespace pattern {
 				std::unique_ptr<Memento> memento_;
 			};
 
-			inline void Run() {
-				CareTaker care_take{};
-				Originator originator{};
-				care_take.set_memento(originator.CreateMemento());
-				const State new_state{ 99, 99 };
-				originator.set_state(new_state);
-				originator.Restore(care_take.memento());
-			};
-
 		} // !namespace memento_simple
 
 
 //#ifdef FULL_MEMENTO
 		namespace memento_templated {
+			// Only owner-originator can use memento. Memento can be accessed only by OriginatorType.
 			// https://en.wikipedia.org/wiki/Memento_pattern
 
 
@@ -224,20 +216,8 @@ namespace pattern {
 				std::unique_ptr<MementoType> memento_;
 			};
 
-			inline void Run() {
-				using MyOriginatorType = Originator<State>;
-
-				CareTaker<MyOriginatorType> care_take{};
-				Originator<State> originator{};
-				care_take.set_memento(originator.CreateMemento());
-				const State new_state{ 99, 99 };
-				originator.set_state(new_state);
-				originator.Restore(care_take.memento());
-
-				int a = 66 - 33;
-			};
-
 		} // !namespace memento_templated
+
 //#endif // FULL_MEMENTO
 
 

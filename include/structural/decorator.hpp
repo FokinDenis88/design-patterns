@@ -119,21 +119,8 @@ namespace pattern {
 				int b_{};
 			};
 
-			inline void Run() {
-				int a{ 33 };
-				int b{ 66 };
-
-				/*ConcreteComponent concrete_component{};
-				ConcreteDecoratorA decorator_a{ ConcreteDecoratorA(std::make_unique<AbstractExpression>(concrete_component), a) };
-				DecoratorAbstract& i_decorator = decorator_a;
-				ConcreteDecoratorB decorator_b{ ConcreteDecoratorB(std::make_unique<AbstractExpression>(decorator_a), b) };*/
-
-				std::unique_ptr<AbstractExpression> my_component = std::make_unique<ConcreteComponent>();
-				my_component = std::make_unique<ConcreteDecoratorA>(std::move(my_component), a);
-				my_component = std::make_unique<ConcreteDecoratorB>(std::move(my_component), b);
-			};
-
 		} // !namespace decorator
+
 	} // !namespace structural
 } // !namespace pattern
 

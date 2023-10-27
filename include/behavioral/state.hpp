@@ -45,9 +45,8 @@ namespace pattern {
 				std::unique_ptr<IState> observer_state_{};
 			};
 
-			void Run();
-
 		} // !namespace observer_state_
+
 	} // !namespace behavioral
 } // !namespace pattern
 

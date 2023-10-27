@@ -67,10 +67,8 @@ namespace pattern {
 				};
 			};
 
-			inline void Run() {
-			};
-
 		} // !namespace visitor
+
 	} // !namespace behavioral
 } // !namespace pattern
 

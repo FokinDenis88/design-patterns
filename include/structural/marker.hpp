@@ -11,11 +11,8 @@ namespace pattern {
 			/** Empty Marker */
 			struct Marker {};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace marker
+
 	} // !namespace creational
 } // !namespace pattern
 

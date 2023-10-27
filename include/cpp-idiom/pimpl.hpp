@@ -12,10 +12,11 @@ namespace pattern {
 	namespace cpp_idiom {
 		namespace pimpl_1 {
 			// https://en.cppreference.com/w/cpp/language/pimpl
+			// Book: Effective modern c++. Scott Mayers
 
 			class Widget {
 			public:
-				Widget() = default;
+				Widget();
 				~Widget();
 
 				Widget(const Widget& obj);
@@ -38,21 +39,16 @@ namespace pattern {
 				std::unique_ptr<Impl> pImpl_;
 			};
 
-			void Run();
-
 		} // !namespace pimpl_1
 
 		namespace pimpl_2 {
 			class Widget {
 			public:
-				Widget() = default;
-
 				DECLARE_PIMPL(Widget)
 			};
 
-			void Run();
-
 		} // !namespace pimpl_2
+
 	} // !namespace cpp_idiom
 } // !namespace pattern
 

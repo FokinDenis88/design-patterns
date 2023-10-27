@@ -137,26 +137,7 @@ namespace pattern {
 				State observable_state_{};
 			};
 
-
-			inline void Run() {
-			//=========Ref============
-				SubjectRef subject_ref{};
-				ObserverRef observer_ref_1{};
-				ObserverRef observer_ref_2{};
-				ObserverRef observer_ref_3{};
-				subject_ref.AttachObserver(observer_ref_1);
-				subject_ref.AttachObserver(observer_ref_2);
-				subject_ref.AttachObserver(observer_ref_3);
-				subject_ref.set_state(State{ 77, 77 });
-				subject_ref.Notify();
-				subject_ref.DetachObserver(observer_ref_1);
-				subject_ref.ClearAllObservers();
-
-				int a = 66 - 66;
-			};
 		} // !namespace observer_ref_1
-
-
 
 
 		namespace observer_smart_ptr {
@@ -373,37 +354,7 @@ namespace pattern {
 			};
 #endif // DEBUG
 
-
-			inline void Run() {
-			//======Simple============
-				Subject subject{};
-				std::shared_ptr<IObserver> observer_1{ std::make_shared<Observer>() };
-				std::shared_ptr<IObserver> observer_2{ std::make_shared<Observer>() };
-				std::shared_ptr<IObserver> observer_3{ std::make_shared<Observer>() };
-				subject.AttachObserver(observer_1);
-				subject.AttachObserver(observer_2);
-				subject.AttachObserver(observer_3);
-				subject.set_state(State{ 77, 77 });
-				subject.Notify();
-				subject.DetachObserver(observer_1);
-				subject.ClearAllObservers();
-
-			//=======Extended==========
-				/*SubjectExtended subject_ext{};
-				std::shared_ptr<IObserver> observer_1_ext{ std::make_shared<ObserverExtended>() };
-				std::shared_ptr<IObserver> observer_2_ext{ std::make_shared<ObserverExtended>() };
-				std::shared_ptr<IObserver> observer_3_ext{ std::make_shared<ObserverExtended>() };
-				subject_ext.AttachObserver(observer_1_ext);
-				subject_ext.AttachObserver(observer_2_ext);
-				subject_ext.AttachObserver(observer_3_ext);
-				subject_ext.set_state(State{ 77, 77 });
-				subject_ext.Notify();
-				subject_ext.DetachObserver(observer_1_ext);
-				subject_ext.ClearAllObservers();*/
-
-				int a = 66 - 66;
-			};
-		}
+		} // !namespace observer_smart_ptr
 
 
 
@@ -470,6 +421,7 @@ namespace pattern {
 			private:
 				std::forward_list<RefObserver> observers;
 			};
+
 		} // namespace observer_wiki_version
 
 

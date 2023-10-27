@@ -77,11 +77,8 @@ namespace pattern {
 				std::unique_ptr<IServices> services_;
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace dependency_injection
+
 	} // !namespace creational
 } // !namespace pattern
 

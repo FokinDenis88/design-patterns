@@ -61,12 +61,8 @@ namespace pattern {
 				};
 			};
 
-
-			inline void Run() {
-
-			};
-
 		} // !namespace delegation
+
 	} // !namespace structural
 } // !namespace pattern
 

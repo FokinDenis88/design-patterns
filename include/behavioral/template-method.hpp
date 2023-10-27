@@ -35,10 +35,8 @@ namespace pattern {
 				};
 			};
 
-			inline void Run() {
-			};
-
 		} // !namespace template_method
+
 	} // !namespace behavioral
 } // !namespace pattern
 

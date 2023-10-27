@@ -25,6 +25,7 @@ namespace pattern {
 			};
 
 		} // !namespace d_pointer
+
 	} // !namespace cpp_idiom
 } // !namespace pattern
 

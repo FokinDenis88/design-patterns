@@ -33,11 +33,8 @@ namespace pattern {
 				};
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace null_object
+
 	} // !namespace behavioral
 } // !namespace pattern
 

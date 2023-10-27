@@ -34,12 +34,8 @@ namespace pattern {
 				std::unique_ptr<IPrototype> creator_{};
 			};
 
-			inline void Run() {
-				Client client{};
-				client.creator_ = std::make_unique<PrototypeA>();
-				client.creator_->Clone();
-			};
 		} // !namespace prototype
+
 	} // !namespace creational
 } // !namespace pattern
 

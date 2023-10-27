@@ -86,11 +86,8 @@ namespace pattern {
 				inline static std::unique_ptr<Singleton_2> instance_{};
 			};
 
-
-
-			void Run();
-
 		} // !namespace singleton
+
 	} // !namespace creational
 } // !namespace pattern
 

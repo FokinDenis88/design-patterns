@@ -25,11 +25,8 @@ namespace pattern {
 				void Action_3_4() {};
 			};
 
-			inline void Run() {
-
-			};
-
 		} // !namespace facade
+
 	} // !namespace creational
 } // !namespace pattern
 

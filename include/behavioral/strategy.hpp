@@ -29,13 +29,8 @@ namespace pattern {
 				std::unique_ptr<IStrategy> strategy_{};
 			};
 
-			inline void Run() {
-				MyTestClass object{};
-				object.strategy_ = std::make_unique<StrategyConcrete>();
-				object.strategy_->Algorithm();
-			};
-
 		} // !namespace strategy
+
 	} // !namespace behavioral
 } // !namespace pattern
 

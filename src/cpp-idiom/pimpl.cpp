@@ -9,6 +9,7 @@ namespace pattern {
 
 			};
 
+			Widget::Widget() = default;
 			Widget::~Widget() = default;
 			Widget::Widget(const Widget& obj) : pImpl_{ nullptr } {
 				if (obj.pImpl_) {
@@ -31,11 +32,9 @@ namespace pattern {
 			Widget::Widget(Widget&& obj) noexcept = default;
 			Widget& Widget::operator=(Widget&& rhs) noexcept = default;
 
-			void Run() {
-				Widget widget{};
-			};
 
-		} // !namespace pimpl
+
+		} // !namespace pimpl_1
 
 		namespace pimpl_2 {
 			struct Widget::Impl {
@@ -45,6 +44,7 @@ namespace pattern {
 
 			DEFINE_PIMPL(Widget)
 
-		} // !namespace pimpl
+		} // !namespace pimpl_2
+
 	} // !namespace cpp_idiom
 } // !namespace pattern

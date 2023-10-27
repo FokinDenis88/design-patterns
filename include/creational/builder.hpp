@@ -112,10 +112,9 @@ namespace pattern {
 			/** Is using Director */
 			class Client {};
 
-			inline void Run() {
-			};
-		}
-	}
-}
+		} // !namespace builder
+
+	} // !namespace creational
+} // !namespace pattern
 
 #endif // !BUILDER_HPP

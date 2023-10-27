@@ -8,6 +8,7 @@
  * with pImpl(Pointer to Implementation). Use in header.hpp file, in class declaration.
  */
 #define DECLARE_PIMPL_CONSTRUCTORS(ClassName)	public:													\
+													ClassName();										\
 													~ClassName();										\
 													ClassName(const ClassName& obj);					\
 													ClassName& operator=(const ClassName& rhs);			\
@@ -33,7 +34,8 @@
  * Define all Constructors and Default Destructor.
  * Use in source.cpp file after defining Impl structure..
  */
-#define DEFINE_PIMPL(ClassName)	ClassName::~ClassName() = default;										\
+#define DEFINE_PIMPL(ClassName)	ClassName::ClassName() = default;										\
+								ClassName::~ClassName() = default;										\
 								ClassName::ClassName(const ClassName& obj) : pImpl_{ nullptr } {		\
 									if (obj.pImpl_) {													\
 										pImpl_ = std::make_unique<ClassName::Impl>(*obj.pImpl_);		\

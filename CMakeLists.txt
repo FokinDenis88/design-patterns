@@ -141,9 +141,6 @@ set(HEADERS_FILTER_UI)
 set(SOURCES_FILTER_UI)
 
 
-set(SOURCES_FILTER_TESTS
-	test/general/general-test.cpp)
-
 set(SOURCES
 	design-patterns.cpp
 	${SOURCES_FILTER_ARCHITECTURAL}
@@ -170,7 +167,8 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_STRUCTURAL}
 	${HEADERS_FILTER_UI})
 set(DOC_FILTER
-    #doc/to-do.txt
+    #doc/general/to-do.txt
+	#doc/general/commit.txt
 )
 
 
@@ -215,7 +213,7 @@ source_group("Distributed-System/Source" FILES ${SOURCES_FILTER_DISTRIBUTED-SYST
 source_group("GameDev/Source" FILES ${SOURCES_FILTER_GAMEDEV})
 source_group("Structural/Source" FILES ${SOURCES_FILTER_STRUCTURAL})
 source_group("UI/Source" FILES ${SOURCES_FILTER_UI})
-source_group("Tests" FILES ${SOURCES_FILTER_TESTS})
+
 
 
 SET(ECLIPSE_GCC_STATIC_ANALYSIS -g -pedantic -Wall -Wextra -Wconversion -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Weffc++ -Wfloat-equal -c -fmessage-length=0)
@@ -236,8 +234,19 @@ set_property(TARGET ${TARGET_NAME} PROPERTY SUBSYSTEM CONSOLE)
 
 
 #============================Google Test========================================
+# Source code, that will be tested
+set(TARGET_TESTABLE_CODE
+	src/cpp-idiom/pimpl.cpp)
+# Source code of tests
+set(SOURCES_FILTER_TESTS
+	test/general/general-test.cpp)
+
+# Library with code of work project for linking to test project
+add_library(testable_code_library OBJECT ${TARGET_TESTABLE_CODE})
+source_group("Tests" FILES ${SOURCES_FILTER_TESTS})
+
 # Enable Google Tests
-set(TEST_TARGET_NAME general-test)
+set(TEST_TARGET_NAME ${TARGET_NAME}-test)
 enable_testing()
 
 add_executable(
@@ -246,134 +255,9 @@ add_executable(
 
 target_link_libraries(
   ${TEST_TARGET_NAME}
+  PUBLIC testable_code_library
   GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(${TEST_TARGET_NAME})
 #================================================================================
-
-
-
-
-#=========================Web Links=============================
-# GCC Compiler
-# https://gcc.gnu.org/onlinedocs/gcc-6.2.0/gcc/Invoking-GCC.html
-# https://www.rapidtables.com/code/linux/gcc.html
-
-# Static Analysis Options:
-# -std=c++2a -std=c++1z -Wall -Wextra -fanalyzer
-
-# Eclipse gcc Static Analysis with all warnings
-#-std=c++2a -I/media/sf_Projects/IT/Programming/!git-web/private/design-patterns/include -O0 -g -pedantic -Wall -Wextra -Wconversion -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Weffc++ -Wfloat-equal -c -fmessage-length=0
-
-
-
-# Help Information
-# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html
-# https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#cmake-language-variables
-
-
-#set(srcs a.c b.c c.c) # sets "srcs" to "a.c;b.c;c.c"
-
-#add_executable(main ${SOURCE_EXE})	# Создает исполняемый файл с именем main
-#add_library (Hello STATIC hello.cxx)
-#target_include_directories (Hello PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-#add_executable (helloDemo demo.cxx demo_b.cxx)
-#target_link_libraries (helloDemo LINK_PUBLIC Hello)
-#target_compile_options(first-test PRIVATE -fexceptions)
-#target_link_options()
-
-#set(SOURCE_EXE main.cpp)   set(SOURCE_LIB foo.cpp)
-#add_library(foo STATIC ${SOURCE_LIB})	# Создание статической библиотеки с именем foo
-#add_executable(main ${SOURCE_EXE})	# Создает исполняемый файл с именем main
-#target_link_libraries(main foo)
-#include_directories(foo)			# Расположение заголовочных файлов
-#file(GLOB <variable> [LIST_DIRECTORIES true|false] [RELATIVE <path>] [CONFIGURE_DEPENDS] [<globbing-expressions>...])
-#target_compile_options(first-test PRIVATE -fexceptions)
-
-#find_package(OpenMP)
-#if (OPENMP_FOUND)
-    #set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    #set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-#endif()
-
-#set_property(TARGET artificial-neural-networks PROPERTY SUBSYSTEM WINDOWS)
-#CMAKE_CXX_FLAGS    /SUBSYSTEM:CONSOLE
-
-#source_group("Header Files" FILES ${INCLUDES} REGULAR_EXPRESSION *)
-
-#OpenMP
-#find_package(OpenMP REQUIRED)
-#target_link_libraries(artificial-neural-networks PRIVATE OpenMP::OpenMP_CXX)
-
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# Добавляет директории для дальнейшей обработки. В них нужно добавлять еще одни CMakeLists.txt файлы
-# add_subdirectory (Hello)
-
-
-
-#message("generator is set to ${CMAKE_GENERATOR}")
-#set(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "" FORCE)
-
-#Eclipse CDT4 - Ninja
-#Eclipse CDT4 - Unix Makefiles
-
-
-#if (WIN32)
-    # do something
-#endif (WIN32)
-
-#if (UNIX)
-    # do something
-#endif (UNIX)
-
-#if (MSVC)
-    # do something
-#endif (MSVC)
-
-#if(UNIX AND NOT APPLE)
-    #set(LINUX TRUE)
-#endif()
-
-# if(NOT LINUX) should work, too, if you need that
-#if(LINUX)
-    #message(STATUS ">>> Linux")
-    # linux stuff here
-#else()
-    #message(STATUS ">>> Not Linux")
-    # stuff that should happen not on Linux
-#endif()
-
-# Permanent verbose command output from the generated Makefiles
-#cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON .
-
-
-
-
-
-
-
-
-
-#=============================================================================
-# https://gcc.gnu.org/onlinedocs/gcc-6.2.0/gcc/Invoking-GCC.html
-# https://www.rapidtables.com/code/linux/gcc.html
-# -c				: compile source files to object files without linking
-# -E				: Preprocess only; do not compile, assemble or link
-# -glevel			: generate debug information to be used by GDB
-# -Idir 			: include directory of header files
-# -llib				: link with library file
-# -Ldir 			: look in directory for library files
-# -o output file 	: write build output to output file
-# -Olevel			: optimize for code size and execution tim
-# -time 			: Time the execution of each subprocess
-# --version			: Display compiler version information
-# https://gcc.gnu.org/onlinedocs/gcc-6.2.0/gcc/Warning-Options.html#Warning-Options
-# -Wall				:
-# -Wextra			:
-# -fanalyzer		:
-# -std=c++2a		:
