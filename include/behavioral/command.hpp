@@ -9,6 +9,7 @@
 #include <utility>
 #include <concepts>
 #include <functional>
+#include <variant>
 
 #include "tuple.hpp"
 
@@ -22,7 +23,8 @@ namespace pattern {
 			// It is like First-class functions and High order functions.
 			// The invoker object is a higher-order function of which the command object is a first-class argument.
 			// Sequence of Commands can be stored in container.
-			// Pattern Friends: 1) Composite is used in MacroCommand.
+			// Pattern Friends:
+			// 1) Composite is used in MacroCommand.
 			// 2) Flyweight is used to store state of command for Undo function
 			// 3) Prototype for command, that must be copied in history list of commands
 
@@ -319,22 +321,116 @@ namespace pattern {
 			};	// !class Client
 
 
-			/** Execute sequence of commands. May be Composite pattern. */
-			template<typename CommandType>
-			//requires std::derived_from<CommandType, ICommand>
-			class MacroCommand : public ICommand {
+//===============================Macro Commands=======================================
+
+			/** Types for containers derived from ICommand */
+			template<typename... CommandTypes>
+			concept ICommandDerivedTypes = (std::derived_from<CommandTypes, ICommand> && ...);
+
+			template<typename... CommandTypes>
+			requires ICommandDerivedTypes<CommandTypes...>
+			using CommandListVariant = std::list<std::variant<CommandTypes...>>;
+
+			/** List of reference wrappers to ICommand objects */
+			using ICommandRefList = std::list<std::reference_wrapper<ICommand>>;
+
+			using ICommandPtrList = std::list<std::unique_ptr<ICommand>>;
+
+
+			/**
+			 * Execute sequence of commands. May be Composite pattern.
+			 * Is used for stateless or stateful references to commands.
+			 *
+			 * @param commands_ list of commands. Invariant: CommandType must be derived from ICommand.
+			 * Element of commands_ must be ref. Invariant: can't be a nullptr pointer.
+			 */
+			struct MacroCommand: public ICommand {
 			public:
 				void Execute() override {
-					for (const auto& command_ptr : commands_) {
+					for (auto& command_ptr : commands_) {
 						if (command_ptr) {
 							command_ptr->Execute();
 						}
 					}
 				};
 
-			private:
-				std::list<std::unique_ptr<ICommand>> commands_{};
+				ICommandPtrList commands_{};
+
+				/*
+				* Class Design:
+				* Command may be stateless or stateful.
+				* All Variety of Commands is hold outside of the class. Class holds only ref to commands.
+				* So you can economy memory for huge count of MacroCommands with common commands.
+				* Commands must not be nullptr.
+				* Command will be list for flexibility.
+				*/
 			};
+
+
+
+			/**
+			 * Execute sequence of commands. May be Composite pattern.
+			 * Is used only stateless references to commands.
+			 *
+			 * @param commands_ list of commands. Invariant: CommandType must be derived from ICommand.
+			 * Element of commands_ must be ref. Invariant: can't be a nullptr pointer.
+			 */
+			/*struct MacroCommandStateless : public ICommand {
+			public:
+				void Execute() override {
+					for (auto& command_ref : commands_) {
+						command_ref.get().Execute();
+					}
+				};
+
+				ICommandRefList commands_{};*/
+
+				/*
+				* Class Design:
+				* Command is stateless.
+				* All Variety of Commands is hold outside of the class. Class holds only ref to commands.
+				* So you can economy memory for huge count of MacroCommands with common commands.
+				* Store single archive of all commands.
+				* Commands must not be nullptr.
+				* Command will be list for flexibility.
+				*/
+			//};
+
+
+			/**
+			 * Execute sequence of commands. May be Composite pattern.
+			 * Is used by stateful commands.
+			 *
+			 * @param commands_ list of commands. Invariant: CommandTypes... must be derived from ICommand.
+			 */
+			/*template<typename... CommandTypes>
+			requires ICommandDerivedTypes<CommandTypes...>
+			struct MacroCommandStateful : public ICommand {
+			public:*/
+				// Needs C++ 17
+
+				//void Execute() override {
+				//	for (auto& command : commands_) {	// commands can change state, so not const auto&
+				//		//std::get<command.index()>(command).Execute(); // can throw std::bad_variant_access
+				//		constexpr size_t indx { command.index() };
+				//		std::get<0>(command).Execute(); // can throw std::bad_variant_access
+
+				//		// Can't access to variant element at compile time. Only runtime.
+				//	}
+				//};
+
+				//CommandListVariant<CommandTypes...> commands_{};
+
+				/*
+				* Class Design:
+				* Command is stateful.
+				* All Variety of Commands is hold inside of class, coz the state of command
+				* is unique for each command and needed for undo operation.
+				* Commands must not be nullptr.
+				* Command will be list for flexibility.
+				* Class is only static polymorphic, coz template of class.
+				*/
+			//};
 
 		} // !namespace command
 

@@ -69,6 +69,10 @@ namespace {
 						ASSERT_EQ(1, 2) << "Test CommandClass";
 					}
 
+					TEST(CommandTest, MacroCommandClass) {
+						//MacroCommandStateless macro_stateless{};
+						//MacroCommandStateful<CommandSTDFunction> macro_stateful{};
+					}
 
 			} // !namespace command
 

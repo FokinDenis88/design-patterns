@@ -72,7 +72,7 @@ namespace pattern {
 			class NonTerminalExpression : public AbstractExpression {
 			public:
 				void Operation() override {
-					for (auto& component : composite_) {
+					for (auto& component : composite_) { // component is non const
 						component->Operation();
 					}
 				};

@@ -58,6 +58,8 @@ namespace pattern {
 
 			class Visitor1 : public IVisitor {
 			public:
+				/* You can use std::visit for realization */
+
 				void VisitElementA(ElementA& element_p) override {
 					element_p.OperationA();
 				};
