@@ -1,9 +1,10 @@
 #include "gtest/gtest.h"
 
-#include <functional>
-
 #include "header-collection/all-headers.hpp"
-//#include "cpp-idiom/pimpl.cpp"
+
+
+//#include <iostream>
+//#include <functional>
 
 
 namespace {
@@ -25,14 +26,14 @@ namespace {
 			namespace command {
 					using namespace ::pattern::behavioral::command;
 
-					TEST(CommandTest, CommandSTDFunctionClass) {
+					TEST(CommandTest, CommandClass) {
 						//TestClass<decltype(Receiver::Add)> test{};
 						//int a = 66 - 44;
 
 						//std::function<CommandSTDFunction::ActionType> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
 
 						std::shared_ptr<Receiver> receiver{ std::make_shared<Receiver>() };
-						auto command{ std::make_shared<CommandSTDFunction>(&Receiver::Add, *receiver, 40, 50) };
+						auto command{ std::make_shared<Command>(&Receiver::Add, *receiver, 40, 50) };
 						std::unique_ptr<Invoker> invoker{ std::make_unique<Invoker>() };
 
 						/*Client client{};
@@ -41,7 +42,8 @@ namespace {
 						client.set_invoker(std::move(invoker));*/
 
 						//std::cout << "Add_result: " << client.InvokeCommand() << '\n';
-						ASSERT_EQ(1, 2) << "Test CommandSTDFunctionClass";
+
+						//ASSERT_EQ(1, 2) << "Test CommandSTDFunctionClass";
 					}
 
 					TEST(CommandTest, CommandClass) {
@@ -55,7 +57,7 @@ namespace {
 
 						Receiver receiver_test{};
 						std::shared_ptr<Receiver> receiver_2{ std::make_shared<Receiver>() };
-						using CommandType = Command<Receiver, int, int, int>;
+						using CommandType = CommandMemberFn<Receiver, int, int, int>;
 						auto command_2{ std::make_shared<CommandType>(receiver_2, &Receiver::Add, 40, 50) };
 						command_2->Execute();
 						std::unique_ptr<Invoker> invoker_2{ std::make_unique<Invoker>() };
@@ -66,10 +68,12 @@ namespace {
 						client.set_command(command);
 						client.set_invoker(std::move(invoker));*/
 
-						ASSERT_EQ(1, 2) << "Test CommandClass";
+						//ASSERT_EQ(1, 2) << "Test CommandClass";
 					}
 
 					TEST(CommandTest, MacroCommandClass) {
+						MacroCommand macro_cmd{};
+
 						//MacroCommandStateless macro_stateless{};
 						//MacroCommandStateful<CommandSTDFunction> macro_stateful{};
 					}

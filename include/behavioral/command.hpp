@@ -1,15 +1,15 @@
 #ifndef COMMAND_HPP
 #define COMMAND_HPP
 
-#include <iostream>
+//#include <iostream>	// for testing functions call
 
 #include <list>
 #include <functional>
 #include <memory>
 #include <utility>
-#include <concepts>
+//#include <concepts>
 #include <functional>
-#include <variant>
+//#include <variant>	// for CommandListVariant
 
 #include "tuple.hpp"
 
@@ -34,15 +34,18 @@ namespace pattern {
 				int b{};
 			};
 
-			/** Defines function, that will be executed by command.  */
+			/**
+			 * Defines function, that will be executed by command.
+			 * Receiver can be object of any class.
+			 */
 			class Receiver {
 			public:
 				int Add(int a, int b) {
-					std::cout << "a + b";
+					//std::cout << "a + b";
 					return a + b;
 				}
 				int Sub(int a, int b) {
-					std::cout << "a - b";
+					//std::cout << "a - b";
 					return a - b;
 				}
 			};
@@ -78,116 +81,126 @@ namespace pattern {
 			};
 
 
+			/** Helper Function
+			* Creates Action from Member Function. Arguments are binded with std::function.
+			* Command pattern is designed to have object, that invokes request, and object, that receives request.
+			* Invoker mustn't know the concrete receiver object. Use only command interface.
+			*
+			* @param action_ptr			pointer to member function
+			* @param receiver_p			ref to receiver object
+			* @param ...action_args_p	arguments for member function call
+			* @return					function object with binded arguments
+			*/
+			template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
+			inline auto CreateMemberFnAction(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
+											ReceiverType& receiver_p,	// mustn't be const. Command execution may change state
+											ActionParamTypes&&... action_args_p) {
+				std::function<void()> new_action = std::bind_front(action_ptr, &receiver_p,
+																std::forward<ActionParamTypes>(action_args_p)...);
+				return new_action;
+			};
+
+
 			/**
-			 * To create std::function object use: std::bind(&ObjectClass::MemberFunction, PointerToObject, MemberFunctionArgs...);
-			 * Only Copyable. Not Movable.
-			 */
-			class CommandSTDFunction final : public ICommand {
-				// Class Description:
+			* Command Design Pattern.
+			* Only Copyable. Not Movable.
+			*
+			* @param action_with_args_ std::function wrapper, binded with args. No Invariant: args must be binded
+			* with args for each parameter fn_type = void(). Can be functor, lambda, member function, function.
+			*
+			* To create std::function object use: std::bind_front(&ObjectClass::MemberFunction, PointerToObject, MemberFunctionArgs...);
+			*/
+			struct Command : public ICommand {
 			public:
 				using ActionType = void();
-
-				CommandSTDFunction() = default;
-				CommandSTDFunction(const CommandSTDFunction&) = default;
-				CommandSTDFunction& operator=(const CommandSTDFunction&) = default;
-
-				// No Move constructors, because std::function support Copy operations
-
-				/** @param new_action callable object must be binded with args, if there are params in function */
-				explicit CommandSTDFunction(const std::function<ActionType>& new_action)
-						: action_with_args_{ new_action } {
-				};
-
-				template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
-				explicit CommandSTDFunction(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
-											ReceiverType& receiver_p, // mustn't be const. Command execution may change state
-											ActionParamTypes&&... action_args_p)
-						: action_with_args_{ CreateAction(action_ptr, receiver_p, std::forward<ActionParamTypes>(action_args_p)...) } {
-				};
-
-				/**
-				 * Command pattern is designed to have object, that invokes request, and object, that receives request.
-				 * Invoker mustn't know the concrete receiver object. Use only command interface.
-				 */
-				template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
-				static auto CreateAction(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
-										 ReceiverType&  receiver_p,	// mustn't be const. Command execution may change state
-										 ActionParamTypes&&... action_args_p) {
-					std::function<ActionType> new_action = std::bind_front(action_ptr, &receiver_p,
-																		   std::forward<ActionParamTypes>(action_args_p)...);
-					return new_action;
-				};
-
-
-				void Execute() override {
-					if (action_with_args_) { action_with_args_(); }
-				};
-
-				/** Check, if there is action function object */
-				inline bool HasAction() const noexcept { return action_with_args_.operator bool(); };
-
-
-				/** @param new_action callable object must be binded with args, if there are params in function */
-				inline void set_action_with_args(const std::function<ActionType>& new_action) {
-					action_with_args_ = new_action;
-				};
-
-				/**
-				 * Create callable action object for command
-				 *
-				 * @param receiver_ptr		pointer to receiver object
-				 * @param action_ptr		pointer to member function
-				 * @param ...action_args_p	arguments for member function call
-				 * @return					function object with no arguments in call
-				 */
-				template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
-				inline void set_action_with_args(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
-												  ReceiverType& receiver_p,
-												  ActionParamTypes&&... action_args_p) {
-					action_with_args_ = CreateAction(action_ptr, receiver_p, std::forward<ActionParamTypes>(action_args_p)...);
-				};
-
-
-				inline const std::function<ActionType>& action_with_args() const noexcept {
-					return action_with_args_;
-				};
-
-			private:
-				/** Service functionality optional */
-				template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
-				void CreateActionNoArgs(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
-										ReceiverType& receiver_p) {
-					action_with_args_ = std::bind_front(action_ptr, &receiver_p);
-				}
-
-				std::function<ActionType> action_with_args_{};
-			};	// !class CommandSTDFunction
-
-
-			/**
-			 * Concrete command.
-			 * You can change receiver, action and action args when ever you want
-			 * Realization May include count of repetitions of executions.
-			 * May include state for Undo operation, that can be changed after execution.
-			 * May include pattern Flyweight for storing state of command object before execution.
-			 */
-			template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
-			// requires callable
-			class Command final : public ICommand {
-			public:
-				/** Pointer to member function */
-				using ActionType = ActionReturnType(ReceiverType::*)(ActionParamTypes...);
-				using ArgsTupleTypes = std::tuple<ActionParamTypes...>;
-				using STDFunctionType = ActionReturnType(ActionParamTypes...);
+				using ActionWithArgsType = std::function<ActionType>;
 
 				Command() = default;
 				Command(const Command&) = default;
 				Command& operator=(const Command&) = default;
-				Command(Command&&) noexcept = default;
-				Command& operator=(Command&&) noexcept = default;
 
-				explicit Command(std::shared_ptr<ReceiverType> receiver_p,
-								 ActionType action_p, ActionParamTypes... action_args_p) // TODO: Maybe ref to args?
+				// No Move constructors, because std::function support Copy operations
+
+				/** @param new_action callable object must be binded with args, if there are params in function */
+				explicit Command(const ActionWithArgsType& new_action)
+						: action_{ new_action } {
+				};
+
+				/** Construction from member function. */
+				template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
+				explicit Command(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
+								 ReceiverType& receiver_p, // mustn't be const. Command execution may change state
+								 ActionParamTypes&&... action_args_p)
+						: action_{ CreateMemberFnAction(action_ptr, receiver_p,
+																  std::forward<ActionParamTypes>(action_args_p)...) } {
+				};
+
+
+				void Execute() override {
+					if (action_) { action_(); }
+				};
+
+				/** Check, if there is action function object */
+				inline bool HasAction() const noexcept { return action_.operator bool(); };
+
+
+				/**
+				 * Create callable action object for command. Set from member function.
+				 *
+				 * @param action_ptr		pointer to member function
+				 * @param receiver_p		pointer to receiver object
+				 * @param ...action_args_p	arguments for member function call
+				 * @return					function object with binded arguments
+				 */
+				template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
+				inline void SetMemberFnAction(ActionReturnType(ReceiverType::* const action_ptr)(ActionParamTypes...),
+												ReceiverType& receiver_p,
+												ActionParamTypes&&... action_args_p) {
+					action_ = CreateMemberFnAction(action_ptr, receiver_p, std::forward<ActionParamTypes>(action_args_p)...);
+				};
+
+
+				/**
+				* Action of some Receiver. with args binded. Callable Function object
+				* must be binded with args for each param. No Invariant.
+				*/
+				ActionWithArgsType action_{};
+
+				/*
+				* Class Design:
+				* Bind arguments to std::function wrapper for each param.
+				* The idea of command pattern is to abstract receiver object and to encapsulate call to member
+				* function of receiver object.
+				* If is used std::function, i can't change receiver object, function-action and args separately.
+				*/
+
+			};	// !class CommandSTDFunction
+
+
+			/**
+			 * Concrete command from any class member function.
+			 * You can change receiver, action and action args when ever you want
+			 * Realization May include count of repetitions of executions.
+			 * May include state for Undo operation, that can be changed after execution.
+			 * May include pattern Flyweight for storing state of command object before execution.
+			 * Copyable and Movable.
+			 */
+			template<typename ReceiverType, typename ActionReturnType, typename... ActionParamTypes>
+			class CommandMemberFn final : public ICommand {
+			public:
+				/** Pointer to member function */
+				using ActionType = ActionReturnType(ReceiverType::*)(ActionParamTypes...);
+				using ArgsTupleTypes = std::tuple<ActionParamTypes&&...>;
+				using STDFunctionType = ActionReturnType(ActionParamTypes...);
+
+				CommandMemberFn() = default;
+				CommandMemberFn(const CommandMemberFn&) = default;
+				CommandMemberFn& operator=(const CommandMemberFn&) = default;
+				CommandMemberFn(CommandMemberFn&&) noexcept = default;
+				CommandMemberFn& operator=(CommandMemberFn&&) noexcept = default;
+
+				explicit CommandMemberFn(std::shared_ptr<ReceiverType> receiver_p,
+										ActionType action_p, ActionParamTypes... action_args_p) // TODO: Maybe ref to args?
 							: receiver_{ std::move(receiver_p) },
 							  action_{ action_p },
 							  action_args_{ std::make_tuple(action_args_p...) } {
@@ -327,9 +340,9 @@ namespace pattern {
 			template<typename... CommandTypes>
 			concept ICommandDerivedTypes = (std::derived_from<CommandTypes, ICommand> && ...);
 
-			template<typename... CommandTypes>
+			/*template<typename... CommandTypes>
 			requires ICommandDerivedTypes<CommandTypes...>
-			using CommandListVariant = std::list<std::variant<CommandTypes...>>;
+			using CommandListVariant = std::list<std::variant<CommandTypes...>>;*/
 
 			/** List of reference wrappers to ICommand objects */
 			using ICommandRefList = std::list<std::reference_wrapper<ICommand>>;
@@ -341,7 +354,7 @@ namespace pattern {
 			 * Execute sequence of commands. May be Composite pattern.
 			 * Is used for stateless or stateful references to commands.
 			 *
-			 * @param commands_ list of commands. Invariant: CommandType must be derived from ICommand.
+			 * @param commands_ list of commands. No Invariant: CommandType must be derived from ICommand.
 			 * Element of commands_ must be ref. Invariant: can't be a nullptr pointer.
 			 */
 			struct MacroCommand: public ICommand {
@@ -365,72 +378,6 @@ namespace pattern {
 				* Command will be list for flexibility.
 				*/
 			};
-
-
-
-			/**
-			 * Execute sequence of commands. May be Composite pattern.
-			 * Is used only stateless references to commands.
-			 *
-			 * @param commands_ list of commands. Invariant: CommandType must be derived from ICommand.
-			 * Element of commands_ must be ref. Invariant: can't be a nullptr pointer.
-			 */
-			/*struct MacroCommandStateless : public ICommand {
-			public:
-				void Execute() override {
-					for (auto& command_ref : commands_) {
-						command_ref.get().Execute();
-					}
-				};
-
-				ICommandRefList commands_{};*/
-
-				/*
-				* Class Design:
-				* Command is stateless.
-				* All Variety of Commands is hold outside of the class. Class holds only ref to commands.
-				* So you can economy memory for huge count of MacroCommands with common commands.
-				* Store single archive of all commands.
-				* Commands must not be nullptr.
-				* Command will be list for flexibility.
-				*/
-			//};
-
-
-			/**
-			 * Execute sequence of commands. May be Composite pattern.
-			 * Is used by stateful commands.
-			 *
-			 * @param commands_ list of commands. Invariant: CommandTypes... must be derived from ICommand.
-			 */
-			/*template<typename... CommandTypes>
-			requires ICommandDerivedTypes<CommandTypes...>
-			struct MacroCommandStateful : public ICommand {
-			public:*/
-				// Needs C++ 17
-
-				//void Execute() override {
-				//	for (auto& command : commands_) {	// commands can change state, so not const auto&
-				//		//std::get<command.index()>(command).Execute(); // can throw std::bad_variant_access
-				//		constexpr size_t indx { command.index() };
-				//		std::get<0>(command).Execute(); // can throw std::bad_variant_access
-
-				//		// Can't access to variant element at compile time. Only runtime.
-				//	}
-				//};
-
-				//CommandListVariant<CommandTypes...> commands_{};
-
-				/*
-				* Class Design:
-				* Command is stateful.
-				* All Variety of Commands is hold inside of class, coz the state of command
-				* is unique for each command and needed for undo operation.
-				* Commands must not be nullptr.
-				* Command will be list for flexibility.
-				* Class is only static polymorphic, coz template of class.
-				*/
-			//};
 
 		} // !namespace command
 
