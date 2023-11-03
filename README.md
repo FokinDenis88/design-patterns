@@ -1,4 +1,4 @@
-# Software Design Patterns
+# C++ Software Design Patterns
 
 
 ## Installation

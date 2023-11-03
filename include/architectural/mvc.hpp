@@ -7,6 +7,8 @@
 namespace pattern {
 	namespace creational {
 		namespace mvc {
+			// https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
+
 			//class Receiver {
 			//public:
 			//	int Add(int a, int b) { return a + b; }
