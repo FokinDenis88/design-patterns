@@ -18,7 +18,6 @@ namespace pattern {
 					if (!instance.data) {
 						instance.data = std::make_unique<DataType>();
 					}
-					// int i = i + 1;
 					return (instance);
 				}
 

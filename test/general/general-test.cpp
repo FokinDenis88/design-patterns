@@ -230,19 +230,35 @@ namespace {
 			namespace dependency_injection {}
 			namespace factory_method {}
 			namespace lazy_initialization {}
+
 			namespace object_pool {
 				using namespace ::pattern::creational::object_pool;
 				TEST(ObjectPoolTest, ObjectPoolClass) {
-					/*auto pool{ ObjectPool::GetInstance() };
-					auto r{ pool.GetResourceFromPool() };
-					if (auto ptr{ r.lock() }) {
-						dynamic_cast<ObjectPoolResource&>(*ptr).SetValue(77);
-					} else {
-						std::cout << "resource expired\n";
-					}*/
-					//pool.ReturnResourceToPool(std::move(r));
+					auto& pool{ ObjectPool<ObjectPoolResource, false>::GetInstance() };
+					pool.set_new_objects_limit(10);
+					EXPECT_EQ(pool.SizeAllocatedResources(), 0);
+					EXPECT_EQ(pool.new_objects_limit(), 10);
+					EXPECT_EQ(pool.SizeMaxAvailableResources(), 10);
+
+					auto resource{ pool.GetResourceFromPool() };
+					std::cout << "resource == nullptr: " << (resource == nullptr) << " sizeof(resource): " << sizeof(resource) << '\n';
+					std::cout << "SizeAllocatedResources: " << pool.SizeAllocatedResources() <<
+								" SizeMaxAvailableResources: " << pool.SizeMaxAvailableResources() << '\n';
+					EXPECT_EQ(pool.SizeAllocatedResources(), 0);
+					EXPECT_EQ(pool.new_objects_limit(), 9);
+					EXPECT_EQ(pool.SizeMaxAvailableResources(), 9);
+
+
+					std::cout << "resource.reset: ";
+					resource.reset();
+					std::cout << "SizeAllocatedResources: " << pool.SizeAllocatedResources() <<
+								" SizeMaxAvailableResources: " << pool.SizeMaxAvailableResources() << '\n';
+					EXPECT_EQ(pool.SizeAllocatedResources(), 1);
+					EXPECT_EQ(pool.new_objects_limit(), 9);
+					EXPECT_EQ(pool.SizeMaxAvailableResources(), 10);
 				};
 			} // !namespace object_pool
+
 			namespace prototype {
 				using namespace ::pattern::creational::prototype;
 				TEST(PrototypeTest, PrototypeClass) {
