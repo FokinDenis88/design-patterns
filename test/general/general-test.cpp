@@ -3,10 +3,6 @@
 #include "header-collection/all-headers.hpp"
 
 
-//#include <iostream>
-//#include <functional>
-
-
 namespace {
 	namespace pattern {
 		namespace ai {} // !namespace ai
@@ -202,7 +198,14 @@ namespace {
 		namespace cpp_idiom {
 			namespace attorney_client {}
 			namespace copy_n_swap {}
-			namespace crtp {}
+			namespace crtp {
+				using namespace ::pattern::cpp_idiom::crtp;
+				TEST(CRTPTest, BaseDerived) {
+					Base<Derived>* base_ptr{};
+					base_ptr->Foo(13);
+					//EXPECT_EQ(pool.SizeAllocatedResources(), 0);
+				}
+			}
 			namespace d_pointer{}
 			namespace named_parameter{}
 			namespace non_virtual_interface {}
@@ -255,7 +258,7 @@ namespace {
 								" SizeMaxAvailableResources: " << pool.SizeMaxAvailableResources() << '\n';
 					EXPECT_EQ(pool.SizeAllocatedResources(), 1);
 					EXPECT_EQ(pool.new_objects_limit(), 9);
-					EXPECT_EQ(pool.SizeMaxAvailableResources(), 10);
+					EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
 				};
 			} // !namespace object_pool
 
@@ -339,6 +342,58 @@ namespace {
 		namespace ui {
 
 		} // !namespace ui
+
+
+		/** https://google.github.io/googletest/primer.html */
+		namespace help {
+			// Info
+			// Test Suite, Test Case
+			// TEST(ObjectPoolTest, ObjectPoolClass) {}
+			// Fixture class for common object for some Test Cases
+
+			struct Foo {
+				int a{};
+			};
+
+			// The fixture for testing class Foo.
+			class FooTest : public testing::Test {
+			protected:
+				// You can remove any or all of the following functions if their bodies would
+				// be empty.
+
+				FooTest() {
+					// You can do set-up work for each test here.
+				}
+
+				~FooTest() override {
+					// You can do clean-up work that doesn't throw exceptions here.
+				}
+
+				// If the constructor and destructor are not enough for setting up
+				// and cleaning up each test, you can define the following methods:
+
+				void SetUp() override {
+					// Code here will be called immediately after the constructor (right
+					// before each test).
+				}
+
+				void TearDown() override {
+					// Code here will be called immediately after each test (right
+					// before the destructor).
+				}
+
+				// Class members declared here can be used by all tests in the test suite
+				// for Foo.
+			};
+
+			// Tests that the Foo::Bar() method does Abc.
+			TEST_F(FooTest, MethodBarDoesAbc) {
+				const std::string input_filepath = "this/package/testdata/myinputfile.dat";
+				const std::string output_filepath = "this/package/testdata/myoutputfile.dat";
+				Foo f;
+				//EXPECT_EQ(f.Bar(input_filepath, output_filepath), 0);
+			}
+		} // !namespace help
 
 	}  // !pattern
 }  // !unnamed namespace

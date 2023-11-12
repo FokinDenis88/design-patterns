@@ -6,8 +6,6 @@
 #include <concepts>
 #include <functional>
 
-#include <stack>
-#include <forward_list>
 #include <vector>
 #include <list>
 
@@ -28,7 +26,7 @@ namespace pattern {
 				virtual void Reset() = 0;
 			};
 
-
+			/** Functor callable object */
 			template<typename ObjectPoolType>
 			struct ObjectPoolDeleterFunctor {
 				void operator()(IObjectPoolResource* used_resource) const {
@@ -36,7 +34,7 @@ namespace pattern {
 				}
 			};
 
-			/** Abstract */
+			/** Abstract. Hybrid version CRTP idiom. */
 			template<typename ObjectPoolType>
 			class IObjectPool {
 			public:
@@ -205,7 +203,8 @@ namespace pattern {
 				 * You can change limit any time.
 				 */
 				size_t new_objects_limit_{ 0 };
-			};
+
+			}; // !class ObjectPool
 
 		} // !namespace object_pool
 
