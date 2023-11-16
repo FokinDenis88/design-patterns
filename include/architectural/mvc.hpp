@@ -1,69 +1,107 @@
 #ifndef MVC_HPP
 #define MVC_HPP
 
-#include <iostream>
+#include <memory>
+#include <utility>
+//#include <iostream>
+
+
+#include "behavioral/observer.hpp"
+#include "behavioral/strategy.hpp"
+#include "structural/composite.hpp"
+
+//#include "creational/factory-method.hpp"
+//#include "structural/decorator.hpp"
+
 
 /** Software Design Patterns */
 namespace pattern {
-	namespace creational {
+	namespace architectural {
 		namespace mvc {
 			// https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
 
-			//class Receiver {
-			//public:
-			//	int Add(int a, int b) { return a + b; }
-			//	int Sub(int a, int b) { return a - b; }
-			//};
+			/**
+			 * View and Controller can be integrated in one class.
+			 * View depends on Model. Model doesn't depend on View.
+			 * Segregation of Model and View is important.
+			 * Segregation of Controller and View less important. (More important for Web)
+			 */
 
-			//class Client {
-			//public:
-			//	int add_result{};
-			//	int sub_result{};
-			//};
 
-			///** Interface of. Abstract class*/
-			//class ICommand {
-			//public:
-			//	ICommand() = default;
-			//	virtual ~ICommand() = default;
+			/**
+			 * Friend Patterns. Main: Observer, Composite, Strategy.
+			 * Model: Observer(Model-to-View)(Main)
+			 *
+			 * View: Composite(for nested views), Observer(Model-to-View),Strategy(Controller-View),
+			 *		 Factory Method(for defining default Controller), Decorator(for scrolling)
+			 *
+			 * Controller: Strategy(Controller-View)(Main)
+			 */
 
-			//	virtual void execute() = 0;
-			//};
 
-			//struct CommandSampleParams{
-			//	int a{};
-			//	int b{};
-			//};
+			using pattern::behavioral::observer_ref::ObserverRef;
+			using pattern::behavioral::observer_ref::SubjectRef;
 
-			//class CommandConcrete : public ICommand {
-			//public:
-			//	CommandConcrete(Receiver* const reciever_p, const CommandSampleParams& params_p, Client* const client_p)
-			//		: receiver{ reciever_p },
-			//		params{ params_p },
-			//		action{ &Receiver::Add },
-			//		client{ client_p } {
-			//	};
+			using pattern::structural::composite::NonTerminalComponent;
+			using pattern::structural::composite::AbstractComponent;
 
-			//	void execute() override {
-			//		client->add_result = (receiver->*action)(params.a, params.b);
-			//	};
+			using pattern::behavioral::strategy::IStrategy;
 
-			//private:
-			//	Receiver* receiver{};
-			//	CommandSampleParams params{};
-			//	int (Receiver::* action)(int, int){};
-			//	Client* client{};
-			//};
+			/**
+			 * It directly manages the data, logic and rules of the application.
+			 * The model is responsible for managing the data of the application. It receives user input from the controller.
+			 */
+			class Model {
+			public:
+			};
 
-			//class Invoker {
-			//public:
-			//	ICommand* command_ptr{};
-			//};
 
-			//void Command();
+			/**
+			 * Any representation of information such as a chart, diagram or table.
+			 * The view renders presentation of the model in a particular format.
+			 */
+			class MainView : public NonTerminalComponent {
+			public:
+			};
+
+			class SubView_1 : public AbstractComponent {
+			public:
+				void Operation() override {
+				};
+			};
+
+			class SubView_2 : public AbstractComponent {
+			public:
+				void Operation() override {
+				};
+			};
+
+
+			/**
+			 * Accepts input and converts it to commands for the model or view.
+			 * At any given time, each controller has one associated view and model, although one model object may
+			 * hear from many different controllers.
+			 *
+			 * The controller responds to the user input and performs interactions on the data model objects.
+			 * The controller receives the input, optionally validates it and then passes the input to the model.
+			 */
+			class Controller : public IStrategy {
+			public:
+				void Algorithm() override {
+					//std::cout << "Hello World";
+				}
+			};
+
+
+			class User {
+			public:
+				void Request() {
+				}
+			};
 
 		} // !namespace mvc
-	} // !namespace creational
+
+	} // !namespace architectural
 } // !namespace pattern
 
 #endif // !MVC_HPP

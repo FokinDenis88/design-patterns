@@ -43,8 +43,15 @@ namespace pattern {
 
 
 			/** Factory Method Class. Allows to redefine what objects will be instantiated in sublasses. Abstract. */
-			template<typename IProductType, typename ProductID_Type> requires std::is_enum_v<ProductID_Type>
+			template<typename IProductType, typename ProductID_Type>
+			requires std::is_enum_v<ProductID_Type>
 			class IFactoryMethod {
+			protected:
+				IFactoryMethod() = default;
+				IFactoryMethod(const IFactoryMethod&) = delete; // C.67	C.21
+				IFactoryMethod& operator=(const IFactoryMethod&) = delete;
+				IFactoryMethod(IFactoryMethod&&) noexcept = delete;
+				IFactoryMethod& operator=(IFactoryMethod&&) noexcept = delete;
 			public:
 				virtual ~IFactoryMethod() = default;
 

@@ -12,8 +12,15 @@ namespace pattern {
 
 			/** Abstract. */
 			class IImplementor {
+			protected:
+				IImplementor() = default;
+				IImplementor(const IImplementor&) = delete; // C.67	C.21
+				IImplementor& operator=(const IImplementor&) = delete;
+				IImplementor(IImplementor&&) noexcept = delete;
+				IImplementor& operator=(IImplementor&&) noexcept = delete;
 			public:
 				virtual ~IImplementor() = default;
+
 
 				virtual void OperationImpl() = 0;
 			};
@@ -26,17 +33,21 @@ namespace pattern {
 
 			/** Abstract. */
 			class Abstraction {
+			protected:
+				Abstraction() = delete;
+				Abstraction(const Abstraction&) = delete; // C.67	C.21
+				Abstraction& operator=(const Abstraction&) = delete;
+				Abstraction(Abstraction&&) noexcept = delete;
+				Abstraction& operator=(Abstraction&&) noexcept = delete;
 			public:
+				virtual ~Abstraction() = default;
+
 				using IImplementorPtr = std::unique_ptr<IImplementor>;
 
-				Abstraction() = delete;
-				Abstraction(const Abstraction&) = delete;
-				Abstraction& operator=(const Abstraction&) = delete;
-
 				explicit Abstraction(IImplementorPtr&& implementor_p) noexcept
-					:	implementor_{ std::move(implementor_p) } {
+					: implementor_{ std::move(implementor_p) } {
 				};
-				virtual ~Abstraction() = default;
+
 
 				virtual void Operation(IImplementorPtr&& implementor_p = nullptr) = 0;
 

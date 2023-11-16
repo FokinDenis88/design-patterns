@@ -37,6 +37,8 @@
 * d-pointer
 * Opaque-Pointer
 * pimpl
+* crtp
+* named parameter
 
 **Creational:**
 * Abstract-Factory

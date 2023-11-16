@@ -6,7 +6,35 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace creational {
+
 		namespace singleton {
+			/**
+			 * Class, which can be instantiated only one time. Instance is stored in heap.
+			 * Inhereted class must (hide to protected)/delete Constructors.
+			 */
+			template<typename SingletonType>
+			class Singleton {
+			public:
+				/** Get the only one instance of class */
+				static SingletonType& GetSingleton() {
+					static SingletonType instance{};
+					return (instance);
+				}
+
+			protected:
+				~Singleton() = default;	// There must be only one instance of class, so hidden constructor
+				Singleton() = default;
+				Singleton(const Singleton&) = delete;
+				Singleton& operator=(const Singleton&) = delete;
+				Singleton(Singleton&&) noexcept = delete;
+				Singleton& operator=(Singleton&&) noexcept = delete;
+
+			};
+
+		} // !namespace singleton
+
+
+		namespace singleton_example {
 
 			/** Class, which can be instantiated only one time. Instance is stored in heap. */
 			template<typename DataType>
@@ -29,7 +57,7 @@ namespace pattern {
 				Singleton() = default;
 				Singleton(const Singleton&) = delete;
 				Singleton& operator=(const Singleton&) = delete;
-				//~Singleton() = default;
+				~Singleton() = default;
 			};
 
 
@@ -85,7 +113,7 @@ namespace pattern {
 				inline static std::unique_ptr<Singleton_2> instance_{};
 			};
 
-		} // !namespace singleton
+		} // !namespace singleton_example
 
 	} // !namespace creational
 } // !namespace pattern

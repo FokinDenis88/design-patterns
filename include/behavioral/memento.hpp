@@ -21,6 +21,12 @@ namespace pattern {
 
 			/** Abstract. Forward declaring for Memento. Memento and Originator can be only concrete classes. */
 			class IOriginator {
+			protected:
+				IOriginator() = default;
+				IOriginator(const IOriginator&) = delete; // C.67	C.21
+				IOriginator& operator=(const IOriginator&) = delete;
+				IOriginator(IOriginator&&) noexcept = delete;
+				IOriginator& operator=(IOriginator&&) noexcept = delete;
 			public:
 				virtual ~IOriginator() = default;
 
@@ -41,9 +47,11 @@ namespace pattern {
 				Memento() = delete;
 				Memento(const Memento&) = delete;
 				Memento& operator=(const Memento&) = delete;
+				Memento(Memento&&) noexcept = delete;
+				Memento& operator=(Memento&&) noexcept = delete;
 
 				explicit Memento(const IOriginator& owner_p) noexcept
-					: owner_{ owner_p }, observer_state_{ owner_p.state() } {
+						: owner_{ owner_p }, observer_state_{ owner_p.state() } {
 				};
 
 			private:
@@ -113,6 +121,7 @@ namespace pattern {
 			};
 
 		} // !namespace memento_simple
+
 
 
 //#ifdef FULL_MEMENTO

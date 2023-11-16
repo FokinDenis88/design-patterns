@@ -120,10 +120,10 @@ namespace {
 					using namespace ::pattern::behavioral::observer_ref;
 					TEST(ObserverTest, ObserverRefClass) {
 						//=========Ref============
-						SubjectRef subject_ref{};
-						ObserverRef observer_ref_1{};
-						ObserverRef observer_ref_2{};
-						ObserverRef observer_ref_3{};
+						SubjectRef<State> subject_ref{};
+						ObserverRef<State> observer_ref_1{};
+						ObserverRef<State> observer_ref_2{};
+						ObserverRef<State> observer_ref_3{};
 						subject_ref.AttachObserver(observer_ref_1);
 						subject_ref.AttachObserver(observer_ref_2);
 						subject_ref.AttachObserver(observer_ref_3);
@@ -315,7 +315,7 @@ namespace {
 					DecoratorAbstract& i_decorator = decorator_a;
 					ConcreteDecoratorB decorator_b{ ConcreteDecoratorB(std::make_unique<AbstractExpression>(decorator_a), b) };*/
 
-					std::unique_ptr<AbstractExpression> my_component = std::make_unique<ConcreteComponent>();
+					std::unique_ptr<AbstractComponent> my_component = std::make_unique<ConcreteComponent>();
 					my_component = std::make_unique<ConcreteDecoratorA>(std::move(my_component), a);
 					my_component = std::make_unique<ConcreteDecoratorB>(std::move(my_component), b);
 				};

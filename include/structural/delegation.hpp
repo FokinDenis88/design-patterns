@@ -18,6 +18,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IDelegatee {
+			protected:
+				IDelegatee() = default;
+				IDelegatee(const IDelegatee&) = delete; // C.67	C.21
+				IDelegatee& operator=(const IDelegatee&) = delete;
+				IDelegatee(IDelegatee&&) noexcept = delete;
+				IDelegatee& operator=(IDelegatee&&) noexcept = delete;
 			public:
 				virtual ~IDelegatee() = default;
 
@@ -32,6 +38,9 @@ namespace pattern {
 				Delegator() = delete;
 				Delegator(const Delegator&) = delete;
 				Delegator& operator=(Delegator&) = delete;
+
+				Delegator(Delegator&&) noexcept = default;
+				Delegator& operator=(Delegator&&) noexcept = default;
 
 				explicit Delegator(std::unique_ptr<IDelegatee>&& delegate_p) noexcept
 					: delegate_{ std::move(delegate_p) } {

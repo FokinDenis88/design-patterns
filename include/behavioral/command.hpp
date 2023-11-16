@@ -53,6 +53,12 @@ namespace pattern {
 
 			/** Abstract. Interface of commands. */
 			class ICommand {
+			protected:
+				ICommand() = default;
+				ICommand(const ICommand&) = delete; // C.67	C.21
+				ICommand& operator=(const ICommand&) = delete;
+				ICommand(ICommand&&) noexcept = delete;
+				ICommand& operator=(ICommand&&) noexcept = delete;
 			public:
 				virtual ~ICommand() = default;
 
@@ -61,6 +67,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class ICommandExtended : public ICommand {
+			protected:
+				ICommandExtended() = default;
+				ICommandExtended(const ICommandExtended&) = delete; // C.67	C.21
+				ICommandExtended& operator=(const ICommandExtended&) = delete;
+				ICommandExtended(ICommandExtended&&) noexcept = delete;
+				ICommandExtended& operator=(ICommandExtended&&) noexcept = delete;
 			public:
 				~ICommandExtended() override = default;
 
@@ -103,7 +115,7 @@ namespace pattern {
 
 			/**
 			* Command Design Pattern.
-			* Only Copyable. Not Movable.
+			* Copyable and Movable.
 			*
 			* @param action_with_args_ std::function wrapper, binded with args. No Invariant: args must be binded
 			* with args for each parameter fn_type = void(). Can be functor, lambda, member function, function.
@@ -118,8 +130,8 @@ namespace pattern {
 				Command() = default;
 				Command(const Command&) = default;
 				Command& operator=(const Command&) = default;
-
-				// No Move constructors, because std::function support Copy operations
+				Command(Command&&) noexcept = default;
+				Command& operator=(Command&&) noexcept = default;
 
 				/** @param new_action callable object must be binded with args, if there are params in function */
 				explicit Command(const ActionWithArgsType& new_action)
@@ -344,11 +356,6 @@ namespace pattern {
 			requires ICommandDerivedTypes<CommandTypes...>
 			using CommandListVariant = std::list<std::variant<CommandTypes...>>;*/
 
-			/** List of reference wrappers to ICommand objects */
-			using ICommandRefList = std::list<std::reference_wrapper<ICommand>>;
-
-			using ICommandPtrList = std::list<std::unique_ptr<ICommand>>;
-
 
 			/**
 			 * Execute sequence of commands. May be Composite pattern.
@@ -359,6 +366,10 @@ namespace pattern {
 			 */
 			struct MacroCommand: public ICommand {
 			public:
+				/** List of reference wrappers to ICommand objects */
+				using ICommandRefList = std::list<std::reference_wrapper<ICommand>>;
+				using ICommandPtrList = std::list<std::unique_ptr<ICommand>>;
+
 				void Execute() override {
 					for (auto& command_ptr : commands_) {
 						if (command_ptr) {

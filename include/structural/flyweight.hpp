@@ -13,6 +13,12 @@ namespace pattern {
 
 			template<typename extrinsicStateType>
 			class IFlyweight {
+			protected:
+				IFlyweight() = default;
+				IFlyweight(const IFlyweight&) = delete; // C.67	C.21
+				IFlyweight& operator=(const IFlyweight&) = delete;
+				IFlyweight(IFlyweight&&) noexcept = delete;
+				IFlyweight& operator=(IFlyweight&&) noexcept = delete;
 			public:
 				virtual ~IFlyweight() = default;
 

@@ -9,16 +9,25 @@ namespace pattern {
 	namespace behavioral {
 		namespace template_method {
 
-			/** Template method. Abstract. */
+			/** Abstract. Template method. */
 			class TemplateMethodAbstract {
+			protected:
+				TemplateMethodAbstract() = default;
+				TemplateMethodAbstract(const TemplateMethodAbstract&) = delete; // C.67	C.21
+				TemplateMethodAbstract& operator=(const TemplateMethodAbstract&) = delete;
+				TemplateMethodAbstract(TemplateMethodAbstract&&) noexcept = delete;
+				TemplateMethodAbstract& operator=(TemplateMethodAbstract&&) noexcept = delete;
 			public:
 				/** Make class Abstract and give possibility to be override in Derived classes */
 				virtual ~TemplateMethodAbstract() = 0 {};
+
 				void TemplateMethod() {
 
 				};
+
 			protected:
 				virtual void PrimitiveOperation1() = 0;
+
 				/** Hook Method */
 				virtual void PrimitiveOperation2() {
 

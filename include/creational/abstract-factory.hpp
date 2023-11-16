@@ -35,6 +35,12 @@ namespace pattern {
 
 			/** Abstract. May include inside factory method, prototype, builder */
 			class IAbstractFactory {
+			protected:
+				IAbstractFactory() = default;
+				IAbstractFactory(const IAbstractFactory&) = delete; // C.67	C.21
+				IAbstractFactory& operator=(const IAbstractFactory&) = delete;
+				IAbstractFactory(IAbstractFactory&&) noexcept = delete;
+				IAbstractFactory& operator=(IAbstractFactory&&) noexcept = delete;
 			public:
 				virtual ~IAbstractFactory() = default;
 

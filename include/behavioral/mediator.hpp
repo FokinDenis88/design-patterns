@@ -15,6 +15,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IMediator {
+			protected:
+				IMediator() = default;
+				IMediator(const IMediator&) = delete; // C.67	C.21
+				IMediator& operator=(const IMediator&) = delete;
+				IMediator(IMediator&&) noexcept = delete;
+				IMediator& operator=(IMediator&&) noexcept = delete;
 			public:
 				virtual ~IMediator() = default;
 
@@ -33,6 +39,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class ColleagueAbstract {
+			protected:
+				ColleagueAbstract() = default;
+				ColleagueAbstract(const ColleagueAbstract&) = delete; // C.67	C.21
+				ColleagueAbstract& operator=(const ColleagueAbstract&) = delete;
+				ColleagueAbstract(ColleagueAbstract&&) noexcept = delete;
+				ColleagueAbstract& operator=(ColleagueAbstract&&) noexcept = delete;
 			public:
 				virtual ~ColleagueAbstract() = default;
 

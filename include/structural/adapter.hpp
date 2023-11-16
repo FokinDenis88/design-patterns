@@ -29,8 +29,15 @@ namespace pattern {
 
 			/** Interface of Adapter */
 			class IAdapter {
+			protected:
+				IAdapter() = default;
+				IAdapter(const IAdapter&) = delete; // C.67	C.21
+				IAdapter& operator=(const IAdapter&) = delete;
+				IAdapter(IAdapter&&) noexcept = delete;
+				IAdapter& operator=(IAdapter&&) noexcept = delete;
 			public:
 				virtual ~IAdapter() = default;
+
 				virtual void SomeInterfaceFunction() = 0;
 			};
 

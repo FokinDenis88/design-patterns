@@ -9,6 +9,12 @@ namespace pattern {
 		namespace prototype {
 
 			class IPrototype {
+			protected:
+				IPrototype() = default;
+				IPrototype(const IPrototype&) = delete; // C.67	C.21
+				IPrototype& operator=(const IPrototype&) = delete;
+				IPrototype(IPrototype&&) noexcept = delete;
+				IPrototype& operator=(IPrototype&&) noexcept = delete;
 			public:
 				virtual ~IPrototype() = default;
 

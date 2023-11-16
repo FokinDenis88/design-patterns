@@ -16,6 +16,12 @@ namespace pattern {
 
 
 			class ISubject {
+			protected:
+				ISubject() = default;
+				ISubject(const ISubject&) = delete; // C.67	C.21
+				ISubject& operator=(const ISubject&) = delete;
+				ISubject(ISubject&&) noexcept = delete;
+				ISubject& operator=(ISubject&&) noexcept = delete;
 			public:
 				virtual ~ISubject() = default;
 
@@ -34,6 +40,9 @@ namespace pattern {
 				Proxy() = delete;
 				Proxy(const Proxy&) = delete;
 				Proxy& operator=(const Proxy&) = delete;
+
+				Proxy(Proxy&&) noexcept = default;
+				Proxy& operator=(Proxy&&) noexcept = default;
 
 				explicit Proxy(std::unique_ptr<ISubject>&& real_subject_p) noexcept
 						: real_subject_{ std::move(real_subject_p) } {

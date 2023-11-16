@@ -16,6 +16,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IAggregate {
+			protected:
+				IAggregate() = default;
+				IAggregate(const IAggregate&) = delete; // C.67	C.21
+				IAggregate& operator=(const IAggregate&) = delete;
+				IAggregate(IAggregate&&) noexcept = delete;
+				IAggregate& operator=(IAggregate&&) noexcept = delete;
 			public:
 				virtual ~IAggregate() = default;
 
@@ -30,6 +36,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IIterator {
+			protected:
+				IIterator() = default;
+				IIterator(const IIterator&) = delete; // C.67	C.21
+				IIterator& operator=(const IIterator&) = delete;
+				IIterator(IIterator&&) noexcept = delete;
+				IIterator& operator=(IIterator&&) noexcept = delete;
 			public:
 				virtual ~IIterator() = default;
 

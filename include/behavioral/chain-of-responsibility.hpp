@@ -22,11 +22,15 @@ namespace pattern {
 				HandlerAbstract(const HandlerAbstract&) = delete;
 				HandlerAbstract& operator=(HandlerAbstract&) = delete;
 
+				HandlerAbstract(HandlerAbstract&&) noexcept = default;
+				HandlerAbstract& operator=(HandlerAbstract&&) noexcept = default;
+
 				explicit HandlerAbstract(std::unique_ptr<HandlerAbstract>&& successor_p) noexcept
 					: successor_{ std::move(successor_p) } {
 				};
 				/** Pure virtual */
 				virtual ~HandlerAbstract() = 0 {};
+
 
 				/** Optional. Can be defaulted or pure virtual */
 				virtual void HandleRequest() {
@@ -47,6 +51,9 @@ namespace pattern {
 				HandlerConcrete1() = delete;
 				HandlerConcrete1(const HandlerConcrete1&) = delete;
 				HandlerConcrete1& operator=(HandlerConcrete1&) = delete;
+
+				HandlerConcrete1(HandlerConcrete1&&) noexcept = default;
+				HandlerConcrete1& operator=(HandlerConcrete1&&) noexcept = default;
 
 				explicit HandlerConcrete1(std::unique_ptr<HandlerAbstract>&& successor_p) noexcept
 					: HandlerAbstract(std::move(successor_p)) {

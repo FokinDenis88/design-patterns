@@ -10,31 +10,39 @@ namespace pattern {
 		namespace decorator {
 			// https://en.wikipedia.org/wiki/Decorator_pattern
 
-			class AbstractExpression {
+			class AbstractComponent {
+			protected:
+				AbstractComponent() = default;
+				AbstractComponent(const AbstractComponent&) = delete; // C.67	C.21
+				AbstractComponent& operator=(const AbstractComponent&) = delete;
+				AbstractComponent(AbstractComponent&&) noexcept = delete;
+				AbstractComponent& operator=(AbstractComponent&&) noexcept = delete;
 			public:
-				virtual ~AbstractExpression() = default;
+				virtual ~AbstractComponent() = default;
 
 				virtual void Operation1() = 0;
 				virtual void Operation2() = 0;
 			};
 
-			class ConcreteComponent : public AbstractExpression {
+			class ConcreteComponent : public AbstractComponent {
 			public:
 				void Operation1() override {};
 				void Operation2() override {};
 			};
 
 			/** Abstract Decorator. Pure Virtual. */
-			class DecoratorAbstract : public AbstractExpression {
-			public:
+			class DecoratorAbstract : public AbstractComponent {
+			protected:
 				DecoratorAbstract() = delete;
-				DecoratorAbstract(const DecoratorAbstract&) = delete;
+				DecoratorAbstract(const DecoratorAbstract&) = delete; // C.67	C.21
 				DecoratorAbstract& operator=(const DecoratorAbstract&) = delete;
-
+				DecoratorAbstract(DecoratorAbstract&&) noexcept = delete;
+				DecoratorAbstract& operator=(DecoratorAbstract&&) noexcept = delete;
+			public:
 				~DecoratorAbstract() override = default;
 
-				explicit DecoratorAbstract(std::unique_ptr<AbstractExpression>&& component_p) noexcept
-					: component_{ std::move(component_p) } {
+				explicit DecoratorAbstract(std::unique_ptr<AbstractComponent>&& component_p) noexcept
+						: component_{ std::move(component_p) } {
 				}
 
 				/* AbstractExpression Functions can be pure virtual or can have default behavior */
@@ -60,7 +68,7 @@ namespace pattern {
 				//inline std::unique_ptr<AbstractExpression>& GetComponent() noexcept { return component_; };
 
 			private:
-				std::unique_ptr<AbstractExpression> component_{};
+				std::unique_ptr<AbstractComponent> component_{};
 			};
 
 			class ConcreteDecoratorA final: public DecoratorAbstract {
@@ -68,11 +76,14 @@ namespace pattern {
 				ConcreteDecoratorA() = delete;
 				ConcreteDecoratorA(const ConcreteDecoratorA&) = delete;
 				ConcreteDecoratorA& operator=(const ConcreteDecoratorA&) = delete;
+				ConcreteDecoratorA(ConcreteDecoratorA&&) noexcept = default;
+				ConcreteDecoratorA& operator=(ConcreteDecoratorA&&) noexcept = default;
 
-				explicit ConcreteDecoratorA(std::unique_ptr<AbstractExpression>&& component_p, int a_p) noexcept
+				explicit ConcreteDecoratorA(std::unique_ptr<AbstractComponent>&& component_p, int a_p) noexcept
 					:	DecoratorAbstract(std::move(component_p)),
 						a_{ a_p } {
 				}
+
 
 				void Operation1() override {
 					// Can add behavior after and/or before delegation
@@ -98,8 +109,10 @@ namespace pattern {
 				ConcreteDecoratorB() = delete;
 				ConcreteDecoratorB(const ConcreteDecoratorB&) = delete;
 				ConcreteDecoratorB& operator=(const ConcreteDecoratorB&) = delete;
+				ConcreteDecoratorB(ConcreteDecoratorB&&) noexcept = default;
+				ConcreteDecoratorB& operator=(ConcreteDecoratorB&&) noexcept = default;
 
-				explicit ConcreteDecoratorB(std::unique_ptr<AbstractExpression>&& component_p, int b_p) noexcept
+				explicit ConcreteDecoratorB(std::unique_ptr<AbstractComponent>&& component_p, int b_p) noexcept
 					:	DecoratorAbstract(std::move(component_p)),
 						b_{ b_p } {
 				}

@@ -14,6 +14,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IServices {
+			protected:
+				IServices() = default;
+				IServices(const IServices&) = delete; // C.67	C.21
+				IServices& operator=(const IServices&) = delete;
+				IServices(IServices&&) noexcept = delete;
+				IServices& operator=(IServices&&) noexcept = delete;
 			public:
 				virtual ~IServices() = default;
 
@@ -66,6 +72,9 @@ namespace pattern {
 				Client() = delete;
 				Client(const Client&) = delete;
 				Client operator=(const Client&) = delete;
+
+				Client(Client&&) noexcept = default;
+				Client& operator=(Client&&) noexcept = default;
 
 				explicit Client(std::unique_ptr<IServices>&& services_p) noexcept : services_{ std::move(services_p) } {
 				};

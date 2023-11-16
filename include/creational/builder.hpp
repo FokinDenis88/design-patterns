@@ -43,6 +43,12 @@ namespace pattern {
 
 			/** Abstract */
 			class CarBuilderAbstract {
+			protected:
+				CarBuilderAbstract() = default;
+				CarBuilderAbstract(const CarBuilderAbstract&) = delete; // C.67	C.21
+				CarBuilderAbstract& operator=(const CarBuilderAbstract&) = delete;
+				CarBuilderAbstract(CarBuilderAbstract&&) noexcept = delete;
+				CarBuilderAbstract& operator=(CarBuilderAbstract&&) noexcept = delete;
 			public:
 				virtual ~CarBuilderAbstract() = default;
 
@@ -80,6 +86,9 @@ namespace pattern {
 				CarDirector() = delete;
 				CarDirector(const CarDirector&) = delete;
 				CarDirector& operator=(const CarDirector&) = delete;
+
+				CarDirector(CarDirector&&) noexcept = default;
+				CarDirector& operator=(CarDirector&&) noexcept = default;
 
 				explicit CarDirector(std::unique_ptr<CarBuilderAbstract>&& car_builder_p) noexcept
 					: car_builder_{ std::move(car_builder_p) } {

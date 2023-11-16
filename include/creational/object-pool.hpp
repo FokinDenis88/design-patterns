@@ -19,8 +19,15 @@ namespace pattern {
 
 			/** Abstract */
 			class IObjectPoolResource {
+			protected:
+				IObjectPoolResource() = default;
+				IObjectPoolResource(const IObjectPoolResource&) = delete; // C.67	C.21
+				IObjectPoolResource& operator=(const IObjectPoolResource&) = delete;
+				IObjectPoolResource(IObjectPoolResource&&) noexcept = delete;
+				IObjectPoolResource& operator=(IObjectPoolResource&&) noexcept = delete;
 			public:
 				virtual ~IObjectPoolResource() = default;
+
 
 				/** Resets values to default value. Needed, when returning resource_ptr to pool */
 				virtual void Reset() = 0;
@@ -37,11 +44,18 @@ namespace pattern {
 			/** Abstract. Hybrid version CRTP idiom. */
 			template<typename ObjectPoolType>
 			class IObjectPool {
+			protected:
+				IObjectPool() = default;
+				IObjectPool(const IObjectPool&) = delete; // C.67	C.21
+				IObjectPool& operator=(const IObjectPool&) = delete;
+				IObjectPool(IObjectPool&&) noexcept = delete;
+				IObjectPool& operator=(IObjectPool&&) noexcept = delete;
 			public:
+				virtual ~IObjectPool() = default;
+
 				using DeleterType = ObjectPoolDeleterFunctor<ObjectPoolType>;
 				using ResourcePtrType = std::unique_ptr<IObjectPoolResource, DeleterType>;
 
-				virtual ~IObjectPool() = default;
 
 				/** Return resource. For Deleter function. */
 				virtual void ReturnResourceToPool(IObjectPoolResource* returning_resource) = 0;
@@ -93,16 +107,16 @@ namespace pattern {
 			requires std::derived_from<ObjectPoolResourceType, IObjectPoolResource>
 			class ObjectPool : public IObjectPool<ObjectPool<ObjectPoolResourceType, kIsVector>> {
 			public:
-				using IObjectPoolType = IObjectPool<ObjectPool<ObjectPoolResourceType, kIsVector>>;
+				using IObjectPoolType	= IObjectPool<ObjectPool<ObjectPoolResourceType, kIsVector>>;
 				/** ObjectPoolDeleterFunctor<ObjectPoolType>; */
-				using DeleterType = IObjectPoolType::DeleterType;
+				using DeleterType		= IObjectPoolType::DeleterType;
 				/** std::unique_ptr<IObjectPoolResource, DeleterType>; */
-				using ResourcePtrType = IObjectPoolType::ResourcePtrType;
+				using ResourcePtrType	= IObjectPoolType::ResourcePtrType;
 
 				using IObjectPoolType::ReturnResourceToPool;
 				using IObjectPoolType::GetResourceFromPool;
 
-				using PoolContainerType = VectorOrList<ResourcePtrType, kIsVector>::Type;
+				using PoolContainerType	= VectorOrList<ResourcePtrType, kIsVector>::Type;
 
 
 				/**
@@ -183,8 +197,10 @@ namespace pattern {
 				explicit ObjectPool(const size_t new_objects_limit_p) noexcept
 						:	new_objects_limit_{ new_objects_limit_p } {
 				}
+				// Mustn't be Copy Constructed, cause singleton
 				ObjectPool(const ObjectPool&) = delete;
 				ObjectPool& operator=(const ObjectPool&) = delete;
+				~ObjectPool() = default;
 
 
 				/** Creating new resource, that can be stored in resources_ vector */
@@ -205,6 +221,7 @@ namespace pattern {
 				size_t new_objects_limit_{ 0 };
 
 			}; // !class ObjectPool
+
 
 		} // !namespace object_pool
 

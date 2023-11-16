@@ -13,15 +13,24 @@ namespace pattern {
 			// https://en.wikipedia.org/wiki/Observer_pattern
 			// Classes ObserverRef and SubjectRef depends on each other by state
 
+			/**
+			 * If too many subjects are observed by little amount of observers you can use hash table
+			 * to economy space, making access time worser.
+			 * If there are many subject, that observer must be subscribed. Needs to add Subject& param to Observer.Update()
+			 */
+
 
 //==================================Interfaces=====================================
-			struct State {
-				int a_{ 0 };
-				int b_{ 0 };
-			};
 
 			/** Abstract. */
+			template<typename StateType>
 			class IObserver {
+			protected:
+				IObserver() = default;
+				IObserver(const IObserver&) = delete; // C.67	C.21
+				IObserver& operator=(const IObserver&) = delete;
+				IObserver(IObserver&&) noexcept = delete;
+				IObserver& operator=(IObserver&&) noexcept = delete;
 			public:
 				virtual ~IObserver() = default;
 
@@ -30,39 +39,48 @@ namespace pattern {
 				 * There is Push and Pull Variants of realization. SubjectRef push aspect information of what
 				 * is changing. Push is less decoupled.
 				 */
-				virtual void Update(const State& observable_state) = 0;
+				virtual void Update(const StateType& observable_state) = 0;
 			};
 
-			class ISubject;
+			template<typename StateType>
 			class ISubjectExtended;
 
 			/** Abstract. */
-			class IObserverExtended : public IObserver {
+			template<typename StateType>
+			class IObserverExtended : public IObserver<StateType> {
 			public:
 				~IObserverExtended() override = default;
 
 				/** Change the subject_ref of which observer_state_ we will be notified */
-				virtual void SetObservable(ISubjectExtended& new_observable) = 0;
+				virtual void SetObservable(ISubjectExtended<StateType>& new_observable) = 0;
 			};
 
 
 			/** Abstract. */
+			template<typename StateType>
 			class ISubject {
+			protected:
+				ISubject() = default;
+				ISubject(const ISubject&) = delete; // C.67	C.21
+				ISubject& operator=(const ISubject&) = delete;
+				ISubject(ISubject&&) noexcept = delete;
+				ISubject& operator=(ISubject&&) noexcept = delete;
 			public:
 				virtual ~ISubject() = default;
 
 				/** Add ObserverRef to list of notification */
-				virtual void AttachObserver(IObserver& observer) = 0;
+				virtual void AttachObserver(IObserver<StateType>& observer) = 0;
 
 				/** Detach observer_ref_1 from notifying list */
-				virtual void DetachObserver(IObserver& observer) = 0;
+				virtual void DetachObserver(IObserver<StateType>& observer) = 0;
 
 				/** Update all attached observers */
 				virtual void Notify() const = 0;
 			};
 
 			/** Abstract. */
-			class ISubjectExtended : public ISubject {
+			template<typename StateType>
+			class ISubjectExtended : public ISubject<StateType> {
 			public:
 				~ISubjectExtended() override = default;
 
@@ -74,33 +92,35 @@ namespace pattern {
 //======================================Ref Version=====================================
 // Ref Version can be used with stack objects
 
-			// TODO: Can be refactored to template?
-			class ObserverRef : public IObserver {
+
+			template<typename StateType>
+			class ObserverRef : public IObserver<StateType> {
 			public:
 				/** Update the information about observer_state_ of observable object */
-				inline void Update(const State& observable_state) noexcept override {
+				inline void Update(const StateType& observable_state) noexcept override {
 					observer_state_ = observable_state;
 				};
 
 			private:
-				State observer_state_{};
+				StateType observer_state_{};
 			};
 
 			/**
 			 * Observers will be notified on SubjectRef state changes.
 			 * Ref Version can be used with stack objects
 			 */
-			class SubjectRef : public ISubject {
+			template<typename StateType>
+			class SubjectRef : public ISubject<StateType> {
 			public:
-				using IObserverRef = std::reference_wrapper<IObserver>;
+				using IObserverRef = std::reference_wrapper<IObserver<StateType>>;
 
 				/** Add ObserverRef to list of notification */
-				inline void AttachObserver(IObserver& observer) override {
+				inline void AttachObserver(IObserver<StateType>& observer) override {
 					notifying_list_.emplace_front(std::ref(observer));
 				};
 
 				/** Detach observer_ref_1 from notifying list */
-				inline void DetachObserver(IObserver& observer) override {
+				inline void DetachObserver(IObserver<StateType>& observer) override {
 					notifying_list_.remove_if([&observer](const IObserverRef& current) {
 														return &current.get() == &observer;
 														});
@@ -118,7 +138,7 @@ namespace pattern {
 					notifying_list_.clear();
 				};
 
-				inline void set_state(const State& new_state) noexcept {
+				inline void set_state(const StateType& new_state) noexcept {
 					observable_state_ = new_state;
 					//Notify();
 				}
@@ -132,12 +152,20 @@ namespace pattern {
 				 * Containers can't hold IObserver&. Only wrapper.
 				 */
 				std::forward_list<IObserverRef> notifying_list_{};
+				// TODO: Maybe unordered_set ???
 
 				/** The observable_state_ of SubjectRef object */
-				State observable_state_{};
+				StateType observable_state_{};
+			};
+
+
+			struct State {
+				int a_{ 0 };
+				int b_{ 0 };
 			};
 
 		} // !namespace observer_ref_1
+
 
 
 		namespace observer_smart_ptr {
@@ -274,7 +302,8 @@ namespace pattern {
 				/*explicit Observer(const std::shared_ptr<ISubject>& new_observable)
 					: observable_{ new_observable } {
 				}
-				Observer(const Observer&) = delete;
+				Observer(const Observer&) = delete
+				;
 				Observer& operator=(const Observer&) = delete;*/
 
 				/** Update the information about observer_state_ of observable object */
@@ -375,14 +404,14 @@ namespace pattern {
 				virtual void update(Subject& s) const = 0;
 
 			private:
-				// erence to a Subject object to detach in the destructor
+				// Rerence to a Subject object to detach in the destructor
 				Subject& subject;
 			};
 
 			// Example of usage
 			class ConcreteObserver : public Observer {
 			public:
-				explicit ConcreteObserver(Subject& subj) noexcept : Observer(subj) {
+				explicit ConcreteObserver(Subject& subj) noexcept : Observer{ subj } {
 				}
 
 				// Get notification

@@ -9,6 +9,12 @@ namespace pattern {
 		namespace observer_state_ {
 
 			class IState {
+			protected:
+				IState() = default;
+				IState(const IState&) = delete; // C.67	C.21
+				IState& operator=(const IState&) = delete;
+				IState(IState&&) noexcept = delete;
+				IState& operator=(IState&&) noexcept = delete;
 			public:
 				virtual ~IState() = default;
 

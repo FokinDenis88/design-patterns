@@ -19,6 +19,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IElement {
+			protected:
+				IElement() = default;
+				IElement(const IElement&) = delete; // C.67	C.21
+				IElement& operator=(const IElement&) = delete;
+				IElement(IElement&&) noexcept = delete;
+				IElement& operator=(IElement&&) noexcept = delete;
 			public:
 				virtual ~IElement() = default;
 
@@ -27,6 +33,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class IVisitor {
+			protected:
+				IVisitor() = default;
+				IVisitor(const IVisitor&) = delete; // C.67	C.21
+				IVisitor& operator=(const IVisitor&) = delete;
+				IVisitor(IVisitor&&) noexcept = delete;
+				IVisitor& operator=(IVisitor&&) noexcept = delete;
 			public:
 				virtual ~IVisitor() = default;
 

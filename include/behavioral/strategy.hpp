@@ -11,6 +11,12 @@ namespace pattern {
 
 			/** Abstract class. */
 			class IStrategy {
+			protected:
+				IStrategy() = default;
+				IStrategy(const IStrategy&) = delete; // C.67	C.21
+				IStrategy& operator=(const IStrategy&) = delete;
+				IStrategy(IStrategy&&) noexcept = delete;
+				IStrategy& operator=(IStrategy&&) noexcept = delete;
 			public:
 				virtual ~IStrategy() = default;
 

@@ -12,6 +12,12 @@ namespace pattern {
 
 			/** Abstract. */
 			class ISubject {
+			protected:
+				ISubject() = default;
+				ISubject(const ISubject&) = delete; // C.67	C.21
+				ISubject& operator=(const ISubject&) = delete;
+				ISubject(ISubject&&) noexcept = delete;
+				ISubject& operator=(ISubject&&) noexcept = delete;
 			public:
 				virtual ~ISubject() = default;
 

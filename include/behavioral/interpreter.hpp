@@ -24,16 +24,23 @@ namespace pattern {
 			};
 
 			/** Abstract. */
-			class AbstractExpression {
+			class AbstractComponent {
+			protected:
+				AbstractComponent() = default;
+				AbstractComponent(const AbstractComponent&) = delete; // C.67	C.21
+				AbstractComponent& operator=(const AbstractComponent&) = delete;
+				AbstractComponent(AbstractComponent&&) noexcept = delete;
+				AbstractComponent& operator=(AbstractComponent&&) noexcept = delete;
 			public:
-				virtual ~AbstractExpression() = default;
+				virtual ~AbstractComponent() = default;
+
 
 				virtual void Interpret(Context& context) = 0;
 
 				// set parent_ptr in AddChild & RemoveChild
-				virtual const AbstractExpression* GetChild() const noexcept { return nullptr; };
+				virtual const AbstractComponent* GetChild() const noexcept { return nullptr; };
 
-				virtual void AddChild(AbstractExpression&) {
+				virtual void AddChild(AbstractComponent&) {
 					if (GetChild()) {
 						// Add Child
 					} else {
@@ -41,7 +48,7 @@ namespace pattern {
 					}
 				};
 
-				virtual void RemoveChild(AbstractExpression&) {
+				virtual void RemoveChild(AbstractComponent&) {
 					if (GetChild()) {
 						// Remove Child
 					} else {
@@ -51,7 +58,7 @@ namespace pattern {
 			};
 
 			/** Terminal Expression of Language Abstract Tree */
-			class TerminalExpression : public AbstractExpression {
+			class TerminalComponent : public AbstractComponent {
 			public:
 				void Interpret(Context& context) override {
 					ProcessLeaf();
@@ -63,7 +70,7 @@ namespace pattern {
 			};
 
 			/** Non Terminal Expression of Language Abstract Tree */
-			class NonTerminalExpression : public AbstractExpression {
+			class NonTerminalComponent : public AbstractComponent {
 			public:
 				void Interpret(Context& context) override {
 					for (auto& expression : child_expressions_) {
@@ -71,12 +78,12 @@ namespace pattern {
 					}
 				};
 
-				const AbstractExpression* GetChild() const noexcept override { return this; };
-				void AddChild(AbstractExpression&) override {};
-				void RemoveChild(AbstractExpression&) override {};
+				const AbstractComponent* GetChild() const noexcept override { return this; };
+				void AddChild(AbstractComponent&) override {};
+				void RemoveChild(AbstractComponent&) override {};
 
 			private:
-				std::forward_list<std::unique_ptr<AbstractExpression>> child_expressions_{};
+				std::forward_list<std::unique_ptr<AbstractComponent>> child_expressions_{};
 			};
 
 		} // !namespace interpreter
