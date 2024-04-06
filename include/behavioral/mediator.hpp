@@ -17,10 +17,10 @@ namespace pattern {
 			class IMediator {
 			protected:
 				IMediator() = default;
-				IMediator(const IMediator&) = delete; // C.67	C.21
-				IMediator& operator=(const IMediator&) = delete;
-				IMediator(IMediator&&) noexcept = delete;
-				IMediator& operator=(IMediator&&) noexcept = delete;
+				IMediator(const IMediator&) = default; // C.67	C.21
+				IMediator& operator=(const IMediator&) = default;
+				IMediator(IMediator&&) noexcept = default;
+				IMediator& operator=(IMediator&&) noexcept = default;
 			public:
 				virtual ~IMediator() = default;
 
@@ -41,10 +41,10 @@ namespace pattern {
 			class ColleagueAbstract {
 			protected:
 				ColleagueAbstract() = default;
-				ColleagueAbstract(const ColleagueAbstract&) = delete; // C.67	C.21
-				ColleagueAbstract& operator=(const ColleagueAbstract&) = delete;
-				ColleagueAbstract(ColleagueAbstract&&) noexcept = delete;
-				ColleagueAbstract& operator=(ColleagueAbstract&&) noexcept = delete;
+				ColleagueAbstract(const ColleagueAbstract&) = default; // C.67	C.21
+				ColleagueAbstract& operator=(const ColleagueAbstract&) = default;
+				ColleagueAbstract(ColleagueAbstract&&) noexcept = default;
+				ColleagueAbstract& operator=(ColleagueAbstract&&) noexcept = default;
 			public:
 				virtual ~ColleagueAbstract() = default;
 

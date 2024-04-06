@@ -14,10 +14,10 @@ namespace pattern {
 			class IImplementor {
 			protected:
 				IImplementor() = default;
-				IImplementor(const IImplementor&) = delete; // C.67	C.21
-				IImplementor& operator=(const IImplementor&) = delete;
-				IImplementor(IImplementor&&) noexcept = delete;
-				IImplementor& operator=(IImplementor&&) noexcept = delete;
+				IImplementor(const IImplementor&) = default; // C.67	C.21
+				IImplementor& operator=(const IImplementor&) = default;
+				IImplementor(IImplementor&&) noexcept = default;
+				IImplementor& operator=(IImplementor&&) noexcept = default;
 			public:
 				virtual ~IImplementor() = default;
 
@@ -37,8 +37,8 @@ namespace pattern {
 				Abstraction() = delete;
 				Abstraction(const Abstraction&) = delete; // C.67	C.21
 				Abstraction& operator=(const Abstraction&) = delete;
-				Abstraction(Abstraction&&) noexcept = delete;
-				Abstraction& operator=(Abstraction&&) noexcept = delete;
+				Abstraction(Abstraction&&) noexcept = default;	// for move unique_ptr
+				Abstraction& operator=(Abstraction&&) noexcept = default;
 			public:
 				virtual ~Abstraction() = default;
 

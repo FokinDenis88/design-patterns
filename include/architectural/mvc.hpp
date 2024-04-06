@@ -92,6 +92,9 @@ namespace pattern {
 				}
 			};
 
+			// Controller_1
+			// Controller_2
+
 
 			class User {
 			public:

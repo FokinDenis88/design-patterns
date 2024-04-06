@@ -28,7 +28,6 @@ namespace pattern {
 				Singleton& operator=(const Singleton&) = delete;
 				Singleton(Singleton&&) noexcept = delete;
 				Singleton& operator=(Singleton&&) noexcept = delete;
-
 			};
 
 		} // !namespace singleton

@@ -55,10 +55,10 @@ namespace pattern {
 			class ICommand {
 			protected:
 				ICommand() = default;
-				ICommand(const ICommand&) = delete; // C.67	C.21
-				ICommand& operator=(const ICommand&) = delete;
-				ICommand(ICommand&&) noexcept = delete;
-				ICommand& operator=(ICommand&&) noexcept = delete;
+				ICommand(const ICommand&) = default; // C.67	C.21
+				ICommand& operator=(const ICommand&) = default;
+				ICommand(ICommand&&) noexcept = default;
+				ICommand& operator=(ICommand&&) noexcept = default;
 			public:
 				virtual ~ICommand() = default;
 
@@ -69,10 +69,10 @@ namespace pattern {
 			class ICommandExtended : public ICommand {
 			protected:
 				ICommandExtended() = default;
-				ICommandExtended(const ICommandExtended&) = delete; // C.67	C.21
-				ICommandExtended& operator=(const ICommandExtended&) = delete;
-				ICommandExtended(ICommandExtended&&) noexcept = delete;
-				ICommandExtended& operator=(ICommandExtended&&) noexcept = delete;
+				ICommandExtended(const ICommandExtended&) = default; // C.67	C.21
+				ICommandExtended& operator=(const ICommandExtended&) = default;
+				ICommandExtended(ICommandExtended&&) noexcept = default;
+				ICommandExtended& operator=(ICommandExtended&&) noexcept = default;
 			public:
 				~ICommandExtended() override = default;
 

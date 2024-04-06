@@ -13,10 +13,10 @@ namespace pattern {
 			class TemplateMethodAbstract {
 			protected:
 				TemplateMethodAbstract() = default;
-				TemplateMethodAbstract(const TemplateMethodAbstract&) = delete; // C.67	C.21
-				TemplateMethodAbstract& operator=(const TemplateMethodAbstract&) = delete;
-				TemplateMethodAbstract(TemplateMethodAbstract&&) noexcept = delete;
-				TemplateMethodAbstract& operator=(TemplateMethodAbstract&&) noexcept = delete;
+				TemplateMethodAbstract(const TemplateMethodAbstract&) = default; // C.67	C.21
+				TemplateMethodAbstract& operator=(const TemplateMethodAbstract&) = default;
+				TemplateMethodAbstract(TemplateMethodAbstract&&) noexcept = default;
+				TemplateMethodAbstract& operator=(TemplateMethodAbstract&&) noexcept = default;
 			public:
 				/** Make class Abstract and give possibility to be override in Derived classes */
 				virtual ~TemplateMethodAbstract() = 0 {};

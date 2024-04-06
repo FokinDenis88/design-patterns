@@ -27,10 +27,10 @@ namespace pattern {
 			class IObserver {
 			protected:
 				IObserver() = default;
-				IObserver(const IObserver&) = delete; // C.67	C.21
-				IObserver& operator=(const IObserver&) = delete;
-				IObserver(IObserver&&) noexcept = delete;
-				IObserver& operator=(IObserver&&) noexcept = delete;
+				IObserver(const IObserver&) = default; // C.67	C.21
+				IObserver& operator=(const IObserver&) = default;
+				IObserver(IObserver&&) noexcept = default;
+				IObserver& operator=(IObserver&&) noexcept = default;
 			public:
 				virtual ~IObserver() = default;
 
@@ -61,10 +61,10 @@ namespace pattern {
 			class ISubject {
 			protected:
 				ISubject() = default;
-				ISubject(const ISubject&) = delete; // C.67	C.21
-				ISubject& operator=(const ISubject&) = delete;
-				ISubject(ISubject&&) noexcept = delete;
-				ISubject& operator=(ISubject&&) noexcept = delete;
+				ISubject(const ISubject&) = default; // C.67	C.21
+				ISubject& operator=(const ISubject&) = default;
+				ISubject(ISubject&&) noexcept = default;
+				ISubject& operator=(ISubject&&) noexcept = default;
 			public:
 				virtual ~ISubject() = default;
 
@@ -98,11 +98,11 @@ namespace pattern {
 			public:
 				/** Update the information about observer_state_ of observable object */
 				inline void Update(const StateType& observable_state) noexcept override {
-					observer_state_ = observable_state;
+					originator_state_ = observable_state;
 				};
 
 			private:
-				StateType observer_state_{};
+				StateType originator_state_{};
 			};
 
 			/**
@@ -239,11 +239,11 @@ namespace pattern {
 			public:
 				/** Update the information about observer_state_ of observable object */
 				inline void Update(const State& observable_state) noexcept override {
-					observer_state_ = observable_state;
+					originator_state_ = observable_state;
 				};
 
 			private:
-				State observer_state_{};
+				State originator_state_{};
 			};
 
 			/** Observers will be notified on SubjectRef state changes */

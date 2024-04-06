@@ -8,6 +8,11 @@
 namespace pattern {
 	namespace creational {
 		namespace builder {
+			/**
+			 * Divide Construction of complex object from it's representation.
+			 */
+
+
 			struct Engine {
 				int value1{};
 				int value2{};
@@ -45,10 +50,10 @@ namespace pattern {
 			class CarBuilderAbstract {
 			protected:
 				CarBuilderAbstract() = default;
-				CarBuilderAbstract(const CarBuilderAbstract&) = delete; // C.67	C.21
-				CarBuilderAbstract& operator=(const CarBuilderAbstract&) = delete;
-				CarBuilderAbstract(CarBuilderAbstract&&) noexcept = delete;
-				CarBuilderAbstract& operator=(CarBuilderAbstract&&) noexcept = delete;
+				CarBuilderAbstract(const CarBuilderAbstract&) = default; // C.67	C.21
+				CarBuilderAbstract& operator=(const CarBuilderAbstract&) = default;
+				CarBuilderAbstract(CarBuilderAbstract&&) noexcept = default;
+				CarBuilderAbstract& operator=(CarBuilderAbstract&&) noexcept = default;
 			public:
 				virtual ~CarBuilderAbstract() = default;
 
@@ -73,6 +78,7 @@ namespace pattern {
 				std::unique_ptr<Car> GetResult() noexcept override {
 					return std::move(broken_car_ptr_);
 				};
+
 			private:
 				std::unique_ptr<Car> broken_car_ptr_{};
 			};

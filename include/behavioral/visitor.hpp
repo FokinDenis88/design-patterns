@@ -21,10 +21,10 @@ namespace pattern {
 			class IElement {
 			protected:
 				IElement() = default;
-				IElement(const IElement&) = delete; // C.67	C.21
-				IElement& operator=(const IElement&) = delete;
-				IElement(IElement&&) noexcept = delete;
-				IElement& operator=(IElement&&) noexcept = delete;
+				IElement(const IElement&) = default; // C.67	C.21
+				IElement& operator=(const IElement&) = default;
+				IElement(IElement&&) noexcept = default;
+				IElement& operator=(IElement&&) noexcept = default;
 			public:
 				virtual ~IElement() = default;
 
@@ -35,10 +35,10 @@ namespace pattern {
 			class IVisitor {
 			protected:
 				IVisitor() = default;
-				IVisitor(const IVisitor&) = delete; // C.67	C.21
-				IVisitor& operator=(const IVisitor&) = delete;
-				IVisitor(IVisitor&&) noexcept = delete;
-				IVisitor& operator=(IVisitor&&) noexcept = delete;
+				IVisitor(const IVisitor&) = default; // C.67	C.21
+				IVisitor& operator=(const IVisitor&) = default;
+				IVisitor(IVisitor&&) noexcept = default;
+				IVisitor& operator=(IVisitor&&) noexcept = default;
 			public:
 				virtual ~IVisitor() = default;
 

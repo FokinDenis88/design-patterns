@@ -20,10 +20,10 @@ namespace pattern {
 			class IDelegatee {
 			protected:
 				IDelegatee() = default;
-				IDelegatee(const IDelegatee&) = delete; // C.67	C.21
-				IDelegatee& operator=(const IDelegatee&) = delete;
-				IDelegatee(IDelegatee&&) noexcept = delete;
-				IDelegatee& operator=(IDelegatee&&) noexcept = delete;
+				IDelegatee(const IDelegatee&) = default; // C.67	C.21
+				IDelegatee& operator=(const IDelegatee&) = default;
+				IDelegatee(IDelegatee&&) noexcept = default;
+				IDelegatee& operator=(IDelegatee&&) noexcept = default;
 			public:
 				virtual ~IDelegatee() = default;
 

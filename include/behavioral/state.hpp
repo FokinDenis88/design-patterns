@@ -6,15 +6,15 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace behavioral {
-		namespace observer_state_ {
+		namespace originator_state_ {
 
 			class IState {
 			protected:
 				IState() = default;
-				IState(const IState&) = delete; // C.67	C.21
-				IState& operator=(const IState&) = delete;
-				IState(IState&&) noexcept = delete;
-				IState& operator=(IState&&) noexcept = delete;
+				IState(const IState&) = default; // C.67	C.21
+				IState& operator=(const IState&) = default;
+				IState(IState&&) noexcept = default;
+				IState& operator=(IState&&) noexcept = default;
 			public:
 				virtual ~IState() = default;
 
@@ -45,10 +45,10 @@ namespace pattern {
 			class Client {
 			public:
 				void Request() {
-					observer_state_->Handle();
+					originator_state_->Handle();
 				};
 			private:
-				std::unique_ptr<IState> observer_state_{};
+				std::unique_ptr<IState> originator_state_{};
 			};
 
 		} // !namespace observer_state_

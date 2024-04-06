@@ -41,10 +41,10 @@ namespace pattern {
 			class AbstractComponent {
 			protected:
 				AbstractComponent() = default;
-				AbstractComponent(const AbstractComponent&) = delete; // C.67	C.21
-				AbstractComponent& operator=(const AbstractComponent&) = delete;
-				AbstractComponent(AbstractComponent&&) noexcept = delete;
-				AbstractComponent& operator=(AbstractComponent&&) noexcept = delete;
+				AbstractComponent(const AbstractComponent&) = default; // C.67	C.21
+				AbstractComponent& operator=(const AbstractComponent&) = default;
+				AbstractComponent(AbstractComponent&&) noexcept = default;
+				AbstractComponent& operator=(AbstractComponent&&) noexcept = default;
 			public:
 				virtual ~AbstractComponent() = default;
 
@@ -90,7 +90,8 @@ namespace pattern {
 				// set parent_ptr in AddChild & RemoveChild
 				std::unique_ptr<AbstractExpression> parent_ptr;
 				// TODO: std::reference_wrapper???*/
-			};
+
+			}; // !class AbstractComponent
 
 
 			/**

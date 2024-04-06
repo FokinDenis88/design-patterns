@@ -86,9 +86,9 @@ namespace {
 			namespace mediator {}
 			namespace memento {
 				namespace memento_simple {
-					using namespace ::pattern::behavioral::memento_simple;
+					using namespace ::pattern::behavioral::memento;
 					TEST(MementoTest, MementoSimpleClass) {
-						CareTaker care_take{};
+						CareTaker<Originator, State> care_take{};
 						Originator originator{};
 						care_take.set_memento(originator.CreateMemento());
 						const State new_state{ 99, 99 };
@@ -97,7 +97,7 @@ namespace {
 					};
 				}
 
-				namespace memento_templated {
+				/*namespace memento_templated {
 					using namespace ::pattern::behavioral::memento_templated;
 					TEST(MementoTest, MementoTemplatedClass) {
 						using MyOriginatorType = Originator<State>;
@@ -111,7 +111,7 @@ namespace {
 
 						int a = 66 - 33;
 					};
-				}
+				}*/
 			} // !namespace memento
 
 			namespace null_object{}
@@ -172,7 +172,7 @@ namespace {
 				} // !namespace observer_smart_ptr
 			}
 			namespace state {
-				using namespace ::pattern::behavioral::observer_state_;
+				using namespace ::pattern::behavioral::originator_state_;
 				TEST(StateTest, ObserverStateClass) {
 
 				};

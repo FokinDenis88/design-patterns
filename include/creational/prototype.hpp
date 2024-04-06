@@ -8,31 +8,33 @@ namespace pattern {
 	namespace creational {
 		namespace prototype {
 
+
+			/** Interface of Prototype design pattern. With Clone function. */
 			class IPrototype {
 			protected:
 				IPrototype() = default;
-				IPrototype(const IPrototype&) = delete; // C.67	C.21
-				IPrototype& operator=(const IPrototype&) = delete;
-				IPrototype(IPrototype&&) noexcept = delete;
-				IPrototype& operator=(IPrototype&&) noexcept = delete;
+				IPrototype(const IPrototype&) = default; // C.67	C.21
+				IPrototype& operator=(const IPrototype&) = default;
+				IPrototype(IPrototype&&) noexcept = default;
+				IPrototype& operator=(IPrototype&&) noexcept = default;
 			public:
 				virtual ~IPrototype() = default;
 
-				virtual std::unique_ptr<IPrototype> Clone() const noexcept = 0;
+				virtual std::unique_ptr<IPrototype> Clone() const = 0;
 			};
 
 			class PrototypeA : public IPrototype {
 			public:
 				PrototypeA() = default;
-				explicit PrototypeA(int state_p) noexcept : observer_state_{ state_p } {
+				explicit PrototypeA(int state_p) noexcept : originator_state_{ state_p } {
 				};
 
-				inline std::unique_ptr<IPrototype> Clone() const noexcept override {
-					return std::make_unique<PrototypeA>(observer_state_);
+				inline std::unique_ptr<IPrototype> Clone() const override {
+					return std::make_unique<PrototypeA>(originator_state_);
 				};
 
 			private:
-				int observer_state_{};
+				int originator_state_{};
 			};
 
 			class Client {

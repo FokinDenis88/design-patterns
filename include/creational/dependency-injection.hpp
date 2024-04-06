@@ -16,10 +16,10 @@ namespace pattern {
 			class IServices {
 			protected:
 				IServices() = default;
-				IServices(const IServices&) = delete; // C.67	C.21
-				IServices& operator=(const IServices&) = delete;
-				IServices(IServices&&) noexcept = delete;
-				IServices& operator=(IServices&&) noexcept = delete;
+				IServices(const IServices&) = default; // C.67	C.21
+				IServices& operator=(const IServices&) = default;
+				IServices(IServices&&) noexcept = default;
+				IServices& operator=(IServices&&) noexcept = default;
 			public:
 				virtual ~IServices() = default;
 

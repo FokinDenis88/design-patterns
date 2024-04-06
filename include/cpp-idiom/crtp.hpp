@@ -18,6 +18,7 @@ namespace pattern {
 			 * Use cases: static polymorphism and other metaprogramming techniques.
 			 * This technique achieves a similar effect to the use of virtual functions,
 			 * without the costs (and some flexibility) of dynamic polymorphism.
+			 * Dynamic polymorphism can be 10 times slowly than static polymorphism.
 			 * This particular use of the CRTP has been called "simulated dynamic binding" by some.
 			 *
 			 * Whenever the base class calls another member function, it will always call its own base class functions.
@@ -70,6 +71,7 @@ namespace pattern {
 
 			private:
 				friend T;	// To give possibility to create Base subobject in Derived class
+
 				// To protect against error Derived_2 : Base<Derived_1>
 				// It will be like static polymorphism abstract class. Can be instantiated only from correct Derived class
 				Base() = default;
@@ -104,6 +106,10 @@ namespace pattern {
 				return obj->Foo(arg);
 			}
 
+			/**
+			 * For break infinite loop. Alternative: Can be used virtual destructor, but
+			 * this will increase storage of object.
+			 */
 			template<typename D>
 			void DeleteBase(Base<D>* obj) {
 				static_cast<D*>(obj)->~D();

@@ -48,10 +48,10 @@ namespace pattern {
 			class IFactoryMethod {
 			protected:
 				IFactoryMethod() = default;
-				IFactoryMethod(const IFactoryMethod&) = delete; // C.67	C.21
-				IFactoryMethod& operator=(const IFactoryMethod&) = delete;
-				IFactoryMethod(IFactoryMethod&&) noexcept = delete;
-				IFactoryMethod& operator=(IFactoryMethod&&) noexcept = delete;
+				IFactoryMethod(const IFactoryMethod&) = default; // C.67	C.21
+				IFactoryMethod& operator=(const IFactoryMethod&) = default;
+				IFactoryMethod(IFactoryMethod&&) noexcept = default;
+				IFactoryMethod& operator=(IFactoryMethod&&) noexcept = default;
 			public:
 				virtual ~IFactoryMethod() = default;
 

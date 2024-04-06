@@ -15,10 +15,10 @@ namespace pattern {
 			class IFlyweight {
 			protected:
 				IFlyweight() = default;
-				IFlyweight(const IFlyweight&) = delete; // C.67	C.21
-				IFlyweight& operator=(const IFlyweight&) = delete;
-				IFlyweight(IFlyweight&&) noexcept = delete;
-				IFlyweight& operator=(IFlyweight&&) noexcept = delete;
+				IFlyweight(const IFlyweight&) = default; // C.67	C.21
+				IFlyweight& operator=(const IFlyweight&) = default;
+				IFlyweight(IFlyweight&&) noexcept = default;
+				IFlyweight& operator=(IFlyweight&&) noexcept = default;
 			public:
 				virtual ~IFlyweight() = default;
 

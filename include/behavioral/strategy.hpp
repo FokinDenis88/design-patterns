@@ -13,10 +13,10 @@ namespace pattern {
 			class IStrategy {
 			protected:
 				IStrategy() = default;
-				IStrategy(const IStrategy&) = delete; // C.67	C.21
-				IStrategy& operator=(const IStrategy&) = delete;
-				IStrategy(IStrategy&&) noexcept = delete;
-				IStrategy& operator=(IStrategy&&) noexcept = delete;
+				IStrategy(const IStrategy&) = default; // C.67	C.21
+				IStrategy& operator=(const IStrategy&) = default;
+				IStrategy(IStrategy&&) noexcept = default;
+				IStrategy& operator=(IStrategy&&) noexcept = default;
 			public:
 				virtual ~IStrategy() = default;
 
