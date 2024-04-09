@@ -94,7 +94,6 @@
 
 
 ## Support
-<pre>
 ### Bitcoin and other cryptocurrency:  
 ***Bitcoin (Zengo)***:    ![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1W-j3C0oI7UvUr-KsCdG--dqCyM2hZTNY)  
 ***Ethereum (Zengo)***:   ![0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f](https://drive.google.com/uc?export=view&id=14g0dtqEhl92-tQgBcVXmNJnH61DtM7K2)  
@@ -124,15 +123,9 @@
 ***Карта Мир (ВТБ)***:  2200 2459 3616 1947  
 ***ЮMoney***:           5599002065385959  
 ***Ozon Card***:        2204240208423477  
-***VK Pay***:           https://vk.com/furious__dragon  
-***Boosty***:           https://boosty.to/furious_dragon  
+***VK Pay***:           [https://vk.com/furious__dragon](https://vk.com/furious__dragon)  
+***Boosty***:           [https://boosty.to/furious_dragon](https://boosty.to/furious_dragon)  
 ***YandexPay***:                -
-
-### CIS countries (страны СНГ):  
-***CoronaPay (Золотая Корона)***:	-  
-***Unistream (Юнистрим)***:			-  
-***Contact***:						-  
-</pre>
 
 
 
