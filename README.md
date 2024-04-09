@@ -94,10 +94,10 @@
 
 
 ## Support
-
+<pre>
 ### Bitcoin and other cryptocurrency:  
-***Bitcoin (Zengo)***:    ![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1uTy4uox6hqAAaaM5XA413UE6AYdMAkD2)  
-***Ethereum (Zengo)***:   ![0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f](https://drive.google.com/uc?export=view&id=17nkAaZP5nH3STFlSjwWdSx4-KjM4aaJd)  
+***Bitcoin (Zengo)***:    ![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1W-j3C0oI7UvUr-KsCdG--dqCyM2hZTNY)  
+***Ethereum (Zengo)***:   ![0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f](https://drive.google.com/uc?export=view&id=14g0dtqEhl92-tQgBcVXmNJnH61DtM7K2)  
 #### Telegram cryptocurrency:  
 ***Toncoin (TON)***:     ![UQA5lQeCGaWC04Fqv_OF5WggsxCevdYqopqUTPBtYeERYJwg](https://drive.google.com/uc?export=view&id=1A12KEmxyDmfba3aTRILMEk1vwLoICyUH)  
 ***Dollar (USDT)***:     ![TJa9G18po9WM6y6vqgGU2CagM4oqdWfcgN](https://drive.google.com/uc?export=view&id=1ctJvfwq_hkXLFMxY_JCHpvSDsG3Px-_V)  
@@ -132,7 +132,7 @@
 ***CoronaPay (Золотая Корона)***:	-  
 ***Unistream (Юнистрим)***:			-  
 ***Contact***:						-  
-
+</pre>
 
 
 
