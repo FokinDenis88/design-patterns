@@ -137,6 +137,10 @@ namespace pattern {
 					}
 				};
 
+				/**
+				 * Restore State of Originator from Memento using copy operation.
+				 * Previous unique pointer will be empty.
+				 */
 				template<typename StateType>
 				std::unique_ptr<Memento<AbstractOriginator, StateType>>
 				bool RestoreCopy(Memento<AbstractOriginator, StateType>&& memento_p) {
