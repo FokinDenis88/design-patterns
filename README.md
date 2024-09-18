@@ -1,7 +1,7 @@
 # C++ Software Design Patterns
 
 ## Repository Web Pages
-[github](https://github.com/FokinDenis88/design-patterns)  
+[github](https://github.com/FokinDenis88/design-patterns) <br>
 [gitlab (main)](https://gitlab.com/FokinDenis88/design-patterns)  
 [gitverse (Russia)](https://gitverse.ru/FokinDenis88/design-patterns)
 
@@ -45,8 +45,6 @@
 * [non-virtual-interface](/include/cpp-idiom/non-virtual-interface.hpp) - **Not realized**
 * [Opaque-Pointer](/include/cpp-idiom/opaque-pointer.hpp)
 * [pimpl](/include/cpp-idiom/pimpl.hpp)
-
-
 
 **Creational:**
 * [Abstract-Factory](/include/creational/abstract-factory.hpp)
