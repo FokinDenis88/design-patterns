@@ -11,11 +11,15 @@
 namespace pattern {
 	namespace creational {
 		// https://en.wikipedia.org/wiki/Factory_method_pattern
+		// Delegate creation of object to subclasses
+		//
 		// Variants of realization:
 		// 1) ICreator Interface class is Abstract
 		// 2) ICreator Interface class is Concrete with default functions realization
 		// 3) Create function in ICreator Interface class is parametrized with enum of ProductID. Parametrized Factory.
 		// 4) Create function in ICreator Interface class is a template.
+		//
+		// Friend patterns: Abstract Factory, Template Method, Prototype
 
 		namespace factory_method {
 			enum class ProductID : unsigned int {
@@ -42,7 +46,7 @@ namespace pattern {
 			};
 
 
-			/** Factory Method Class. Allows to redefine what objects will be instantiated in sublasses. Abstract. */
+			/** Abstract. Factory Method Class. Allows to redefine what objects will be instantiated in sublasses. */
 			template<typename IProductType, typename ProductID_Type>
 			requires std::is_enum_v<ProductID_Type>
 			class IFactoryMethod {

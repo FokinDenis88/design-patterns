@@ -187,6 +187,7 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_UI})
 
 set(DOC_FILTER
+	.gitlab-ci.yml
 	README.md
     #doc/general/to-do.txt
 	#doc/general/commit.txt
@@ -198,10 +199,6 @@ set(DOC_FILTER
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 # RUNTIME_OUTPUT_DIRECTORY and RUNTIME_OUTPUT_NAME
 
-
-# Add source to this project's executable.
-add_executable(${TARGET_NAME} ${ALL_SOURCES} ${ALL_HEADERS_FILTER} ${DOC_FILTER})
-
 # Include Directories
 set(INCLUDES
 	include
@@ -210,8 +207,12 @@ set(INCLUDES
 )
 #target_include_directories(${TARGET_NAME} PUBLIC ${INCLUDES})
 include_directories(PUBLIC ${INCLUDES})
-#target_link_libraries(${TARGET_NAME} PRIVATE OpenMP::OpenMP_CXX)
 
+
+# Add source to this project's executable.
+add_executable(${TARGET_NAME} ${ALL_SOURCES} ${ALL_HEADERS_FILTER} ${DOC_FILTER})
+
+#target_link_libraries(${TARGET_NAME} PRIVATE OpenMP::OpenMP_CXX)
 #add_custom_command()
 
 

@@ -4,6 +4,7 @@
 
 
 namespace {
+	// TEST(TestSuiteName, TestName) {}
 	namespace pattern {
 		namespace ai {} // !namespace ai
 		namespace anti_pattern{} // !namespace anti_pattern
@@ -48,7 +49,6 @@ namespace {
 					}
 
 					TEST(CommandTest, CommandMemberFnClass) {
-
 						//auto fn{ &Receiver::Add };
 						//int (Receiver::*fn)(int, int){ &Receiver::Add };
 						//(receiver_test.*fn)(20, 30);
@@ -85,15 +85,26 @@ namespace {
 			namespace iterator {}
 			namespace mediator {}
 			namespace memento {
-				namespace memento_simple {
-					using namespace ::pattern::behavioral::memento;
-					TEST(MementoTest, MementoSimpleClass) {
-						CareTaker<Originator, State> care_take{};
-						Originator originator{};
-						care_take.set_memento(originator.CreateMemento());
-						const State new_state{ 99, 99 };
-						originator.set_state(new_state);
-						originator.Restore(care_take.memento());
+				namespace memento {
+
+					TEST(MementoTest, MementoMain) {
+						using namespace ::pattern::behavioral::memento;
+						MyOriginator my_originator{};
+                        my_originator.a = 2;
+                        my_originator.b = 3;
+						Memento<MyOriginator, MyMementoState> my_memento{ my_originator.CreateMemento() };
+
+                        my_originator.a = 0;
+                        my_originator.b = 0;
+						my_originator.RestoreByCopy(my_memento);
+						EXPECT_EQ(my_originator.a, 2) << "RestoreByCopy failed";
+						EXPECT_EQ(my_originator.a, 3);
+
+                        my_originator.a = 0;
+                        my_originator.b = 0;
+						my_originator.RestoreByMove(std::move(my_memento));
+                        EXPECT_EQ(my_originator.a, 2);
+                        EXPECT_EQ(my_originator.a, 3);
 					};
 				}
 
@@ -104,7 +115,7 @@ namespace {
 
 						CareTaker<MyOriginatorType> care_take{};
 						Originator<State> originator{};
-						care_take.set_memento(originator.CreateMemento());
+						care_take.set_memento(originator.CreateMementoPtr());
 						const State new_state{ 99, 99 };
 						originator.set_state(new_state);
 						originator.Restore(care_take.memento());

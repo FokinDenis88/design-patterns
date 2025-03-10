@@ -2,14 +2,18 @@
 #define PROTOTYPE_HPP
 
 #include <memory>
+#include <concepts>
 
 /** Software Design Patterns */
 namespace pattern {
 	namespace creational {
 		namespace prototype {
+            // https://
+            // Friend patterns:
+            //
 
 
-			/** Interface of Prototype design pattern. With Clone function. */
+			/** Abstract. Interface of Prototype design pattern. With Clone function. */
 			class IPrototype {
 			protected:
 				IPrototype() = default;
@@ -23,6 +27,22 @@ namespace pattern {
 				virtual std::unique_ptr<IPrototype> Clone() const = 0;
 			};
 
+			template<typename ConcretePrototypeT>
+			concept IsPrototype = std::derived_from<ConcretePrototypeT, IPrototype>;
+
+			/**
+			 * Clone Sample template function for concrete prototype class.
+			 *
+			 * @param ConcretePrototypeT Concrete prototype class
+			 * @param constructor_args arguments for constructor of concrete prototype
+			 * @param Prototype_Construct_Arg arguments for constructor
+			 */
+			template<IsPrototype ConcretePrototypeT, typename... Constructor_ArgsT>
+            inline std::unique_ptr<IPrototype> CloneHelper(Constructor_ArgsT... constructor_args) {
+                return std::make_unique<ConcretePrototypeT>(constructor_args...);
+            };
+
+
 			class PrototypeA : public IPrototype {
 			public:
 				PrototypeA() = default;
@@ -30,7 +50,8 @@ namespace pattern {
 				};
 
 				inline std::unique_ptr<IPrototype> Clone() const override {
-					return std::make_unique<PrototypeA>(originator_state_);
+					//return std::make_unique<PrototypeA>(originator_state_);
+					return CloneHelper<PrototypeA>(originator_state_);
 				};
 
 			private:

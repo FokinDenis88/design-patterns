@@ -2,12 +2,12 @@
 
 ## Repository Web Pages
 [github](https://github.com/FokinDenis88/design-patterns) <br>
-[gitlab (main)](https://gitlab.com/FokinDenis88/design-patterns)  
+[gitlab (main repo)](https://gitlab.com/FokinDenis88/design-patterns) <br>
 [gitverse (Russia)](https://gitverse.ru/FokinDenis88/design-patterns)
 
 ## Installation
-1) git clone --branch develop --recurse-submodules https://gitlab.com/FokinDenis88/design-patterns.git
-2) (From the working dir = design-patterns)  cmake -B build/visual-studio
+1. git clone --branch develop --recurse-submodules https://gitlab.com/FokinDenis88/design-patterns.git
+2. (From the working dir = design-patterns)  cmake -B build/visual-studio
  
 ## Realized Design Patterns
 **AI:**
@@ -92,50 +92,50 @@
 * **Not realized**.
 
 ## Contact
-**Skype:** live:dragon8806  
-**Telegram:** https://t.me/Furious_Dragon_88  
-**VK (Russia):** https://vk.com/furious__dragon  
-**Discord:** ***ID:*** 1203018807162175522 fokin_denis_yurievich_  ***User Name:*** fokin_denis_yurievich_  
-**Email:** fokin-denis-88-code@ya.ru  
+**Skype:** live:dragon8806 <br>
+**Telegram:** https://t.me/Furious_Dragon_88 <br>
+**VK (Russia):** https://vk.com/furious__dragon <br>
+**Discord:** ***ID:*** 1203018807162175522 fokin_denis_yurievich_  ***User Name:*** fokin_denis_yurievich_ <br>
+**Email:** fokin-denis-88-code@ya.ru <br>
 **Gitter:** @fokindenis88_gitlab:gitter.im
 
 ## Support
 ### Bitcoin and other cryptocurrency:  
-***Bitcoin (Zengo)***:	3E18A9tKarZSCUUCPiBympih7iy9LFvkG5  
-	![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1W-j3C0oI7UvUr-KsCdG--dqCyM2hZTNY)  
-***Ethereum (Zengo)***: 0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f  
-	![0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f](https://drive.google.com/uc?export=view&id=14g0dtqEhl92-tQgBcVXmNJnH61DtM7K2)  
-#### Telegram cryptocurrency:  
-***Toncoin (TON)***:	UQA5lQeCGaWC04Fqv_OF5WggsxCevdYqopqUTPBtYeERYJwg  
-	![UQA5lQeCGaWC04Fqv_OF5WggsxCevdYqopqUTPBtYeERYJwg](https://drive.google.com/uc?export=view&id=1A12KEmxyDmfba3aTRILMEk1vwLoICyUH)  
-***Dollar (USDT)***:	TJa9G18po9WM6y6vqgGU2CagM4oqdWfcgN  
-	![TJa9G18po9WM6y6vqgGU2CagM4oqdWfcgN](https://drive.google.com/uc?export=view&id=1ctJvfwq_hkXLFMxY_JCHpvSDsG3Px-_V)  
-***Bitcoin (BTC)***:	17jSk2fvfGwQ9vKje4jyEMekrHHSJDL9Y1  
-	![17jSk2fvfGwQ9vKje4jyEMekrHHSJDL9Y1](https://drive.google.com/uc?export=view&id=1Z2hMVApFkxHYQx7JnePpzDcrS0FdUBf2)  
+***Bitcoin (Zengo)***:	3E18A9tKarZSCUUCPiBympih7iy9LFvkG5 <br>
+	![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1W-j3C0oI7UvUr-KsCdG--dqCyM2hZTNY) <br>
+***Ethereum (Zengo)***: 0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f <br>
+	![0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f](https://drive.google.com/uc?export=view&id=14g0dtqEhl92-tQgBcVXmNJnH61DtM7K2) <br>
+#### Telegram cryptocurrency:
+***Toncoin (TON)***:	UQA5lQeCGaWC04Fqv_OF5WggsxCevdYqopqUTPBtYeERYJwg <br>
+	![UQA5lQeCGaWC04Fqv_OF5WggsxCevdYqopqUTPBtYeERYJwg](https://drive.google.com/uc?export=view&id=1A12KEmxyDmfba3aTRILMEk1vwLoICyUH) <br>
+***Dollar (USDT)***:	TJa9G18po9WM6y6vqgGU2CagM4oqdWfcgN <br>
+	![TJa9G18po9WM6y6vqgGU2CagM4oqdWfcgN](https://drive.google.com/uc?export=view&id=1ctJvfwq_hkXLFMxY_JCHpvSDsG3Px-_V) <br>
+***Bitcoin (BTC)***:	17jSk2fvfGwQ9vKje4jyEMekrHHSJDL9Y1 <br>
+	![17jSk2fvfGwQ9vKje4jyEMekrHHSJDL9Y1](https://drive.google.com/uc?export=view&id=1Z2hMVApFkxHYQx7JnePpzDcrS0FdUBf2) <br>
 
-### World:  
-***PayPal***:              -  
-***Visa***:                -  
-***Stripe***:              -  
-***Payeer***:         P1113895997  
-***Volet***:       U 1138 0788 4280, E 8013 3382 9320  
-***Profee***:              -  
-***Patreon***:             -  
-***Buy Me a Coffee***:     -  
-***Ko-Fi***:               -  
+### World:
+***PayPal***:              - <br>
+***Visa***:                - <br>
+***Stripe***:              - <br>
+***Payeer***:         P1113895997 <br>
+***Volet***:       U 1138 0788 4280, E 8013 3382 9320 <br>
+***Profee***:              - <br>
+***Patreon***:             - <br>
+***Buy Me a Coffee***:     - <br>
+***Ko-Fi***:               - <br>
 
-### China:  
+### China:
 ***UnionPay***:   -
 
-### Japan:  
+### Japan:
 ***JCB (Japan Credit Bureau)***:   -
 
-### Russia:  
-***Карта Мир (ВТБ)***:  2200 2459 3616 1947  
-***ЮMoney***:           5599002065385959  
-***Ozon Card***:        2204240208423477  
-***VK Pay***:           [https://vk.com/furious__dragon](https://vk.com/furious__dragon)  
-***Boosty***:           [https://boosty.to/furious_dragon](https://boosty.to/furious_dragon)  
+### Russia:
+***Карта Мир (ВТБ)***:  2200 2459 3616 1947 <br>
+***ЮMoney***:           5599002065385959 <br>
+***Ozon Card***:        2204240208423477 <br>
+***VK Pay***:           [https://vk.com/furious__dragon](https://vk.com/furious__dragon) <br>
+***Boosty***:           [https://boosty.to/furious_dragon](https://boosty.to/furious_dragon) <br>
 ***YandexPay***:                -
 
 
