@@ -46,6 +46,8 @@
 * [Opaque-Pointer](/include/cpp-idiom/opaque-pointer.hpp)
 * [pimpl](/include/cpp-idiom/pimpl.hpp)
 
+
+
 **Creational:**
 * [Abstract-Factory](/include/creational/abstract-factory.hpp)
 * [Builder](/include/creational/builder.hpp)
