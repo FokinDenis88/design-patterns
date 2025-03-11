@@ -86,13 +86,13 @@ namespace {
 			namespace mediator {}
 			namespace memento {
 				namespace memento {
+					using namespace ::pattern::behavioral::memento;
 
 					TEST(MementoTest, MementoMain) {
-						using namespace ::pattern::behavioral::memento;
 						MyOriginator my_originator{};
                         my_originator.a = 2;
                         my_originator.b = 3;
-						Memento<MyOriginator, MyMementoState> my_memento{ my_originator.CreateMemento() };
+						Memento<MyOriginator, MyMementoState> my_memento{ my_originator.CreateMementoByValue() };
 
                         my_originator.a = 0;
                         my_originator.b = 0;
@@ -104,7 +104,7 @@ namespace {
                         my_originator.b = 0;
 						my_originator.RestoreByMove(std::move(my_memento));
                         EXPECT_EQ(my_originator.a, 2);
-                        EXPECT_EQ(my_originator.a, 3);
+                        EXPECT_EQ(my_originator.b, 3);
 					};
 				}
 
