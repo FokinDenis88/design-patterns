@@ -31,10 +31,10 @@ namespace pattern {
 			class IAdapter {
 			protected:
 				IAdapter() = default;
-				IAdapter(const IAdapter&) = default; // C.67	C.21
-				IAdapter& operator=(const IAdapter&) = default;
-				IAdapter(IAdapter&&) noexcept = default;
-				IAdapter& operator=(IAdapter&&) noexcept = default;
+				IAdapter(const IAdapter&) = delete; // C.67	C.21
+				IAdapter& operator=(const IAdapter&) = delete;
+				IAdapter(IAdapter&&) noexcept = delete;
+				IAdapter& operator=(IAdapter&&) noexcept = delete;
 			public:
 				virtual ~IAdapter() = default;
 

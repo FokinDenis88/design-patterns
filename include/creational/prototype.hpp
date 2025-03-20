@@ -17,10 +17,10 @@ namespace pattern {
 			class IPrototype {
 			protected:
 				IPrototype() = default;
-				IPrototype(const IPrototype&) = default; // C.67	C.21
-				IPrototype& operator=(const IPrototype&) = default;
-				IPrototype(IPrototype&&) noexcept = default;
-				IPrototype& operator=(IPrototype&&) noexcept = default;
+				IPrototype(const IPrototype&) = delete; // C.67	C.21 Polymorphic class
+				IPrototype& operator=(const IPrototype&) = delete;
+				IPrototype(IPrototype&&) noexcept = delete;
+				IPrototype& operator=(IPrototype&&) noexcept = delete;
 			public:
 				virtual ~IPrototype() = default;
 
@@ -28,7 +28,7 @@ namespace pattern {
 			};
 
 			template<typename ConcretePrototypeT>
-			concept IsPrototype = std::derived_from<ConcretePrototypeT, IPrototype>;
+			concept Prototype = std::derived_from<ConcretePrototypeT, IPrototype>;
 
 			/**
 			 * Clone Sample template function for concrete prototype class.
@@ -37,7 +37,7 @@ namespace pattern {
 			 * @param constructor_args arguments for constructor of concrete prototype
 			 * @param Prototype_Construct_Arg arguments for constructor
 			 */
-			template<IsPrototype ConcretePrototypeT, typename... Constructor_ArgsT>
+			template<Prototype ConcretePrototypeT, typename... Constructor_ArgsT>
             inline std::unique_ptr<IPrototype> CloneHelper(Constructor_ArgsT... constructor_args) {
                 return std::make_unique<ConcretePrototypeT>(constructor_args...);
             };

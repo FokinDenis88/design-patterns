@@ -52,10 +52,10 @@ namespace pattern {
 			class IFactoryMethod {
 			protected:
 				IFactoryMethod() = default;
-				IFactoryMethod(const IFactoryMethod&) = default; // C.67	C.21
-				IFactoryMethod& operator=(const IFactoryMethod&) = default;
-				IFactoryMethod(IFactoryMethod&&) noexcept = default;
-				IFactoryMethod& operator=(IFactoryMethod&&) noexcept = default;
+				IFactoryMethod(const IFactoryMethod&) = delete; // C.67	C.21
+				IFactoryMethod& operator=(const IFactoryMethod&) = delete;
+				IFactoryMethod(IFactoryMethod&&) noexcept = delete;
+				IFactoryMethod& operator=(IFactoryMethod&&) noexcept = delete;
 			public:
 				virtual ~IFactoryMethod() = default;
 
@@ -122,16 +122,18 @@ namespace pattern {
 				size_t switch_value{ 0 };
 				switch (switch_value) {
 				case 0:
-					return product_ptr.reset(new Product1(std::forward<ArgTypes>(args)...));
+					product_ptr.reset(new Product1(std::forward<ArgTypes>(args)...));
 					break;
 				case 1:
-					return product_ptr.reset(new Product2(std::forward<ArgTypes>(args)...));
+					product_ptr.reset(new Product2(std::forward<ArgTypes>(args)...));
 					break;
 				case 2:
-					return product_ptr.reset(new Product3(std::forward<ArgTypes>(args)...));
+					product_ptr.reset(new Product3(std::forward<ArgTypes>(args)...));
 					break;
 				default:
 					break;
+
+					return product_ptr;
 				}
 			}
 		} // !namespace factory_method_book

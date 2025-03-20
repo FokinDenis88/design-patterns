@@ -52,6 +52,7 @@ namespace pattern {
 
 				// TODO: To minimize copy, move operations while creating memento from Originator in which
 				// OriginatorStateT consists of part of data member maybe created struct of reference to interested data members.
+				// Can be hold by std::list<std::ref>
 
 				// There is two Variants of creation memento. One is to create memento from
 				// whole OriginatorStateT object inside of Originator.
@@ -275,11 +276,11 @@ namespace pattern {
 				};
 
 			private:
-				/** Donwcast. Get const reference to Concrete Originator from pointer this AbstractOriginator* */
+				/** Donwcast. Support func. Get const reference to Concrete Originator from pointer this AbstractOriginator* */
 				inline const ConcreteOriginatorT& GetConcreteOriginatorCRef() const noexcept {
 					return *dynamic_cast<const ConcreteOriginatorT*>(this);
 				};
-				/** Donwcast. Get reference to Concrete Originator from pointer this AbstractOriginator* */
+				/** Donwcast. Support func. Get reference to Concrete Originator from pointer this AbstractOriginator* */
                 inline ConcreteOriginatorT& GetConcreteOriginatorRef() noexcept {
                     return *dynamic_cast<ConcreteOriginatorT*>(this);
                 };
@@ -428,10 +429,10 @@ namespace pattern {
 
 			protected:
 				IOriginator() = default;
-				IOriginator(const IOriginator&) = default; // C.67	C.21
-				IOriginator& operator=(const IOriginator&) = default;
-				IOriginator(IOriginator&&) noexcept = default;
-				IOriginator& operator=(IOriginator&&) noexcept = default;
+				IOriginator(const IOriginator&) = delete; // C.67	C.21
+				IOriginator& operator=(const IOriginator&) = delete;
+				IOriginator(IOriginator&&) noexcept = delete;
+				IOriginator& operator=(IOriginator&&) noexcept = delete;
 			public:
 				virtual ~IOriginator() = default;
 

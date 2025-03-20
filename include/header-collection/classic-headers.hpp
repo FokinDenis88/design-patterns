@@ -39,4 +39,8 @@
 #include "behavioral/null-object.hpp"
 
 
+// General - for support
+#include "general/general.hpp"
+#include "general/ieditor.hpp"
+
 #endif // !CLASSIC_HEADERS_HPP

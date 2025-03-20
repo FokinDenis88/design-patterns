@@ -37,10 +37,10 @@ namespace pattern {
 			class IAbstractFactory {
 			protected:
 				IAbstractFactory() = default;
-				IAbstractFactory(const IAbstractFactory&) = default; // C.67	C.21
-				IAbstractFactory& operator=(const IAbstractFactory&) = default;
-				IAbstractFactory(IAbstractFactory&&) noexcept = default;
-				IAbstractFactory& operator=(IAbstractFactory&&) noexcept = default;
+				IAbstractFactory(const IAbstractFactory&) = delete; // C.67	C.21
+				IAbstractFactory& operator=(const IAbstractFactory&) = delete;
+				IAbstractFactory(IAbstractFactory&&) noexcept = delete;
+				IAbstractFactory& operator=(IAbstractFactory&&) noexcept = delete;
 			public:
 				virtual ~IAbstractFactory() = default;
 

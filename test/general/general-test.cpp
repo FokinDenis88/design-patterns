@@ -131,24 +131,61 @@ namespace {
 					using namespace ::pattern::behavioral::observer_ref;
 					TEST(ObserverTest, ObserverRefClass) {
 						//=========Ref============
-						SubjectRef<State> subject_ref{};
-						ObserverRef<State> observer_ref_1{};
-						ObserverRef<State> observer_ref_2{};
-						ObserverRef<State> observer_ref_3{};
+						MySubject subject_1{}, subject_2{}, subject_3{};
+						MyObserver observer_1{ subject_1 }, observer_2{ subject_2 }, observer_3{ subject_3 };
+						subject_1.state_.a_ = 1;
+                        subject_1.state_.b_ = 2;
+                        subject_2.state_.a_ = 3;
+                        subject_2.state_.b_ = 4;
+                        subject_3.state_.a_ = 5;
+                        subject_3.state_.b_ = 6;
+
+						observer_1.state_.a_ = 1;
+						observer_1.state_.b_ = 2;
+                        observer_2.state_.a_ = 3;
+                        observer_2.state_.b_ = 4;
+                        observer_3.state_.a_ = 5;
+                        observer_3.state_.b_ = 6;
+
+						subject_1.AttachObserver(observer_1);
+						subject_1.AttachObserver(observer_2);
+
+                        subject_2.AttachObserver(observer_2);
+                        subject_2.AttachObserver(observer_3);
+
+                        subject_3.AttachObserver(observer_1);
+                        subject_3.AttachObserver(observer_3);
+
+						subject_1.NotifyObserversMulti();
+						subject_2.NotifyObserversMulti();
+						subject_3.NotifyObserversMulti();
+
+						subject_1.AttachObserver(observer_3);
+						subject_1.DetachObserver(observer_1);
+						subject_1.DetachObserver(observer_2);
+
+						subject_3.AttachObserver(observer_2);
+						subject_3.ClearAllObservers();
+
+						/*AbstractSubjectRef<State> subject_ref{};
+						Observer<State> observer_ref_1{};
+						Observer<State> observer_ref_2{};
+						Observer<State> observer_ref_3{};
 						subject_ref.AttachObserver(observer_ref_1);
 						subject_ref.AttachObserver(observer_ref_2);
 						subject_ref.AttachObserver(observer_ref_3);
 						subject_ref.set_state(State{ 77, 77 });
-						subject_ref.Notify();
+						subject_ref.NotifyObservers();
 						subject_ref.DetachObserver(observer_ref_1);
 						subject_ref.ClearAllObservers();
 
-						int a = 66 - 66;
+						int a = 66 - 66;*/
+						//EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
 					};
 				} // !namespace observer_ref
 
 				namespace observer_smart_ptr {
-					using namespace ::pattern::behavioral::observer_smart_ptr;
+					using namespace ::pattern::behavioral::observer_ptr;
 					TEST(ObserverTest, ObserverSmartPtrSimpleClass) {
 						//======Simple============
 						Subject subject{};
@@ -159,7 +196,7 @@ namespace {
 						subject.AttachObserver(observer_2);
 						subject.AttachObserver(observer_3);
 						subject.set_state(State{ 77, 77 });
-						subject.Notify();
+						subject.NotifyObservers();
 						subject.DetachObserver(observer_1);
 						subject.ClearAllObservers();
 					}
@@ -180,7 +217,7 @@ namespace {
 
 						int a = 66 - 66;
 					};
-				} // !namespace observer_smart_ptr
+				} // !namespace observer_ptr
 			}
 			namespace state {
 				using namespace ::pattern::behavioral::originator_state_;

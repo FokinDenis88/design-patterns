@@ -13,6 +13,13 @@ namespace pattern {
 			// https://en.wikipedia.org/wiki/Interpreter_pattern
 			// Common patterns: NonTerminalExpression, Flyweight, Iterator, Visitor
 
+
+			class InterpreterError : public std::runtime_error {
+            public:
+				InterpreterError(const char* const error_message_p = nullptr) noexcept
+					: std::runtime_error{ error_message_p } {};
+            };
+
 			class Client {
 			public:
 			};
@@ -27,10 +34,10 @@ namespace pattern {
 			class AbstractComponent {
 			protected:
 				AbstractComponent() = default;
-				AbstractComponent(const AbstractComponent&) = default; // C.67	C.21
-				AbstractComponent& operator=(const AbstractComponent&) = default;
-				AbstractComponent(AbstractComponent&&) noexcept = default;
-				AbstractComponent& operator=(AbstractComponent&&) noexcept = default;
+				AbstractComponent(const AbstractComponent&) = delete; // C.67	C.21
+				AbstractComponent& operator=(const AbstractComponent&) = delete;
+				AbstractComponent(AbstractComponent&&) noexcept = delete;
+				AbstractComponent& operator=(AbstractComponent&&) noexcept = delete;
 			public:
 				virtual ~AbstractComponent() = default;
 
@@ -44,7 +51,7 @@ namespace pattern {
 					if (GetChild()) {
 						// Add Child
 					} else {
-						throw std::runtime_error("AddChild");
+						throw InterpreterError("AddChild");
 					}
 				};
 
@@ -52,7 +59,7 @@ namespace pattern {
 					if (GetChild()) {
 						// Remove Child
 					} else {
-						throw std::runtime_error("RemoveChild");
+						throw InterpreterError("RemoveChild");
 					}
 				};
 			};

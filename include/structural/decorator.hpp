@@ -13,10 +13,10 @@ namespace pattern {
 			class AbstractComponent {
 			protected:
 				AbstractComponent() = default;
-				AbstractComponent(const AbstractComponent&) = default; // C.67	C.21
-				AbstractComponent& operator=(const AbstractComponent&) = default;
-				AbstractComponent(AbstractComponent&&) noexcept = default;
-				AbstractComponent& operator=(AbstractComponent&&) noexcept = default;
+				AbstractComponent(const AbstractComponent&) = delete; // C.67	C.21
+				AbstractComponent& operator=(const AbstractComponent&) = delete;
+				AbstractComponent(AbstractComponent&&) noexcept = delete;
+				AbstractComponent& operator=(AbstractComponent&&) noexcept = delete;
 			public:
 				virtual ~AbstractComponent() = default;
 
@@ -33,11 +33,11 @@ namespace pattern {
 			/** Abstract Decorator. Pure Virtual. */
 			class DecoratorAbstract : public AbstractComponent {
 			protected:
-				DecoratorAbstract() = delete;
+				DecoratorAbstract() = default;
 				DecoratorAbstract(const DecoratorAbstract&) = delete; // C.67	C.21
 				DecoratorAbstract& operator=(const DecoratorAbstract&) = delete;
 				DecoratorAbstract(DecoratorAbstract&&) noexcept = default;	// for move unique_ptr
-				DecoratorAbstract& operator=(DecoratorAbstract&&) noexcept = default;
+				DecoratorAbstract& operator=(DecoratorAbstract&&) noexcept = delete;
 			public:
 				~DecoratorAbstract() override = default;
 

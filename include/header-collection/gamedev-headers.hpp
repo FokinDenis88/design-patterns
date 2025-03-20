@@ -19,7 +19,7 @@ Behavioral
 1. Command
 2. State
 3. Strategy
-4. ObserverRef
+4. Observer
 
 
 Sequencing Patterns

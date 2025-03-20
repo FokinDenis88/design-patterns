@@ -39,18 +39,18 @@ namespace pattern {
 
 			/** Abstract. To create Terminal Component just override Operation. */
 			class AbstractComponent {
+			public:
+                using AbstractComponentPtr = std::unique_ptr<AbstractComponent>;
+                using ContainerType = std::forward_list<AbstractComponentPtr>;
+
 			protected:
 				AbstractComponent() = default;
-				AbstractComponent(const AbstractComponent&) = default; // C.67	C.21
-				AbstractComponent& operator=(const AbstractComponent&) = default;
-				AbstractComponent(AbstractComponent&&) noexcept = default;
-				AbstractComponent& operator=(AbstractComponent&&) noexcept = default;
+				AbstractComponent(const AbstractComponent&) = delete; // C.67	C.21
+				AbstractComponent& operator=(const AbstractComponent&) = delete;
+				AbstractComponent(AbstractComponent&&) noexcept = delete;
+				AbstractComponent& operator=(AbstractComponent&&) noexcept = delete;
 			public:
 				virtual ~AbstractComponent() = default;
-
-				using AbstractComponentPtr = std::unique_ptr<AbstractComponent>;
-				using ContainerType = std::forward_list<AbstractComponentPtr>;
-
 
 				/**
 				 * Main operation for Component.
@@ -59,13 +59,7 @@ namespace pattern {
 				virtual void Operation() = 0;
 
 
-			//============Default Operation for TerminalComponent===============================
-
-				/** Default for TerminalComponent. Returns const this pointer. Must not be smart, cause const. */
-				virtual inline const ContainerType* GetChildren() const noexcept { return nullptr; };
-
-				/** Default for TerminalComponent. Checks, if Component is Composite, that can include other components. */
-				virtual constexpr bool IsNonTerminal() const noexcept { return false; };
+			//============Default Operation for Leaf TerminalComponent===============================
 
 				/** Default for TerminalComponent. */
 				virtual inline void AddChild(AbstractComponentPtr&& new_component) {
@@ -83,6 +77,14 @@ namespace pattern {
 					}
 				};
 
+                /** Default for TerminalComponent. Returns const this pointer. Must not be smart, cause const. */
+                virtual inline const ContainerType* GetChildren() const noexcept { return nullptr; };
+
+			protected:
+                /** Default for TerminalComponent. Checks, if Component is Composite, that can include other components. */
+                virtual constexpr bool IsNonTerminal() const noexcept { return false; };
+
+
 			/*protected:
 				AbstractExpression& parent() const;
 				void set_parent();
@@ -99,7 +101,15 @@ namespace pattern {
 			 * Can't include other Components inside of itself.
 			 */
 			class TerminalComponent : public AbstractComponent {
-			public:
+            protected:
+                TerminalComponent() = default;
+                TerminalComponent(const TerminalComponent&) = delete; // C.67	C.21
+				TerminalComponent& operator=(const TerminalComponent&) = delete;
+				TerminalComponent(TerminalComponent&&) noexcept = delete;
+				TerminalComponent& operator=(TerminalComponent&&) noexcept = delete;
+            public:
+                ~TerminalComponent() override = default;
+
 				void Operation() override {
 					ProcessLeaf();
 				};
@@ -114,28 +124,21 @@ namespace pattern {
 			 * Can include other Components inside of itself.
 			 */
 			class NonTerminalComponent : public AbstractComponent {
-			public:
+			protected:
 				NonTerminalComponent() = default;
 				NonTerminalComponent(const NonTerminalComponent&) = delete;	// cause list of unique_ptr can be only moved
 				NonTerminalComponent& operator=(const NonTerminalComponent&) = delete;
 
 				NonTerminalComponent(NonTerminalComponent&&) noexcept = default;
 				NonTerminalComponent& operator=(NonTerminalComponent&&) noexcept = default;
-				// TODO: virtual constructors in interface?
-
+			public:
+				~NonTerminalComponent() override = default;
 
 				void Operation() override {
 					for (auto& component_ptr : components_ptrs) { // component is non const Operation can mutate component
 						if (component_ptr){ component_ptr->Operation(); }
 					}
 				};
-
-
-				/** Returns const this pointer. Must not be smart, cause const. */
-				inline const ContainerType* GetChildren() const noexcept override { return &components_ptrs; };
-
-				/** Default for TerminalComponent. Checks, if Component is Composite, that can include other components. */
-				constexpr bool IsNonTerminal() const noexcept override { return true; };
 
 				void AddChild(AbstractComponentPtr&& new_component_ptr) override {
 					components_ptrs.emplace_front(std::move(new_component_ptr));
@@ -146,9 +149,16 @@ namespace pattern {
 							if (elem_ptr && (elem_ptr.get() == &new_component)) {
 								return true;
 							}
-							else { return false; }
+							return false;
 						});
 				};
+
+                /** Returns const this pointer. Must not be smart, cause const. */
+                inline const ContainerType* GetChildren() const noexcept override { return &components_ptrs; };
+
+            protected:
+                /** Default for TerminalComponent. Checks, if Component is Composite, that can include other components. */
+                constexpr bool IsNonTerminal() const noexcept override { return true; };
 
 			private:
 				/** Pointers to childern components of Composite. */

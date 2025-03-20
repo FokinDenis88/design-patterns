@@ -21,10 +21,10 @@ namespace pattern {
 			class IObjectPoolResource {
 			protected:
 				IObjectPoolResource() = default;
-				IObjectPoolResource(const IObjectPoolResource&) = default; // C.67	C.21
-				IObjectPoolResource& operator=(const IObjectPoolResource&) = default;
-				IObjectPoolResource(IObjectPoolResource&&) noexcept = default;
-				IObjectPoolResource& operator=(IObjectPoolResource&&) noexcept = default;
+				IObjectPoolResource(const IObjectPoolResource&) = delete; // C.67	C.21
+				IObjectPoolResource& operator=(const IObjectPoolResource&) = delete;
+				IObjectPoolResource(IObjectPoolResource&&) noexcept = delete;
+				IObjectPoolResource& operator=(IObjectPoolResource&&) noexcept = delete;
 			public:
 				virtual ~IObjectPoolResource() = default;
 
@@ -46,10 +46,10 @@ namespace pattern {
 			class IObjectPool {
 			protected:
 				IObjectPool() = default;
-				IObjectPool(const IObjectPool&) = default; // C.67	C.21
-				IObjectPool& operator=(const IObjectPool&) = default;
-				IObjectPool(IObjectPool&&) noexcept = default;
-				IObjectPool& operator=(IObjectPool&&) noexcept = default;
+				IObjectPool(const IObjectPool&) = delete; // C.67	C.21
+				IObjectPool& operator=(const IObjectPool&) = delete;
+				IObjectPool(IObjectPool&&) noexcept = delete;
+				IObjectPool& operator=(IObjectPool&&) noexcept = delete;
 			public:
 				virtual ~IObjectPool() = default;
 

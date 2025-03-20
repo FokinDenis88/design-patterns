@@ -55,10 +55,10 @@ namespace pattern {
 			class ICommand {
 			protected:
 				ICommand() = default;
-				ICommand(const ICommand&) = default; // C.67	C.21
-				ICommand& operator=(const ICommand&) = default;
-				ICommand(ICommand&&) noexcept = default;
-				ICommand& operator=(ICommand&&) noexcept = default;
+				ICommand(const ICommand&) = delete; // C.67	C.21
+				ICommand& operator=(const ICommand&) = delete;
+				ICommand(ICommand&&) noexcept = delete;
+				ICommand& operator=(ICommand&&) noexcept = delete;
 			public:
 				virtual ~ICommand() = default;
 
@@ -69,10 +69,10 @@ namespace pattern {
 			class ICommandExtended : public ICommand {
 			protected:
 				ICommandExtended() = default;
-				ICommandExtended(const ICommandExtended&) = default; // C.67	C.21
-				ICommandExtended& operator=(const ICommandExtended&) = default;
-				ICommandExtended(ICommandExtended&&) noexcept = default;
-				ICommandExtended& operator=(ICommandExtended&&) noexcept = default;
+				ICommandExtended(const ICommandExtended&) = delete; // C.67	C.21
+				ICommandExtended& operator=(const ICommandExtended&) = delete;
+				ICommandExtended(ICommandExtended&&) noexcept = delete;
+				ICommandExtended& operator=(ICommandExtended&&) noexcept = delete;
 			public:
 				~ICommandExtended() override = default;
 
@@ -301,12 +301,12 @@ namespace pattern {
 				}
 
 
-				inline void set_command(std::shared_ptr<ICommand> const new_command_ptr) {
+				inline void set_command(std::shared_ptr<ICommand> const new_command_ptr) noexcept {
 					command_ = std::weak_ptr<ICommand>(new_command_ptr);
 				};
 
 				/** Can be nullptr, because of weak_ptr */
-				inline const ICommand* command() const { return command_.lock().get(); };
+				inline const ICommand* command() const noexcept { return command_.lock().get(); };
 
 			private:
 				std::weak_ptr<ICommand> command_{};

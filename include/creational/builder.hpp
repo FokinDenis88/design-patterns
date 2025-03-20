@@ -50,10 +50,10 @@ namespace pattern {
 			class CarBuilderAbstract {
 			protected:
 				CarBuilderAbstract() = default;
-				CarBuilderAbstract(const CarBuilderAbstract&) = default; // C.67	C.21
-				CarBuilderAbstract& operator=(const CarBuilderAbstract&) = default;
-				CarBuilderAbstract(CarBuilderAbstract&&) noexcept = default;
-				CarBuilderAbstract& operator=(CarBuilderAbstract&&) noexcept = default;
+				CarBuilderAbstract(const CarBuilderAbstract&) = delete; // C.67	C.21
+				CarBuilderAbstract& operator=(const CarBuilderAbstract&) = delete;
+				CarBuilderAbstract(CarBuilderAbstract&&) noexcept = delete;
+				CarBuilderAbstract& operator=(CarBuilderAbstract&&) noexcept = delete;
 			public:
 				virtual ~CarBuilderAbstract() = default;
 

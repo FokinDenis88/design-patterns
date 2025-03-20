@@ -1,5 +1,4 @@
 // Project TODO section
-// TODO: make google tests
 
 
 #include <iostream>

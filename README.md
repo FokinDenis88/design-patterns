@@ -17,7 +17,7 @@
 * **Not realized**
 
 **Architectural:**
-* [mvc](/include/architectural/mvc.hpp) - **Not realized**.
+* [mvc](/include/architectural/mvc.hpp)
 
 **Behavioral:**
 * [Chain-of-Responsibility](/include/behavioral/chain-of-responsibility.hpp)

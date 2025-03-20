@@ -140,7 +140,14 @@ set(SOURCES_FILTER_STRUCTURAL)
 set(HEADERS_FILTER_UI)
 set(SOURCES_FILTER_UI)
 
+set(INCLUDE_GENERAL include/general/)
+set(HEADERS_FILTER_GENERAL
+	${INCLUDE_GENERAL}general.hpp
+	${INCLUDE_GENERAL}ieditor.hpp)
+set(SOURCES_FILTER_GENERAL)
 
+
+# Many headers in every file
 set(INCLUDE_HEADER_COLLECTION include/header-collection/)
 set(HEADERS_FILTER_HEADER_COLLECTION
 	${INCLUDE_HEADER_COLLECTION}ai-headers.hpp
@@ -169,7 +176,8 @@ set(ALL_SOURCES
 	${SOURCES_FILTER_DISTRIBUTED-SYSTEM}
 	${SOURCES_FILTER_GAMEDEV}
 	${SOURCES_FILTER_STRUCTURAL}
-	${SOURCES_FILTER_UI})
+	${SOURCES_FILTER_UI}
+	${SOURCES_FILTER_GENERAL})
 
 set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_AI}
@@ -184,7 +192,8 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_GAMEDEV}
 	${HEADERS_FILTER_HEADER_COLLECTION}
 	${HEADERS_FILTER_STRUCTURAL}
-	${HEADERS_FILTER_UI})
+	${HEADERS_FILTER_UI}
+	${HEADERS_FILTER_GENERAL})
 
 set(DOC_FILTER
 	.gitlab-ci.yml
@@ -231,6 +240,7 @@ source_group("GameDev/Headers"				FILES ${HEADERS_FILTER_GAMEDEV})
 source_group("Header Collection"			FILES ${HEADERS_FILTER_HEADER_COLLECTION})
 source_group("Structural/Headers"			FILES ${HEADERS_FILTER_STRUCTURAL})
 source_group("UI/Headers"					FILES ${HEADERS_FILTER_UI})
+source_group("General/Headers"				FILES ${HEADERS_FILTER_GENERAL})
 
 # Sources
 source_group("AI/Source"					FILES ${SOURCES_FILTER_AI})
@@ -245,6 +255,7 @@ source_group("Distributed-System/Source"	FILES ${SOURCES_FILTER_DISTRIBUTED-SYST
 source_group("GameDev/Source"				FILES ${SOURCES_FILTER_GAMEDEV})
 source_group("Structural/Source"			FILES ${SOURCES_FILTER_STRUCTURAL})
 source_group("UI/Source"					FILES ${SOURCES_FILTER_UI})
+source_group("General/Source"				FILES ${SOURCES_FILTER_GENERAL})
 
 # Other groups
 source_group("Doc" FILES ${DOC_FILTER})
