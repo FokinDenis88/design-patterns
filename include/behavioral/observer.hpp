@@ -180,6 +180,7 @@ namespace pattern {
 				using SubjectRef = std::reference_wrapper<SubjectType>;
 				using HashFunctorType = HashRefWrapperReferent<SubjectType>;
 				using EqualToFunctorType = HashRefWrapperEqualTo<SubjectRef>;
+				using ContainerType = std::unordered_set<SubjectRef, HashFunctorType, EqualToFunctorType>;
 
                 explicit ObserverSetMulti(SubjectType& subject) noexcept
                     : subjects_refs_{ {std::ref(subject)} } {
@@ -193,9 +194,14 @@ namespace pattern {
 				ObserverSetMulti& operator=(ObserverSetMulti&&) noexcept = delete;
 			public:
 				~ObserverSetMulti() override {
-					for (SubjectRef subject_ref : subjects_refs_) {
-						subject_ref.get().DetachObserver(*this);
+					ContainerType::iterator it = subjects_refs_.begin();
+					while (it != subjects_refs_.end()) {
+						it++->get().DetachObserver(*this);
+						//.get().DetachObserver(*this);
 					}
+                        /*for (SubjectRef subject_ref : subjects_refs_) {
+                            subject_ref.get().DetachObserver(*this);
+                        }*/
 				};
 
 				/** Update the information about Subject */
@@ -227,7 +233,7 @@ namespace pattern {
 
 			private:
 				/** Subjects for which we will be notified. */
-				std::unordered_set<SubjectRef, HashFunctorType, EqualToFunctorType> subjects_refs_{};
+				ContainerType subjects_refs_{};
 				// Is not const, cause Attach, Detach functions call.
 
 			};	// !class ObserverSetMulti
@@ -247,6 +253,7 @@ namespace pattern {
 				using ObserverRef = std::reference_wrapper<ObserverType>;
 				using HashFunctorType = HashRefWrapperReferent<ObserverType>;
 				using EqualToFunctorType = HashRefWrapperEqualTo<ObserverRef>;
+				using ContainerType = std::unordered_set<ObserverRef, HashFunctorType, EqualToFunctorType>;
 
 				SubjectSetMulti() = default;
 			protected:
@@ -256,9 +263,13 @@ namespace pattern {
 				SubjectSetMulti& operator=(SubjectSetMulti&&) noexcept = delete;
 			public:
 				~SubjectSetMulti() override {
-					for (ObserverRef observer_ref : observers_refs) {
-						observer_ref.get().DetachSubject(*this);
+					ContainerType::iterator it = observers_refs.begin();
+					while (it != observers_refs.end()) {
+						it++->get().DetachSubject(*this);
 					}
+					/*for (ObserverRef observer_ref : observers_refs) {
+						observer_ref.get().DetachSubject(*this);
+					}*/
 				};
 
 				/** Add Observer to list of notification */
@@ -315,7 +326,7 @@ namespace pattern {
 				 *
 				 * Design: If there is too many subjects with few observers you can use hash table.
 				 */
-				std::unordered_set<ObserverRef, HashFunctorType, EqualToFunctorType> observers_refs{};
+				ContainerType observers_refs{};
 				/*
 				* observers_refs maybe unordered_set for quicker search and detach
 				* List is used, when the order of observers is important.

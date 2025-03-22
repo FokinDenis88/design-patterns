@@ -128,10 +128,11 @@ namespace pattern {
 				using ActionWithArgsType = std::function<ActionType>;
 
 				Command() = default;
-				Command(const Command&) = default;
-				Command& operator=(const Command&) = default;
-				Command(Command&&) noexcept = default;
-				Command& operator=(Command&&) noexcept = default;
+				Command(const Command&) = delete;
+				Command& operator=(const Command&) = delete;
+				Command(Command&&) noexcept = delete;
+				Command& operator=(Command&&) noexcept = delete;
+				~Command() override = default;
 
 				/** @param new_action callable object must be binded with args, if there are params in function */
 				explicit Command(const ActionWithArgsType& new_action)
@@ -206,10 +207,11 @@ namespace pattern {
 				using STDFunctionType = ActionReturnType(ActionParamTypes...);
 
 				CommandMemberFn() = default;
-				CommandMemberFn(const CommandMemberFn&) = default;
-				CommandMemberFn& operator=(const CommandMemberFn&) = default;
-				CommandMemberFn(CommandMemberFn&&) noexcept = default;
-				CommandMemberFn& operator=(CommandMemberFn&&) noexcept = default;
+				CommandMemberFn(const CommandMemberFn&) = delete;
+				CommandMemberFn& operator=(const CommandMemberFn&) = delete;
+				CommandMemberFn(CommandMemberFn&&) noexcept = delete;
+				CommandMemberFn& operator=(CommandMemberFn&&) noexcept = delete;
+				~CommandMemberFn() = default;
 
 				explicit CommandMemberFn(std::shared_ptr<ReceiverType> receiver_p,
 										ActionType action_p, ActionParamTypes... action_args_p) // TODO: Maybe ref to args?

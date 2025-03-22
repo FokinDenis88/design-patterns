@@ -90,21 +90,21 @@ namespace {
 
 					TEST(MementoTest, MementoMain) {
 						MyOriginator my_originator{};
-                        my_originator.a = 2;
-                        my_originator.b = 3;
+                        my_originator.state_.a = 2;
+                        my_originator.state_.b = 3;
 						Memento<MyOriginator, MyMementoState> my_memento{ my_originator.CreateMementoByValue() };
 
-                        my_originator.a = 0;
-                        my_originator.b = 0;
+                        my_originator.state_.a = 0;
+                        my_originator.state_.b = 0;
 						my_originator.RestoreByCopy(my_memento);
-						EXPECT_EQ(my_originator.a, 2) << "RestoreByCopy failed";
-						EXPECT_EQ(my_originator.a, 3);
+						EXPECT_EQ(my_originator.state_.a, 2) << "RestoreByCopy failed";
+						EXPECT_EQ(my_originator.state_.b, 3);
 
-                        my_originator.a = 0;
-                        my_originator.b = 0;
+                        my_originator.state_.a = 0;
+                        my_originator.state_.b = 0;
 						my_originator.RestoreByMove(std::move(my_memento));
-                        EXPECT_EQ(my_originator.a, 2);
-                        EXPECT_EQ(my_originator.b, 3);
+                        EXPECT_EQ(my_originator.state_.a, 2);
+                        EXPECT_EQ(my_originator.state_.b, 3);
 					};
 				}
 
@@ -160,9 +160,10 @@ namespace {
 						subject_2.NotifyObserversMulti();
 						subject_3.NotifyObserversMulti();
 
-						subject_1.AttachObserver(observer_3);
 						subject_1.DetachObserver(observer_1);
 						subject_1.DetachObserver(observer_2);
+						subject_1.ClearAllObservers();
+						subject_1.AttachObserver(observer_3);
 
 						subject_3.AttachObserver(observer_2);
 						subject_3.ClearAllObservers();
@@ -181,6 +182,8 @@ namespace {
 
 						int a = 66 - 66;*/
 						//EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
+
+						int a = 2;
 					};
 				} // !namespace observer_ref
 
