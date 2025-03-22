@@ -90,6 +90,9 @@ namespace pattern {
 				 */
 				virtual void Update(const SubjectType& subject) = 0;
 
+				/** Add Subject to list of observing. Add Observer to list of Observers in Subject */
+				virtual void AttachSubject(SubjectType& subject) = 0;
+
 				/**
 				 * Detach Subject from Observer, when Subject is destructed..
 				 *
@@ -120,7 +123,10 @@ namespace pattern {
 			public:
 				virtual ~ISubject() = default;
 
-				/** Add Observer to list of notification */
+				/**
+				 * Add Observer to list of notification in Subject.
+				 * Add Subject to list of Observers in Observer..
+				 */
 				virtual void AttachObserver(ObserverT& observer) = 0;
 
 				/** Detach observer_ref_1 from notifying list */
@@ -183,7 +189,7 @@ namespace pattern {
 				using ContainerType = std::unordered_set<SubjectRef, HashFunctorType, EqualToFunctorType>;
 
                 explicit ObserverSetMulti(SubjectType& subject) noexcept
-                    : subjects_refs_{ {std::ref(subject)} } {
+						: subjects_refs_{ {std::ref(subject)} } {
                     subject.AttachObserver(*this);
                 }
 
@@ -197,11 +203,7 @@ namespace pattern {
 					ContainerType::iterator it = subjects_refs_.begin();
 					while (it != subjects_refs_.end()) {
 						it++->get().DetachObserver(*this);
-						//.get().DetachObserver(*this);
 					}
-                        /*for (SubjectRef subject_ref : subjects_refs_) {
-                            subject_ref.get().DetachObserver(*this);
-                        }*/
 				};
 
 				/** Update the information about Subject */
@@ -215,6 +217,14 @@ namespace pattern {
 				 */
 				void Update(const SubjectType& subject) override {
 				};
+
+
+                /** Add Subject to list of observing. Add Observer to list of Observers in Subject */
+                void AttachSubject(SubjectType& subject) override {
+                    //subjects_refs_.emplace(std::ref(subject));
+					subjects_refs_.emplace(subject);
+                    if (!subject.HasObserver(*this)) { subject.AttachObserver(*this); }
+                };
 
 				/**
 				 * Delete Subject from set of subjects in Observer, when Subject is destructed.
@@ -267,21 +277,22 @@ namespace pattern {
 					while (it != observers_refs.end()) {
 						it++->get().DetachSubject(*this);
 					}
-					/*for (ObserverRef observer_ref : observers_refs) {
-						observer_ref.get().DetachSubject(*this);
-					}*/
 				};
 
 				/** Add Observer to list of notification */
-				inline void AttachObserver(ObserverType& observer) override {
+				inline void AttachObserver(ObserverType& observer) override {	// mustn't be const, cause observer may change
+					//observers_refs.emplace(std::ref(observer));
 					observers_refs.emplace(observer);
+					if (!observer.HasSubject(*this)) {
+						observer.AttachSubject(*this);
+					}
 				};
 				// TODO: Attach Observers() initializer_list, vector. Other operations with multiple observers.
 
 				/** Detach observer_ref_1 from notifying list */
 				inline void DetachObserver(ObserverType& observer) override {
 					observers_refs.erase(std::ref(observer));
-					if (observer.HasSubject(*this)) observer.DetachSubject(*this);
+					if (observer.HasSubject(*this)) { observer.DetachSubject(*this); }
 				};
 
 				/** Update all attached observers */
@@ -312,8 +323,9 @@ namespace pattern {
 			private:
 				/** Delete this subject from sets in all attached observers  */
 				inline void DetachAllObservers() {
-                    for (ObserverRef observer_ref : observers_refs) {
-                        observer_ref.get().DetachSubject(*this);
+                    auto it = observers_refs.begin();
+                    while (it != observers_refs.end()) {
+                        it++->get().DetachSubject(*this);
                     }
 				}
 
@@ -419,7 +431,7 @@ namespace pattern {
 					}
 				};
 
-				/** Add Observer to list of notification */
+				/** Add Observer to list of notification. Used in constructor of Observer */
 				inline void AttachObserver(ObserverType& observer) override {
 					observers_refs.emplace_front(std::ref(observer));
 				};

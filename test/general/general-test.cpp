@@ -168,21 +168,6 @@ namespace {
 						subject_3.AttachObserver(observer_2);
 						subject_3.ClearAllObservers();
 
-						/*AbstractSubjectRef<State> subject_ref{};
-						Observer<State> observer_ref_1{};
-						Observer<State> observer_ref_2{};
-						Observer<State> observer_ref_3{};
-						subject_ref.AttachObserver(observer_ref_1);
-						subject_ref.AttachObserver(observer_ref_2);
-						subject_ref.AttachObserver(observer_ref_3);
-						subject_ref.set_state(State{ 77, 77 });
-						subject_ref.NotifyObservers();
-						subject_ref.DetachObserver(observer_ref_1);
-						subject_ref.ClearAllObservers();
-
-						int a = 66 - 66;*/
-						//EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
-
 						int a = 2;
 					};
 				} // !namespace observer_ref
