@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+﻿#include "gtest/gtest.h"
 
 #include "header-collection/all-headers.hpp"
 
@@ -306,7 +306,25 @@ namespace {
 					client.creator_->Clone();
 				};
 			}
-			namespace singleton {}
+			namespace singleton {
+                using namespace ::pattern::creational::singleton;
+
+                TEST(SingletonTest, SingletonClass) {
+					//auto& a{ SingletonStatic<int>::GetSingleton() };
+					//auto& b{ SingletonStatic<double>::GetSingleton() };
+
+					auto& c{ MySingletonStatic::GetSingleton() };
+					auto& d{ SingletonDynamic<int>::GetSingleton() };
+
+					SingletonDynamic<int>::DestructSingleton();
+					d = SingletonDynamic<int>::GetSingleton();
+
+					//ConcreteSingleton my_singleton;
+                    //EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
+
+					//pattern::creational::singleton_example::Singleton_2& a{ pattern::creational::singleton_example::Singleton_2::Get() };
+                };
+			}
 		} // !namespace creational
 
 

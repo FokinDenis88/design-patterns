@@ -1,4 +1,4 @@
-#ifndef BUILDER_HPP
+﻿#ifndef BUILDER_HPP
 #define BUILDER_HPP
 
 #include <memory>
