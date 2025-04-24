@@ -29,6 +29,9 @@ namespace {
 						std::cout << "std::function " << sizeof(a) << "\n";
 						std::cout << "lambda " << sizeof(b) << "\n";
 
+
+                        std::cout << "std::function " << sizeof(a) << "\n";
+
 						//TestClass<decltype(Receiver::Add)> test{};
 						//int a = 66 - 44;
 
@@ -46,6 +49,21 @@ namespace {
 						//std::cout << "Add_result: " << client.InvokeCommand() << '\n';
 
 						//ASSERT_EQ(1, 2) << "Test CommandSTDFunctionClass";
+
+
+						// Test std::function type convertion experiments
+                        std::function<void()> aa = []() -> void {};
+                        std::function<void()> aa1 = []() -> int { return 0; };
+                        std::function<void()> aa2 = []() -> double { return 1.0; };
+                        auto aa3 = []() -> double { return 1.0; };
+						std::function<void()> aa4 = aa3;
+						//void(* aaa1)() = []() -> int { return 0; }; can't convert
+
+                        std::vector<std::function<void()>> vec{ aa, aa1, aa2, aa3 };
+                        bool flag{ typeid(aa).hash_code() == typeid(aa3).hash_code() };
+
+						//void(Receiver::* my_add)(int, int) = &Receiver::Add;
+						//std::function<void(int, int)> aa5 = std::bind(&Receiver::Add, receiver.get());
 					}
 
 					TEST(CommandTest, CommandMemberFnClass) {
@@ -58,7 +76,7 @@ namespace {
 
 						Receiver receiver_test{};
 						std::shared_ptr<Receiver> receiver_2{ std::make_shared<Receiver>() };
-						using CommandType = CommandMemberFn<Receiver, int, int, int>;
+						using CommandType = CommandMemberFn<int, Receiver, int, int>;
 						auto command_2{ std::make_shared<CommandType>(receiver_2, &Receiver::Add, 40, 50) };
 						command_2->Execute();
 						std::unique_ptr<Invoker> invoker_2{ std::make_unique<Invoker>() };
@@ -127,6 +145,58 @@ namespace {
 
 			namespace null_object{}
 			namespace observer {
+
+                namespace observer {
+                    using namespace ::pattern::behavioral::observer;
+                    TEST(ObserverTest, ObserverPtrClass) {
+                        //=========Ref============
+                        MySubject subject_1{}, subject_2{}, subject_3{};
+                        MyObserver observer_1{ subject_1 }, observer_2{ subject_2 }, observer_3{ subject_3 };
+                        subject_1.state_.a_ = 1;
+                        subject_1.state_.b_ = 2;
+                        subject_2.state_.a_ = 3;
+                        subject_2.state_.b_ = 4;
+                        subject_3.state_.a_ = 5;
+                        subject_3.state_.b_ = 6;
+
+                        observer_1.state_.a_ = 1;
+                        observer_1.state_.b_ = 2;
+                        observer_2.state_.a_ = 3;
+                        observer_2.state_.b_ = 4;
+                        observer_3.state_.a_ = 5;
+                        observer_3.state_.b_ = 6;
+
+                        subject_1.AttachObserver(observer_1);
+                        subject_1.AttachObserver(observer_2);
+
+                        subject_2.AttachObserver(observer_2);
+                        subject_2.AttachObserver(observer_3);
+
+                        subject_3.AttachObserver(observer_1);
+                        subject_3.AttachObserver(observer_3);
+
+                        subject_1.NotifyObserversMulti();
+                        subject_2.NotifyObserversMulti();
+                        subject_3.NotifyObserversMulti();
+
+                        subject_1.DetachObserver(observer_1);
+                        subject_1.DetachObserver(observer_2);
+                        subject_1.ClearAllObservers();
+                        subject_1.AttachObserver(observer_3);
+
+                        subject_3.AttachObserver(observer_2);
+                        subject_3.ClearAllObservers();
+
+
+                        MySubject subject_4{};
+                        { // Destructor test
+                            MyObserver observer_4{ subject_4 };
+                        }
+
+                        int a = 2;
+                    };
+                } // !namespace observer
+
 				namespace observer_ref {
 					using namespace ::pattern::behavioral::observer_ref;
 					TEST(ObserverTest, ObserverRefClass) {
@@ -168,12 +238,18 @@ namespace {
 						subject_3.AttachObserver(observer_2);
 						subject_3.ClearAllObservers();
 
+
+                        MySubject subject_4{};
+						{ // Destructor test
+							MyObserver observer_4{ subject_4 };
+						}
+
 						int a = 2;
 					};
 				} // !namespace observer_ref
 
 				namespace observer_smart_ptr {
-					using namespace ::pattern::behavioral::observer_ptr;
+					using namespace ::pattern::behavioral::observer_ptr_old;
 					TEST(ObserverTest, ObserverSmartPtrSimpleClass) {
 						//======Simple============
 						Subject subject{};
@@ -205,7 +281,7 @@ namespace {
 
 						int a = 66 - 66;
 					};
-				} // !namespace observer_ptr
+				} // !namespace observer_ptr_old
 			}
 			namespace state {
 				using namespace ::pattern::behavioral::originator_state_;
@@ -317,7 +393,7 @@ namespace {
 					auto& d{ SingletonDynamic<int>::GetSingleton() };
 
 					SingletonDynamic<int>::DestructSingleton();
-					d = SingletonDynamic<int>::GetSingleton();
+					//d = SingletonDynamic<int>::GetSingleton();
 
 					//ConcreteSingleton my_singleton;
                     //EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
@@ -397,57 +473,96 @@ namespace {
 
 		} // !namespace ui
 
-
-		/** https://google.github.io/googletest/primer.html */
-		namespace help {
-			// Info
-			// Test Suite, Test Case
-			// TEST(ObjectPoolTest, ObjectPoolClass) {}
-			// Fixture class for common object for some Test Cases
-
-			struct Foo {
-				int a{};
-			};
-
-			// The fixture for testing class Foo.
-			class FooTest : public testing::Test {
-			protected:
-				// You can remove any or all of the following functions if their bodies would
-				// be empty.
-
-				FooTest() {
-					// You can do set-up work for each test here.
-				}
-
-				~FooTest() override {
-					// You can do clean-up work that doesn't throw exceptions here.
-				}
-
-				// If the constructor and destructor are not enough for setting up
-				// and cleaning up each test, you can define the following methods:
-
-				void SetUp() override {
-					// Code here will be called immediately after the constructor (right
-					// before each test).
-				}
-
-				void TearDown() override {
-					// Code here will be called immediately after each test (right
-					// before the destructor).
-				}
-
-				// Class members declared here can be used by all tests in the test suite
-				// for Foo.
-			};
-
-			// Tests that the Foo::Bar() method does Abc.
-			TEST_F(FooTest, MethodBarDoesAbc) {
-				const std::string input_filepath = "this/package/testdata/myinputfile.dat";
-				const std::string output_filepath = "this/package/testdata/myoutputfile.dat";
-				Foo f;
-				//EXPECT_EQ(f.Bar(input_filepath, output_filepath), 0);
-			}
-		} // !namespace help
-
 	}  // !pattern
+
+
+    namespace refactoring {
+        namespace encapsulate_variable {
+
+			using namespace ::refactoring::encapsulate_variable;
+
+            // Test How to track changes of global variable
+			int abc__{};
+			int abc_fn() {
+				static int abc{};
+				return abc;
+			};
+
+			TEST(EncapsulateVariableTest, EncapsulateVariableTuple) {
+				// How to Track changes of global variable?
+				// You can use data breakpoint to track changes of global variable
+				abc__ = 3;
+				abc__ = abc_fn();
+				using GlobalVarsType = GlobalVariablesTuple<GlobalVariablesEnum,
+																int, // a
+																double // b
+															>;
+
+				constexpr GlobalVariablesEnum a_enum{ GlobalVariablesEnum::a };
+				int a = GlobalVarsType::get_variable<GlobalVariablesEnum::a>();
+				GlobalVarsType::set_variable<GlobalVariablesEnum::a>(-33);
+				GlobalVarsType::set_variable<GlobalVariablesEnum::b>(66.0);
+				int aa = GlobalVarsType::get_variable<a_enum>();
+				int bbb = GlobalVarsType::get_variable<GlobalVariablesEnum::b>();
+
+				//EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
+				EXPECT_EQ(GlobalVarsType::get_variable<GlobalVariablesEnum::a>(), -33);
+				EXPECT_EQ(GlobalVarsType::get_variable<GlobalVariablesEnum::b>(), 66.0);
+			}
+        } // !namespace encapsulate_variable
+
+    } // !namespace refactoring
+
+
+    /** https://google.github.io/googletest/primer.html */
+    namespace help {
+        // Info
+        // Test Suite, Test Case
+        // TEST(ObjectPoolTest, ObjectPoolClass) {}
+        // Fixture class for common object for some Test Cases
+
+        struct Foo {
+            int a{};
+        };
+
+        // The fixture for testing class Foo.
+        class FooTest : public testing::Test {
+        protected:
+            // You can remove any or all of the following functions if their bodies would
+            // be empty.
+
+            FooTest() {
+                // You can do set-up work for each test here.
+            }
+
+            ~FooTest() override {
+                // You can do clean-up work that doesn't throw exceptions here.
+            }
+
+            // If the constructor and destructor are not enough for setting up
+            // and cleaning up each test, you can define the following methods:
+
+            void SetUp() override {
+                // Code here will be called immediately after the constructor (right
+                // before each test).
+            }
+
+            void TearDown() override {
+                // Code here will be called immediately after each test (right
+                // before the destructor).
+            }
+
+            // Class members declared here can be used by all tests in the test suite
+            // for Foo.
+        };
+
+        // Tests that the Foo::Bar() method does Abc.
+        TEST_F(FooTest, MethodBarDoesAbc) {
+            const std::string input_filepath = "this/package/testdata/myinputfile.dat";
+            const std::string output_filepath = "this/package/testdata/myoutputfile.dat";
+            Foo f;
+            //EXPECT_EQ(f.Bar(input_filepath, output_filepath), 0);
+        }
+    } // !namespace help
+
 }  // !unnamed namespace

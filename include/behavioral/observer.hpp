@@ -1,6 +1,7 @@
-#ifndef OBSERVER_HPP
+﻿#ifndef OBSERVER_HPP
 #define OBSERVER_HPP
 
+// TODO: compress include list
 #include <forward_list>
 #include <functional>
 #include <memory>
@@ -14,11 +15,14 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace behavioral {
-		namespace observer_ref {
 			// https://en.wikipedia.org/wiki/Observer_pattern
+			// https://eliogubser.com/posts/2021-04-cpp-observer/	Simple observer pattern using modern C++
+			//		eliogubser Used Function wrapper for Update command.
+			//
 			// Friend patterns: Mediator. ChangeManager act like mediator between Observers and Subjects,
-			// encapsulate complex mechanics of Update.
+			//		encapsulate complex mechanics of Update.
 			// Singleton is used in ChangeManager.
+			// Command. Realization of Observer may store Delegates in Subject to Observer's functions.
 			//
 			// Classes Observer and Subject depends on each other by state
 
@@ -28,21 +32,418 @@ namespace pattern {
 			 * If there are many subject, that observer must be subscribed. Needs to add Subject& param to Observer.Update()
 			 */
 
+			 /**
+			  * Observer with "event propagation" or in realization of "Listener".
+			  *
+			  * Push, Pull protocols of update.
+			  * Push is less decoupled. Subject knows what data is needed by observer.
+			  * Pull is more decoupled. Subject knows nothing about observer. Observer decides what data is needed.
+			  *
+			  * Aspect defines what events are interested for observer.
+			  * Realization by subscribing to concrete events.
+			  * Second, by sending information about event when Updating
+			  *
+			  * One Observer may has many Subjects. One Subject can has many Observers.
+			  */
+
+			  /**
+			   * Update function may be called in Subject's Notify() in mode Sync or Async (Message, Events Queue).
+			   * You can use parallel threads, if Observer's Update() is huge, slow, resource eating code.
+			   * Or if there is huge count of observers.
+			   *
+			   * Lapsed Listener Problem - memory leak, if there is strong references, pointers to Observers.
+			   *
+			   * Message Queue. By creating a dedicated message queue server (and sometimes an extra message handler
+			   * object) as an extra stage between the observer and the object being observed, thus decoupling the components.
+			   *
+			   * Change Manager - is Mediator Pattern, that helps to move all refs to Observer from Subject to Manager.
+			   * Change Manager is best solution for complex update logic.
+			   */
+
+
+
+		namespace observer {
+			// TODO:
+			// weak ptr in Observer and Subject. Container Cleanup.
+			// parallel execution policy
+			// command pattern instead Update
+			// composition over inheritance
+
+
+
+
 			/**
-			 * Observer with "event propagation" or in realization of "Listener".
-			 *
-			 * Push, Pull protocols of update.
-			 * Push is less decoupled. Subject knows what data is needed by observer.
-			 * Pull is more decoupled. Subject knows nothing about observer. Observer decides what data is needed.
-			 *
-			 * Aspect defines what events are interested for observer.
-			 * Realization by subscribing to concrete events.
-			 * Second, by sending information about event when Updating
-			 *
-			 * One Observer may has many Subjects. One Subject can has many Observers.
+			 * Abstract. Stateless. Interface of Observer.
+			 * Alternative name - Subscriber.
 			 */
+			class IObserver {
+			protected:
+				IObserver() = default;	// Must be created with Subject reference inside
+				IObserver(const IObserver&) = delete; // C.67	C.21
+				IObserver& operator=(const IObserver&) = delete;
+				IObserver(IObserver&&) noexcept = delete;
+				IObserver& operator=(IObserver&&) noexcept = delete;
+			public:
+				virtual ~IObserver() = default;
+
+				/** Update the information about Subject */
+				virtual void Update() = 0;
+			};
+
+			template<typename ObserverT>
+			class ISubject;
+
+			/** Abstract. Stateless. Interface for Observer with multiple subjects */
+			class IObserverMulti {
+			public:
+				using SubjectType = ISubject<IObserverMulti>;
+
+			protected:
+				IObserverMulti() = default;
+				IObserverMulti(const IObserverMulti&) = delete; // C.67	C.21
+				IObserverMulti& operator=(const IObserverMulti&) = delete;
+				IObserverMulti(IObserverMulti&&) noexcept = delete;
+				IObserverMulti& operator=(IObserverMulti&&) noexcept = delete;
+			public:
+				virtual ~IObserverMulti() = default;
+
+				/** Update the information about Subject */
+				virtual void Update() = 0;
+
+				/**
+				 * Update the information about Subject.
+				 *
+				 * @param subject concrete subject from subjects_refs_, that called Update.
+				 */
+				virtual void Update(const SubjectType& subject) = 0;
+
+				/** Add Subject to list of observing. Add Observer to list of Observers in Subject */
+				virtual void AttachSubject(SubjectType& subject) = 0;
+
+				/**
+				 * Detach Subject from Observer, when Subject is destructed..
+				 *
+				 * @param subject subject, that is destructing.
+				 */
+				virtual void DetachSubject(SubjectType& subject) = 0;
+
+				/** Check if there is subject reference in Observer */
+				virtual bool HasSubject(SubjectType& subject) const noexcept = 0;
+			};
+
+			/**
+			 * Abstract. Stateless.
+			 * Alternative name - Publisher.
+			 * May be used for IObserver, IObserverMulti.
+			 */
+			template<typename ObserverT = IObserver>
+			class ISubject {
+			public:
+				using ObserverType = IObserverMulti;
+
+			protected:
+				ISubject() = default;
+				ISubject(const ISubject&) = delete; // C.67	C.21
+				ISubject& operator=(const ISubject&) = delete;
+				ISubject(ISubject&&) noexcept = delete;
+				ISubject& operator=(ISubject&&) noexcept = delete;
+			public:
+				virtual ~ISubject() = default;
+
+				/**
+				 * Add Observer to list of notification in Subject.
+				 * Add Subject to list of Observers in Observer..
+				 */
+				virtual void AttachObserver(ObserverT& observer) = 0;
+
+				/** Detach observer_ref_1 from notifying list */
+				virtual void DetachObserver(ObserverT& observer) = 0;
+
+				/** Update all attached observers */
+				virtual void NotifyObservers() const = 0;
+
+				/** Check if there is observer reference in Subject */
+				virtual bool HasObserver(ObserverType& observer) const noexcept = 0;
+			};
 
 
+			//======================================Ref Version=====================================
+			// Ref Version can be used with stack objects
+
+
+			// TODO: Realize pull version of Update
+
+			/**
+			 * Functor, calculating hash of referent for reference_wrapper.
+			 * Hash calculated by hash of address of referent object.
+			 *
+			 * @tparam T Class type of referent (T&), that wrapped by reference_wrapper.
+			 */
+			template<typename T>
+			struct HashRefWrapperReferent { // for hash table in unordered_set of reference_wrapper
+				constexpr size_t operator()(const std::reference_wrapper<T>& ref) const noexcept {
+					return std::hash<T*>()(&ref.get());
+				}
+			};
+			/** Functor, calculating hash of reference address for reference_wrapper. */
+			template<typename T>
+			struct HashRefWrapperRefAddress { // for hash table in unordered_set of reference_wrapper
+				constexpr size_t operator()(const std::reference_wrapper<T>& ref) const noexcept {
+					return std::hash<const std::reference_wrapper<T>&*>()(&ref);
+				}
+			};
+			/** Functor for EqualTo operation for unordered_set<reference_wrapper> */
+			template<typename T>
+			struct HashRefWrapperEqualTo { // for hash table in unordered_set of reference_wrapper
+				constexpr bool operator()(const T& lhs_ref, const T& rhs_ref) const noexcept {
+					return &lhs_ref.get() == &rhs_ref.get();
+				}
+			};
+
+
+			class SubjectRefSetMulti;
+
+			/**
+			 * Concrete. Simple observer class realize Upate() and Update(Subject&) functions.
+			 * One Observer may has many Subjects.
+			 * Don't use with dynamic objects, cause dangling references.
+			 * Subjects list is unordered_set of reference wrapper.
+			 * Use, when the order of Update is not important.
+			 */
+			class ObserverRefSetMulti : public IObserverMulti {
+			public:
+				using SubjectType = ISubject<IObserverMulti>;
+				using SubjectRefType = std::reference_wrapper<SubjectType>;
+				using HashFunctorType = HashRefWrapperReferent<SubjectType>;
+				using EqualToFunctorType = HashRefWrapperEqualTo<SubjectRefType>;
+				using ContainerType = std::unordered_set<SubjectRefType, HashFunctorType, EqualToFunctorType>;
+
+				explicit ObserverRefSetMulti(SubjectType& subject) noexcept
+					: subjects_refs_{ {std::ref(subject)} } {
+					subject.AttachObserver(*this);
+				}
+
+			protected:
+				ObserverRefSetMulti(const ObserverRefSetMulti&) = delete; // C.67	C.21
+				ObserverRefSetMulti& operator=(const ObserverRefSetMulti&) = delete;
+				ObserverRefSetMulti(ObserverRefSetMulti&&) noexcept = delete;
+				ObserverRefSetMulti& operator=(ObserverRefSetMulti&&) noexcept = delete;
+			public:
+				~ObserverRefSetMulti() override {
+					ContainerType::iterator it{ subjects_refs_.begin() };
+					const auto cend{ subjects_refs_.cend() };
+					auto it_prev{ it }; // post increment returns unmutable const_iterator, that is not best choice for mutable Detach
+					while (it != cend) { // not ranged for, cause elements deleted
+						it_prev = it;
+						++it;
+						it_prev->get().DetachObserver(*this);
+					}
+				};
+
+				/** Update the information about Subject */
+				void Update() override {
+				};
+
+				/**
+				 * Update the information about Subject.
+				 *
+				 * @param subject concrete subject from subjects_refs_, that called Update.
+				 */
+				void Update(const SubjectType& subject) override {
+				};
+
+
+				/** Add Subject to list of observing. Add Observer to list of Observers in Subject */
+				void AttachSubject(SubjectType& subject) override {
+					subjects_refs_.emplace(subject);
+					if (!subject.HasObserver(*this)) { subject.AttachObserver(*this); }
+				};
+
+				/**
+				 * Delete Subject from set of subjects in Observer, when Subject is destructed.
+				 *
+				 * @param subject subject, that is destructing.
+				 */
+				void DetachSubject(SubjectType& subject) override {
+					subjects_refs_.erase(std::ref(subject));
+					if (subject.HasObserver(*this)) { subject.DetachObserver(*this); }
+				};
+
+				/** Check if there is subject reference in Observer */
+				bool HasSubject(SubjectType& subject) const noexcept override {
+					return subjects_refs_.find(subject) != subjects_refs_.end();
+				};
+
+			private:
+				/** Subjects for which we will be notified. */
+				ContainerType subjects_refs_{};
+				// Is not const, cause Attach, Detach functions call.
+
+			};	// !class ObserverRefSetMulti
+
+
+			/**
+			 * Concrete. Observers will be notified on Subject state changes.
+			 * One Subject can has many Observers.
+			 * Ref Version can be used with stack objects.
+			 * Don't use with dynamic objects, cause dangling references.
+			 * Observers list is unordered_set.
+			 * Don't forget to Notify Observers, where it is necessary, when Subject state changes.
+			 * It is better to use set, when the order of Update is not important.
+			 */
+			class SubjectRefSetMulti : public ISubject<IObserverMulti> {
+			public:
+				using ObserverType = IObserverMulti;
+				using ObserverRefType = std::reference_wrapper<ObserverType>;
+				using HashFunctorType = HashRefWrapperReferent<ObserverType>;
+				using EqualToFunctorType = HashRefWrapperEqualTo<ObserverRefType>;
+				using ContainerType = std::unordered_set<ObserverRefType, HashFunctorType, EqualToFunctorType>;
+
+				SubjectRefSetMulti() = default;
+			protected:
+				SubjectRefSetMulti(const SubjectRefSetMulti&) = delete; // C.67	C.21
+				SubjectRefSetMulti& operator=(const SubjectRefSetMulti&) = delete;
+				SubjectRefSetMulti(SubjectRefSetMulti&&) noexcept = delete;
+				SubjectRefSetMulti& operator=(SubjectRefSetMulti&&) noexcept = delete;
+			public:
+				~SubjectRefSetMulti() override {
+					ContainerType::iterator it = observers_refs.begin();
+					const auto cend{ observers_refs.cend() };
+					auto it_prev{ it }; // post increment returns unmutable const_iterator, that is not best choice for mutable Detach
+					while (it != cend) { // not ranged for, cause elements deleted
+						it_prev = it;
+						++it;
+						it_prev->get().DetachSubject(*this);
+					}
+				};
+
+				/** Add Observer to list of notification */
+				inline void AttachObserver(ObserverType& observer) override {	// mustn't be const, cause observer may change
+					//observers_refs.emplace(std::ref(observer));
+					observers_refs.emplace(observer);
+					if (!observer.HasSubject(*this)) {
+						observer.AttachSubject(*this);
+					}
+				};
+				// TODO: Attach Observers() initializer_list, vector. Other operations with multiple observers.
+
+				/** Detach observer_ref_1 from notifying list */
+				inline void DetachObserver(ObserverType& observer) override {
+					observers_refs.erase(std::ref(observer));
+					if (observer.HasSubject(*this)) { observer.DetachSubject(*this); }
+				};
+
+				/** Update all attached observers */
+				inline void NotifyObservers() const override {
+					for (ObserverRefType observer_ref : observers_refs) {
+						observer_ref.get().Update();
+					}
+				};
+
+				/** Update all attached observers with multiple subjects sending Subject& */
+				inline void NotifyObserversMulti() const {
+					for (ObserverRefType observer : observers_refs) {
+						observer.get().Update(*this);
+					}
+				};
+
+				/** Detach all attached observers */
+				inline void ClearAllObservers() noexcept {
+					observers_refs.clear();
+					DetachAllObservers();
+				};
+
+				/** Check if there is observer reference in Subject */
+				bool HasObserver(ObserverType& observer) const noexcept override {
+					return observers_refs.find(observer) != observers_refs.end();
+				};
+
+			private:
+				/** Delete this subject from sets in all attached observers  */
+				inline void DetachAllObservers() {
+					auto it = observers_refs.begin();
+					while (it != observers_refs.end()) {
+						it++->get().DetachSubject(*this);
+					}
+				}
+
+				/**
+				 * List of observers, that will be attach to observable object.
+				 * Subject is not interested in owning of its Observers.
+				 * So can be used weak_ptr, created from shared_ptr.
+				 * Also can be used ref IObserver&.
+				 * Containers can't hold IObserver&. Only wrapper.
+				 *
+				 * Design: If there is too many subjects with few observers you can use hash table.
+				 */
+				ContainerType observers_refs{};
+				/*
+				* observers_refs maybe unordered_set for quicker search and detach
+				* List is used, when the order of observers is important.
+				*/
+
+			};	// !class SubjectRefSetMulti
+
+
+
+
+
+			struct State {
+				int a_{ 0 };
+				int b_{ 0 };
+			};
+
+			class MySubject : public SubjectRefSetMulti {
+			public:
+				MySubject() = default;
+			protected:
+				MySubject(const MySubject&) = delete; // C.67	C.21
+				MySubject& operator=(const MySubject&) = delete;
+				MySubject(MySubject&&) noexcept = delete;
+				MySubject& operator=(MySubject&&) noexcept = delete;
+			public:
+				~MySubject() override = default;
+
+				State state_{};
+			};
+
+			class MyObserver : public ObserverRefSetMulti {
+			public:
+				explicit MyObserver(MySubject& observer) noexcept
+					: ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::SubjectType&>(observer) } {
+				};
+			protected:
+				MyObserver(const MyObserver&) = delete; // C.67	C.21
+				MyObserver& operator=(const MyObserver&) = delete;
+				MyObserver(MyObserver&&) noexcept = delete;
+				MyObserver& operator=(MyObserver&&) noexcept = delete;
+			public:
+				~MyObserver() override = default;
+
+				/**
+				 * Update the information about Subject.
+				 *
+				 * @param subject concrete subject from subjects_refs_, that called Update.
+				 */
+				void Update(const SubjectType& subject) override {
+					//state_observer_ = subject
+				};
+
+				State state_{};
+			};
+
+
+		} // !namespace observer
+
+
+
+
+
+
+
+
+		/** Observer pattern namespace with realization by reference wrapper container in Subject */
+		namespace observer_ref {
 //==================================Interfaces=====================================
 
 			/**
@@ -148,61 +549,68 @@ namespace pattern {
 
 			/**
 			 * Functor, calculating hash of referent for reference_wrapper.
+			 * Hash calculated by hash of address of referent object.
 			 *
 			 * @tparam T Class type of referent (T&), that wrapped by reference_wrapper.
 			 */
 			template<typename T>
-			struct HashRefWrapperReferent {
+			struct HashRefWrapperReferent { // for hash table in unordered_set of reference_wrapper
                 constexpr size_t operator()(const std::reference_wrapper<T>& ref) const noexcept {
                     return std::hash<T*>()(&ref.get());
                 }
 			};
             /** Functor, calculating hash of reference address for reference_wrapper. */
             template<typename T>
-            struct HashRefWrapperRefAddress {
-                constexpr size_t operator()(const T& ref) const noexcept {
-                    return std::hash<T*>()(&ref.get());
+            struct HashRefWrapperRefAddress { // for hash table in unordered_set of reference_wrapper
+                constexpr size_t operator()(const std::reference_wrapper<T>& ref) const noexcept {
+                    return std::hash<const std::reference_wrapper<T>&*>()(&ref);
                 }
             };
 			/** Functor for EqualTo operation for unordered_set<reference_wrapper> */
             template<typename T>
-            struct HashRefWrapperEqualTo {
+            struct HashRefWrapperEqualTo { // for hash table in unordered_set of reference_wrapper
                 constexpr bool operator()(const T& lhs_ref, const T& rhs_ref) const noexcept {
                     return &lhs_ref.get() == &rhs_ref.get();
                 }
             };
 
 
-			class SubjectSetMulti;
+			class SubjectRefSetMulti;
 
 			/**
 			 * Concrete. Simple observer class realize Upate() and Update(Subject&) functions.
 			 * One Observer may has many Subjects.
-			 * Subjects list is unordered_set.
+			 * Don't use with dynamic objects, cause dangling references.
+			 * Subjects list is unordered_set of reference wrapper.
+			 * Use, when the order of Update is not important.
 			 */
-			class ObserverSetMulti : public IObserverMulti {
+			class ObserverRefSetMulti : public IObserverMulti {
 			public:
                 using SubjectType = ISubject<IObserverMulti>;
-				using SubjectRef = std::reference_wrapper<SubjectType>;
+				using SubjectRefType = std::reference_wrapper<SubjectType>;
 				using HashFunctorType = HashRefWrapperReferent<SubjectType>;
-				using EqualToFunctorType = HashRefWrapperEqualTo<SubjectRef>;
-				using ContainerType = std::unordered_set<SubjectRef, HashFunctorType, EqualToFunctorType>;
+				using EqualToFunctorType = HashRefWrapperEqualTo<SubjectRefType>;
+				using ContainerType = std::unordered_set<SubjectRefType, HashFunctorType, EqualToFunctorType>;
 
-                explicit ObserverSetMulti(SubjectType& subject) noexcept
+                explicit ObserverRefSetMulti(SubjectType& subject) noexcept
 						: subjects_refs_{ {std::ref(subject)} } {
                     subject.AttachObserver(*this);
                 }
 
 			protected:
-				ObserverSetMulti(const ObserverSetMulti&) = delete; // C.67	C.21
-				ObserverSetMulti& operator=(const ObserverSetMulti&) = delete;
-				ObserverSetMulti(ObserverSetMulti&&) noexcept = delete;
-				ObserverSetMulti& operator=(ObserverSetMulti&&) noexcept = delete;
+				ObserverRefSetMulti(const ObserverRefSetMulti&) = delete; // C.67	C.21
+				ObserverRefSetMulti& operator=(const ObserverRefSetMulti&) = delete;
+				ObserverRefSetMulti(ObserverRefSetMulti&&) noexcept = delete;
+				ObserverRefSetMulti& operator=(ObserverRefSetMulti&&) noexcept = delete;
 			public:
-				~ObserverSetMulti() override {
-					ContainerType::iterator it = subjects_refs_.begin();
-					while (it != subjects_refs_.end()) {
-						it++->get().DetachObserver(*this);
+				~ObserverRefSetMulti() override {
+					ContainerType::iterator it{ subjects_refs_.begin() };
+					const auto cend{ subjects_refs_.cend() };
+					auto it_prev{ it }; // post increment returns unmutable const_iterator, that is not best choice for mutable Detach
+					while (it != cend) { // not ranged for, cause elements deleted
+						it_prev = it;
+						++it;
+						it_prev->get().DetachObserver(*this);
 					}
 				};
 
@@ -221,7 +629,6 @@ namespace pattern {
 
                 /** Add Subject to list of observing. Add Observer to list of Observers in Subject */
                 void AttachSubject(SubjectType& subject) override {
-                    //subjects_refs_.emplace(std::ref(subject));
 					subjects_refs_.emplace(subject);
                     if (!subject.HasObserver(*this)) { subject.AttachObserver(*this); }
                 };
@@ -246,36 +653,41 @@ namespace pattern {
 				ContainerType subjects_refs_{};
 				// Is not const, cause Attach, Detach functions call.
 
-			};	// !class ObserverSetMulti
+			};	// !class ObserverRefSetMulti
 
 
 			/**
 			 * Concrete. Observers will be notified on Subject state changes.
-			 * Ref Version can be used with stack objects.
-			 * Don't forget to Notify Observers, where it is necessary, when Subject state changes.
 			 * One Subject can has many Observers.
+			 * Ref Version can be used with stack objects.
+			 * Don't use with dynamic objects, cause dangling references.
 			 * Observers list is unordered_set.
+			 * Don't forget to Notify Observers, where it is necessary, when Subject state changes.
+			 * It is better to use set, when the order of Update is not important.
 			 */
-			//template<typename HashFunctorT>
-			class SubjectSetMulti : public ISubject<IObserverMulti> {
+			class SubjectRefSetMulti : public ISubject<IObserverMulti> {
 			public:
                 using ObserverType = IObserverMulti;
-				using ObserverRef = std::reference_wrapper<ObserverType>;
+				using ObserverRefType = std::reference_wrapper<ObserverType>;
 				using HashFunctorType = HashRefWrapperReferent<ObserverType>;
-				using EqualToFunctorType = HashRefWrapperEqualTo<ObserverRef>;
-				using ContainerType = std::unordered_set<ObserverRef, HashFunctorType, EqualToFunctorType>;
+				using EqualToFunctorType = HashRefWrapperEqualTo<ObserverRefType>;
+				using ContainerType = std::unordered_set<ObserverRefType, HashFunctorType, EqualToFunctorType>;
 
-				SubjectSetMulti() = default;
+				SubjectRefSetMulti() = default;
 			protected:
-				SubjectSetMulti(const SubjectSetMulti&) = delete; // C.67	C.21
-				SubjectSetMulti& operator=(const SubjectSetMulti&) = delete;
-				SubjectSetMulti(SubjectSetMulti&&) noexcept = delete;
-				SubjectSetMulti& operator=(SubjectSetMulti&&) noexcept = delete;
+				SubjectRefSetMulti(const SubjectRefSetMulti&) = delete; // C.67	C.21
+				SubjectRefSetMulti& operator=(const SubjectRefSetMulti&) = delete;
+				SubjectRefSetMulti(SubjectRefSetMulti&&) noexcept = delete;
+				SubjectRefSetMulti& operator=(SubjectRefSetMulti&&) noexcept = delete;
 			public:
-				~SubjectSetMulti() override {
+				~SubjectRefSetMulti() override {
 					ContainerType::iterator it = observers_refs.begin();
-					while (it != observers_refs.end()) {
-						it++->get().DetachSubject(*this);
+					const auto cend{ observers_refs.cend() };
+					auto it_prev{ it }; // post increment returns unmutable const_iterator, that is not best choice for mutable Detach
+					while (it != cend) { // not ranged for, cause elements deleted
+                        it_prev = it;
+                        ++it;
+						it_prev->get().DetachSubject(*this);
 					}
 				};
 
@@ -297,14 +709,14 @@ namespace pattern {
 
 				/** Update all attached observers */
 				inline void NotifyObservers() const override {
-					for (ObserverRef observer_ref : observers_refs) {
+					for (ObserverRefType observer_ref : observers_refs) {
 						observer_ref.get().Update();
 					}
 				};
 
                 /** Update all attached observers with multiple subjects sending Subject& */
                 inline void NotifyObserversMulti() const {
-                    for (ObserverRef observer : observers_refs) {
+                    for (ObserverRefType observer : observers_refs) {
                         observer.get().Update(*this);
                     }
                 };
@@ -344,7 +756,7 @@ namespace pattern {
 				* List is used, when the order of observers is important.
 				*/
 
-			};	// !class SubjectSetMulti
+			};	// !class SubjectRefSetMulti
 
 
 
@@ -352,11 +764,12 @@ namespace pattern {
 			 * Concrete. Simple observer class realize Upate() and Update(Subject&) functions.
 			 * One Observer may has many Subjects.
 			 * Subjects list is unordered_set.
+			 * It is better to use List, when the order of Update is important.
 			 */
 			class ObserverListMulti : public IObserverMulti {
 			public:
 				using SubjectType = ISubject<IObserverMulti>;
-				using SubjectRef = std::reference_wrapper<SubjectType>;
+				using SubjectRefType = std::reference_wrapper<SubjectType>;
 
                 explicit ObserverListMulti(SubjectType& subject) noexcept
                     : subjects_refs_{ {std::ref(subject)} } {
@@ -369,7 +782,7 @@ namespace pattern {
 				ObserverListMulti& operator=(ObserverListMulti&&) noexcept = delete;
 			public:
 				~ObserverListMulti() override {
-					for (SubjectRef subject_ref : subjects_refs_) {
+					for (SubjectRefType subject_ref : subjects_refs_) {
 						subject_ref.get().DetachObserver(*this);
 					}
 				};
@@ -392,14 +805,14 @@ namespace pattern {
 				 * @param subject subject, that is destructing.
 				 */
 				void DetachSubject(SubjectType& subject) override {
-					subjects_refs_.remove_if([&subject](const SubjectRef& current) {
+					subjects_refs_.remove_if([&subject](const SubjectRefType& current) {
                         return &current.get() == &subject;
                         });
 				};
 
 			private:
 				/** Subjects for which we will be notified. */
-				std::forward_list<SubjectRef> subjects_refs_{};
+				std::forward_list<SubjectRefType> subjects_refs_{};
 				// Is not const, cause Attach, Detach functions call.
 
 			};	// !class ObserverListMulti
@@ -411,12 +824,13 @@ namespace pattern {
 			 * Don't forget to Notify Observers, where it is necessary, when Subject state changes.
 			 * One Subject can has many Observers.
 			 * Observers list is unordered_set.
+			 * It is better to use List, when the order of Update is important.
 			 */
 			 //template<typename HashFunctorT>
 			class SubjectListMulti : public ISubject<IObserverMulti> {
 			public:
 				using ObserverType = IObserverMulti;
-				using ObserverRef = std::reference_wrapper<ObserverType>;
+				using ObserverRefType = std::reference_wrapper<ObserverType>;
 
 				SubjectListMulti() = default;
 			protected:
@@ -426,7 +840,7 @@ namespace pattern {
 				SubjectListMulti& operator=(SubjectListMulti&&) noexcept = delete;
 			public:
 				~SubjectListMulti() override {
-					for (ObserverRef observer_ref : observers_refs) {
+					for (ObserverRefType observer_ref : observers_refs) {
 						observer_ref.get().DetachSubject(*this);
 					}
 				};
@@ -439,7 +853,7 @@ namespace pattern {
 
 				/** Detach observer_ref_1 from notifying list */
 				inline void DetachObserver(ObserverType& observer) override {
-                    observers_refs.remove_if([&observer](const ObserverRef& current) {
+                    observers_refs.remove_if([&observer](const ObserverRefType& current) {
                         return &current.get() == &observer;
                         });
 				};
@@ -447,14 +861,14 @@ namespace pattern {
 
 				/** Update all attached observers */
 				inline void NotifyObservers() const override {
-					for (ObserverRef observer_ref : observers_refs) {
+					for (ObserverRefType observer_ref : observers_refs) {
 						observer_ref.get().Update();
 					}
 				};
 
 				/** Update all attached observers with multiple subjects sending Subject& */
 				inline void NotifyObserversMulti() const {
-					for (ObserverRef observer : observers_refs) {
+					for (ObserverRefType observer : observers_refs) {
 						observer.get().Update(*this);
 					}
 				};
@@ -469,7 +883,7 @@ namespace pattern {
 			private:
 				/** Delete this subject from sets in all attached observers  */
 				inline void DetachAllObservers() {
-					for (ObserverRef observer_ref : observers_refs) {
+					for (ObserverRefType observer_ref : observers_refs) {
 						observer_ref.get().DetachSubject(*this);
 					}
 				}
@@ -483,7 +897,7 @@ namespace pattern {
 				 *
 				 * Design: If there is too many subjects with few observers you can use hash table.
 				 */
-				std::forward_list<ObserverRef> observers_refs{};
+				std::forward_list<ObserverRefType> observers_refs{};
 				/*
 				* observers_refs maybe unordered_set for quicker search and detach
 				* List is used, when the order of observers is important.
@@ -739,7 +1153,7 @@ namespace pattern {
                 int b_{ 0 };
             };
 
-            class MySubject : public SubjectSetMulti {
+            class MySubject : public SubjectRefSetMulti {
             public:
                 MySubject() = default;
             protected:
@@ -753,10 +1167,10 @@ namespace pattern {
                 State state_{};
             };
 
-			class MyObserver : public ObserverSetMulti {
+			class MyObserver : public ObserverRefSetMulti {
             public:
                 explicit MyObserver(MySubject& observer) noexcept
-                    : ObserverSetMulti{ dynamic_cast<ObserverSetMulti::SubjectType&>(observer) } {
+                    : ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::SubjectType&>(observer) } {
                 };
             protected:
                 MyObserver(const MyObserver&) = delete; // C.67	C.21
@@ -784,7 +1198,7 @@ namespace pattern {
 
 
 
-		namespace observer_ptr {
+		namespace observer_ptr_old {
 //==================================Interfaces=====================================
 
 			// TODO: Make Review of ptr version of Observer Pattern
@@ -1001,7 +1415,7 @@ namespace pattern {
 			};
 #endif // DEBUG
 
-		} // !namespace observer_ptr
+		} // !namespace observer_ptr_old
 
 
 
@@ -1070,6 +1484,65 @@ namespace pattern {
 			};
 
 		} // namespace observer_wiki_version
+
+
+
+		namespace observer_delegate {
+// https://eliogubser.com/posts/2021-04-cpp-observer/
+
+#include <memory>
+#include <forward_list>
+#include <functional>
+
+
+			// Simple observer pattern in modern C++ without pointers.
+			// Register functions with make_observer() and call notify() to call them.
+			// Note: Functions are called from the thread that calls notify().
+			template <typename... Args>
+			class Subject
+			{
+			public:
+				typedef std::shared_ptr<std::function<void(Args...)>> Observer;
+
+				Subject() {}
+
+				void notify(const Args &...args)
+				{
+					bool cleanup = false;
+					for (const auto& observer_weak : m_observers)
+					{
+						if (const auto& observer_function = observer_weak.lock())
+						{
+							(*observer_function)(args...);
+						}
+						else
+						{
+							// weak pointer expired, do a cleanup round
+							cleanup = true;
+						}
+					}
+
+					if (cleanup)
+					{
+						m_observers.remove_if([](auto observer) { return observer.expired(); });
+					}
+				}
+
+
+				// Register a function as observer. Keep the returned shared_ptr around as long as you want
+				// the function to be called.
+				Observer makeObserver(std::function<void(Args...)> observerFunction)
+				{
+					auto observer = std::make_shared<std::function<void(Args...)>>(observerFunction);
+					m_observers.emplace_front(observer);
+					return observer;
+				}
+
+			private:
+				std::forward_list<std::weak_ptr<std::function<void(Args...)>>> m_observers;
+			};
+
+		} // !observer_delegate
 
 
 	} // !namespace behavioral

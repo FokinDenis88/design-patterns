@@ -1,4 +1,4 @@
-# CMakeList.txt : CMake project for artificial-neural-networks, include source and define
+﻿# CMakeList.txt : CMake project for artificial-neural-networks, include source and define
 # project specific logic here.
 #
 cmake_minimum_required(VERSION 3.8)
@@ -81,6 +81,7 @@ set(HEADERS_FILTER_CPP-IDIOMS
 	${INCLUDE_CPP_IDIOM}crtp.hpp
 	${INCLUDE_CPP_IDIOM}d-pointer.hpp
 	${INCLUDE_CPP_IDIOM}named-parameter.hpp
+	${INCLUDE_CPP_IDIOM}named-parameter-type.hpp
 	${INCLUDE_CPP_IDIOM}non-virtual-interface.hpp
 	${INCLUDE_CPP_IDIOM}opaque-pointer.hpp
 	${INCLUDE_CPP_IDIOM}pimpl.hpp
@@ -147,6 +148,14 @@ set(HEADERS_FILTER_GENERAL
 set(SOURCES_FILTER_GENERAL)
 
 
+set(INCLUDE_REFACTORING include/refactoring/)
+set(HEADERS_FILTER_REFACTORING
+	${INCLUDE_REFACTORING}extract-method.hpp
+	${INCLUDE_REFACTORING}encapsulate-variable.hpp
+	)
+set(SOURCES_FILTER_REFACTORING)
+
+
 # Many headers in every file
 set(INCLUDE_HEADER_COLLECTION include/header-collection/)
 set(HEADERS_FILTER_HEADER_COLLECTION
@@ -160,6 +169,7 @@ set(HEADERS_FILTER_HEADER_COLLECTION
 	${INCLUDE_HEADER_COLLECTION}database-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}distributed-system-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}gamedev-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}refactoring-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}ui-headers.hpp
 )
 
@@ -176,6 +186,7 @@ set(ALL_SOURCES
 	${SOURCES_FILTER_DISTRIBUTED-SYSTEM}
 	${SOURCES_FILTER_GAMEDEV}
 	${SOURCES_FILTER_STRUCTURAL}
+	${SOURCES_FILTER_REFACTORING}
 	${SOURCES_FILTER_UI}
 	${SOURCES_FILTER_GENERAL})
 
@@ -192,6 +203,7 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_GAMEDEV}
 	${HEADERS_FILTER_HEADER_COLLECTION}
 	${HEADERS_FILTER_STRUCTURAL}
+	${HEADERS_FILTER_REFACTORING}
 	${HEADERS_FILTER_UI}
 	${HEADERS_FILTER_GENERAL})
 
@@ -239,6 +251,7 @@ source_group("Distributed-System/Headers"	FILES ${HEADERS_FILTER_DISTRIBUTED-SYS
 source_group("GameDev/Headers"				FILES ${HEADERS_FILTER_GAMEDEV})
 source_group("Header Collection"			FILES ${HEADERS_FILTER_HEADER_COLLECTION})
 source_group("Structural/Headers"			FILES ${HEADERS_FILTER_STRUCTURAL})
+source_group("Refactoring/Headers"			FILES ${HEADERS_FILTER_REFACTORING})
 source_group("UI/Headers"					FILES ${HEADERS_FILTER_UI})
 source_group("General/Headers"				FILES ${HEADERS_FILTER_GENERAL})
 
@@ -254,6 +267,7 @@ source_group("Database/Source"				FILES ${SOURCES_FILTER_DATABASE})
 source_group("Distributed-System/Source"	FILES ${SOURCES_FILTER_DISTRIBUTED-SYSTEM})
 source_group("GameDev/Source"				FILES ${SOURCES_FILTER_GAMEDEV})
 source_group("Structural/Source"			FILES ${SOURCES_FILTER_STRUCTURAL})
+source_group("Refactoring/Source"			FILES ${SOURCES_FILTER_REFACTORING})
 source_group("UI/Source"					FILES ${SOURCES_FILTER_UI})
 source_group("General/Source"				FILES ${SOURCES_FILTER_GENERAL})
 

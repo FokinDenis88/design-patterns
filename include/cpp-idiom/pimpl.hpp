@@ -1,4 +1,4 @@
-#ifndef PIMPL_HPP
+﻿#ifndef PIMPL_HPP
 #define PIMPL_HPP
 
 #include <memory>
@@ -30,7 +30,7 @@ namespace pattern {
 
 			private:
 				/**
-				 * Unspecified Type.
+				 * Declare implementation Unspecified Type.
 				 * All private data members and all private non - virtual member functions are placed in the implementation class.
 				 */
 				struct Impl;

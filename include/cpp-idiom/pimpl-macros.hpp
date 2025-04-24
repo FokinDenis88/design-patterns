@@ -1,4 +1,4 @@
-#ifndef PIMPL_MACROS_HPP
+﻿#ifndef PIMPL_MACROS_HPP
 #define PIMPL_MACROS_HPP
 
 #include <memory>
@@ -54,12 +54,12 @@
 template<typename ObjectType>
 inline void CopyUniquePtrOwnedObjects(const std::unique_ptr<ObjectType>& source_ptr,
 										std::unique_ptr<ObjectType>& destination_ptr) {
-	if (!source_ptr) {
+	if (!source_ptr) { // source_ptr is nullptr
 		destination_ptr.reset();
-	} else {
+	} else { // source_ptr is not nullptr
 		if (destination_ptr) {
-			*destination_ptr = *source_ptr;
-		} else {
+			*destination_ptr = *source_ptr; // Copy assignment of stored object
+		} else { // memory is not allocated for destination_ptr. No stored object
 			destination_ptr = std::make_unique<ObjectType>(*source_ptr);
 		}
 	}

@@ -1,4 +1,4 @@
-# C++ Software Design Patterns
+﻿# C++ Software Design Patterns
 
 ## Repository Web Pages
 [github](https://github.com/FokinDenis88/design-patterns) <br>
@@ -92,6 +92,10 @@
 
 **UI:**
 * **Not realized**.
+
+**Refactoring:**
+* [Encapsulate Variable](/refactoring/encapsulate-variable.hpp)
+* Extract Method - **Not realized**
 
 ## Contact
 **Skype:** live:dragon8806 <br>
