@@ -4,7 +4,7 @@
 //#include <iostream>	// for testing functions call
 
 #include <algorithm>
-#include <execution>
+#include <execution> // Execution policies
 #include <functional>
 #include <type_traits>
 #include <list>
@@ -120,6 +120,7 @@ namespace pattern {
 
 				// Type can be converted from any pointer to fn type to void(), if all arguments of fn are binded
 				// Only reinterpret_cast helps to convert one pointer to member function to another, of another type
+				// void() is unified type for all command functions.
 				std::function<void()> new_action = std::bind(action_ptr, &receiver_p,
 															 std::forward<ParamTypes>(action_args_p)...);
 				return new_action;
@@ -436,8 +437,8 @@ namespace pattern {
 
 				template<typename ExecutionPolicyType>
 				requires std::is_execution_policy_v<ExecutionPolicyType>
-				void ExecuteWithPolicy(const ExecutionPolicyType& execution_policy) {
-					std::for_each(execution_policy, commands_.begin(), commands_.end(),
+				void ExecuteWithPolicy(ExecutionPolicyType policy = std::execution::seq) {
+					std::for_each(policy, commands_.begin(), commands_.end(),
 									[](auto& command) { command.Execute(); });
 				};
 

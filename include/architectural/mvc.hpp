@@ -191,7 +191,7 @@ namespace pattern {
             class View : public NonTerminalComponent, public ObserverRefSetMulti {
             public:
                 explicit View(Controller& controller) noexcept
-                    : ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::SubjectType&>(controller) } {
+                    : ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::ISubjectType&>(controller) } {
                 };
             protected:
                 View(const View&) = delete; // C.67	C.21

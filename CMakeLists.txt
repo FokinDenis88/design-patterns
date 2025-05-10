@@ -80,6 +80,7 @@ set(HEADERS_FILTER_CPP-IDIOMS
 	${INCLUDE_CPP_IDIOM}copy-n-swap.hpp
 	${INCLUDE_CPP_IDIOM}crtp.hpp
 	${INCLUDE_CPP_IDIOM}d-pointer.hpp
+	${INCLUDE_CPP_IDIOM}erase-remove.hpp
 	${INCLUDE_CPP_IDIOM}named-parameter.hpp
 	${INCLUDE_CPP_IDIOM}named-parameter-type.hpp
 	${INCLUDE_CPP_IDIOM}non-virtual-interface.hpp
@@ -210,7 +211,8 @@ set(ALL_HEADERS_FILTER
 set(DOC_FILTER
 	.gitlab-ci.yml
 	README.md
-    #doc/general/to-do.txt
+    doc/issues/to-do.txt
+	doc/issues/issue.txt
 	#doc/general/commit.txt
 )
 
@@ -286,7 +288,7 @@ endif()
 
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 20)
+  set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 23)
   set_property(TARGET ${TARGET_NAME} PROPERTY C_STANDARD 17)
 endif()
 set_property(TARGET ${TARGET_NAME} PROPERTY SUBSYSTEM CONSOLE)
