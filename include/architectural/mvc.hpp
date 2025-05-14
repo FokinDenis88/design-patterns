@@ -98,7 +98,7 @@ namespace pattern {
 			/** In standard realization model and view are not stored in controller. */
 
 
-
+			using general::IEditor;
 			using pattern::behavioral::observer_ref::ObserverRefSetMulti;
 			using pattern::behavioral::observer_ref::SubjectRefSetMulti;
 

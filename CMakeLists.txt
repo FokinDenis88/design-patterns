@@ -213,6 +213,7 @@ set(DOC_FILTER
 	README.md
     doc/issues/to-do.txt
 	doc/issues/issue.txt
+	doc/general/complexity-helper.txt
 	#doc/general/commit.txt
 )
 

@@ -1,4 +1,4 @@
-﻿# C++ Software Design Patterns
+﻿# C++ Design Patterns
 
 ## Repository Web Pages
 [github](https://github.com/FokinDenis88/design-patterns) <br>
