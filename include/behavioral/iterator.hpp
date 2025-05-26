@@ -1,4 +1,4 @@
-#ifndef ITERATOR_HPP
+﻿#ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
 #include <memory>
@@ -7,6 +7,11 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace behavioral {
+
+		namespace iterator_boost {
+			// https://www.boost.org/doc/libs/1_82_0/libs/iterator/doc/index.html
+		}
+
 		namespace iterator {
 			// https://en.wikipedia.org/wiki/Iterator_pattern
 			// Iterator-Cursor

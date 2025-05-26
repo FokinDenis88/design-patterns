@@ -53,7 +53,7 @@
 * [Builder](/include/creational/builder.hpp)
 * [Dependency-Injection](/include/creational/dependency-injection.hpp)
 * [Factory-Method](/include/creational/factory-method.hpp)
-* [Lazy-Initialization](/include/creational/lazy-initialization.hpp)
+* [Lazy-Initialization](/include/creational/lazy-initialization.hpp) Lazy Evaluation and Initialization.
 * [Object-Pool](/include/creational/object-pool.hpp)
 * [Prototype](/include/creational/prototype.hpp)
 * [Singleton](/include/creational/singleton.hpp)

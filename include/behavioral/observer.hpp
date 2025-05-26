@@ -2,14 +2,19 @@
 #define OBSERVER_HPP
 
 // TODO: compress include list
+#include <atomic>
 #include <algorithm> // remove_if
 #include <execution> // execution policies
 #include <forward_list>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <iterator>
 #include <initializer_list>	// for AttachObservers
 #include <string>
+#include <shared_mutex>
+#include <set>
+#include <thread>	// concurrency and thread safety SubjectWeakHub
 #include <type_traits>
 #include <list>
 #include <utility> // pair
@@ -74,29 +79,354 @@ namespace pattern {
 				* This realization give opportunity to have create of events and decrease dependency.
 				*/
 
+				/*
+				* Boost.Signals. Can be a good alternative to implementing the Observer pattern in C++.
+				* They provide a flexible and efficient way to manage event-driven programming and
+				* facilitate communication between objects.
+				*/
 
+
+		namespace observer_boost {
+			// https://www.boost.org/doc/libs/1_63_0/doc/html/signals.html
+		}
 
 		namespace observer_weak_ptr {
-			// TODO:
-			// command pattern instead Update
-			// SubjectWeakMultiShared - class with shared_ptr
-			// std::set implementation to all functions. all operations O(log n)
-			// add ranges from c++ 20
-			//
-			// refactoring: Function extraction from member methods of ObserverWeakMulti
-			//		and SubjectWeakMulti. Many equal code in functions.
-
 
 //=============================Helper Functions for ObserverMulti & SubjectMulti=====================================
 
+			/*
+			*
+#include <string>
+#include <sstream>
+#include <exception>
+
+			class CustomException : public std::exception {
+			private:
+				std::string message_;
+				std::string file_name_;
+				size_t line_number_;
+				std::string reason_;
+
+			public:
+				CustomException(const std::string& msg, const std::string& file, size_t line, const std::string& reason = "")
+					: message_(msg),
+					file_name_(file),
+					line_number_(line),
+					reason_(reason) {
+				}
+
+				virtual const char* what() const noexcept override {
+					std::ostringstream oss;
+					oss << "Custom Exception:\n"
+						<< "Message: " << message_
+						<< "\nFile: " << file_name_
+						<< "\nLine: " << line_number_
+						<< "\nReason: " << reason_;
+					return oss.str().c_str();
+				}
+
+				// Метод для удобного вывода диагностической информации
+				friend std::ostream& operator<<(std::ostream& os, const CustomException& ex) {
+					os << ex.what();
+					return os;
+				}
+			};
+
+			// Макросы для упрощенного использования класса
+#define THROW_CUSTOM_EXCEPTION(msg, reason) \
+    throw CustomException(msg, __FILE__, __LINE__, reason);
+
+// Использование макросов
+#define LOG_AND_THROW_CUSTOM_EXCEPTION(msg, reason) \
+    do {                                           \
+        std::cerr << "Error occurred: " << msg << std::endl; \
+        THROW_CUSTOM_EXCEPTION(msg, reason);       \
+    } while(false)
+
+// Пример использования
+			void testFunction(int value) {
+				if (value <= 0) {
+					LOG_AND_THROW_CUSTOM_EXCEPTION("Invalid input value", "Value must be positive.");
+				}
+				std::cout << "Valid value: " << value << std::endl;
+			}
+
+			int main() {
+				try {
+					testFunction(-10);
+				}
+				catch (const CustomException& ex) {
+					std::cerr << ex << std::endl;
+				}
+
+				return 0;
+			}
+
+
+
+			// Создаем собственный класс исключения
+			class MyCustomException : public std::exception {
+			public:
+				const char* what() const noexcept override { return "My custom exception"; }
+			};
+
+
+
+
+#include <thread>
+#include <vector>
+#include <queue>
+#include <functional>
+#include <future>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
+			class ThreadPool {
+			private:
+				using Task = std::function<void()>;
+
+				std::vector<std::thread> workers_;           // Рабочие потоки
+				std::queue<Task> task_queue_;                 // Очередь задач
+				std::mutex queue_mutex_;                      // Мьютекс для защиты очереди
+				std::condition_variable condition_;          // Условная переменная для уведомления потоков
+				std::atomic<bool> stop_{ false };              // Флаг остановки потока
+
+			public:
+				explicit ThreadPool(size_t thread_count)
+					: workers_(thread_count) {
+					for (size_t i = 0; i < thread_count; ++i) {
+						workers_[i] = std::thread([this]() {
+							while (!stop_) {
+								Task task;
+								{
+									std::unique_lock<std::mutex> lock(queue_mutex_);
+									condition_.wait(lock, [this]() { return !task_queue_.empty() || stop_; });
+
+									if (stop_ && task_queue_.empty()) break;
+
+									task = std::move(task_queue_.front());
+									task_queue_.pop();
+								}
+
+								task();  // Выполняем задачу вне мьютекса
+							}
+							});
+					}
+				}
+
+				~ThreadPool() {
+					stop_ = true;
+					condition_.notify_all();
+					for (auto& worker : workers_)
+						worker.join();
+				}
+
+				template<typename F, typename... Args>
+				auto enqueue(F&& f, Args&&... args) -> std::future<typename std::invoke_result<F, Args...>::type> {
+					using ReturnType = typename std::invoke_result<F, Args...>::type;
+
+					auto task = std::make_shared<std::packaged_task<ReturnType()>>(
+						std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+
+					std::future<ReturnType> result = task->get_future();
+					{
+						std::lock_guard<std::mutex> lock(queue_mutex_);
+						task_queue_.emplace([task]() { (*task)(); });
+					}
+					condition_.notify_one();
+					return result;
+				}
+
+				void shutdown() {
+					stop_ = true;
+					condition_.notify_all();
+					for (auto& worker : workers_)
+						worker.join();
+				}
+			};
+
+			// Простое использование
+			int main() {
+				ThreadPool pool(4); // Используем 4 потока
+
+				// Добавляем задачу в пул
+				auto future = pool.enqueue([]() {
+					std::this_thread::sleep_for(std::chrono::seconds(2)); // Имитация длительной задачи
+					return 42;
+					});
+
+				// Ждем завершения задачи
+				int result = future.get();
+				std::cout << "Result is: " << result << std::endl;
+
+				return 0;
+			}
+
+			*/
+
+
+
+
+
+
+
+			/* Class for calling member functions of objects, that maybe already destructed and expired */
+			template<typename ObjectType>
+			class WeakMemberFunction {
+			public:
+				using MemberFunctionType = std::function<void()>;
+
+				/** Type Pointer to Member Function */
+				template<typename ActionReturnType, typename ReceiverType, typename... ActionParamTypes>
+				using MemberFunctionPtrType = ActionReturnType(ReceiverType::*)(ActionParamTypes...);
+
+				/**
+				 * Bind member function with saving weak_ptr on the object of member function.
+				 * Arguments are binded with std::function(void()).
+				 *
+				 * @param action_ptr			pointer to member function
+				 * @param receiver_p			ref to receiver object
+				 * @param ...action_args_p		arguments for member function call
+				 */
+				template<typename ReturnType, typename ReceiverType, typename... ParamTypes>
+				//requires std::is_class_v<ReceiverType>
+				void Bind(const MemberFunctionPtrType<ReturnType, ReceiverType, ParamTypes...> action_ptr,
+							const std::weak_ptr<ReceiverType> receiver_ptr,
+							ParamTypes&&... action_args_p) {	// noexcept: bind maybe has exceptions
+					if (!action_ptr || receiver_ptr.expired()) { return; } // precondition
+
+					if (auto shared_receiver = receiver_ptr.lock()) {
+						// Type can be converted from any pointer to fn type to void(), if all arguments of fn are binded
+						// Only reinterpret_cast helps to convert one pointer to member function to another, of another type
+						// void() is unified type for all command functions.
+						member_function = std::bind(action_ptr, shared_receiver.get(),
+													std::forward<ParamTypes>(action_args_p)...);
+                        object_ = receiver_ptr;
+					}
+				};
+
+				/** Call member function of object, that maybe already destructed and expired */
+				void operator()() {
+					if (!object_.expired()) {
+						if (auto shared_ptr = object_.lock()) {
+							// check cheap operation expireted, then lock for call
+							member_function();
+						}
+					}
+				};
+
+			private:
+				std::weak_ptr<ObjectType> object_;
+				MemberFunctionType member_function{};
+				// TODO: it is important to store all args of std::function seperately for duplicate check in Observer Pattern
+			};
+
+
+			class UpdateException {
+
+			};
+
+			class ThreadPool {
+				// Best count of threads is: max threads of CPU + 1 (or 2)
+			};
+			/*
+			* Container choices:
+			* 1) vector
+			* This is the most common and simplest option due to its ease of memory management and good performance
+			* characteristics. A thread pool is usually implemented in such a way that a fixed number of threads are
+			* allocated in advance and stored in a vector.
+			*
+			* It is important to note that inserting and deleting elements from the middle of a vector can cause all
+			* subsequent elements to be moved, which slows down the operation. However, this problem can be solved
+			* by pre-reserving memory (reserve()).
+			*
+			* 2) list, forward_list
+			* If you expect threads to be frequently removed from arbitrary positions in the list (e.g. one thread has
+			* finished its work and is removed from the pool), a doubly linked list (std::list) is a better choice, since
+			* it provides constant time for removing an element across iterators.
+			* Note: Make sure to use mutex protection to safely access the list from different threads.
+			*
+			* 3) deque
+			* A queue allows you to efficiently add and remove items from both the front and back of a queue. It is especially
+			* useful if you need to implement a priority task queue where items can be added and removed asynchronously by
+			* different threads.
+			*
+			* 4) Intel TBB (Threaded Building Blocks) Containers for multithread work.
+			*/
+
+			class TasksQueue {
+
+			};
+
+
+//===========================Generic Container Element Modification================================
+
+			/**
+			 * Add (emplace, push or insert) element from any type of container.
+			 * Complexity: O(1)
+			 * Mutex: write
+			 */
+			template<typename ContainerType>
+			inline void GenericAddElement(ContainerType& container, typename ContainerType::value_type&& value) {
+				using value_type = typename ContainerType::value_type;
+
+				if constexpr (std::is_same_v<std::remove_cvref_t<ContainerType>,
+											 std::forward_list<value_type>>) { // forward_list
+					container.emplace_front(std::forward<value_type>(value));
+				} else { // All other types of containers, except forward_list
+					container.emplace(std::forward<value_type>(value));
+					// emplace_back is better for  vector, deque and list
+				}
+			}
+
+			/**
+			 * Remove element from any type of container.
+			 * Complexity: O(n)
+			 * Mutex: write
+			 */
+			template<typename ContainerType, typename ExecPolicyType>
+			inline void GenericRemoveIf(ContainerType& container,
+										auto predicate,
+										ExecPolicyType policy = std::execution::seq) {
+				if (container.empty()) { return; } // Precondition
+
+				if constexpr (std::is_same_v<ContainerType,
+											std::forward_list<typename ContainerType::value_type>>) { // for Forward_list
+					container.remove_if(predicate); // erase-remove idiom is not for forward_list
+				} else { // All other containers
+					container.erase(std::remove_if(policy, container.begin(),
+													container.end(), predicate), container.end()); // O(n)
+				}
+			}
+
+//============================Process weak_ptr Container. Erase============================================
+
 			using ExpiredFnType = decltype([](const auto& value_weak_ptr) { return value_weak_ptr.expired(); });
 
-
-			/** Erase custom n number of expired weak_ptr from container */
+			/**
+			 * Erase all expired weak_ptr from container
+			 * Complexity: O(n)
+			 * Mutex: write
+			 */
 			template<typename ContainerType, typename ExecPolicyType>
-			inline void EraseNExpired(ContainerType& container,
-										const size_t expired_count,
-										ExecPolicyType policy = std::execution::seq) {
+			inline void EraseAllExpired(ContainerType& container, ExecPolicyType policy = std::execution::seq) {
+				// Generic Function. Maybe used not only in observer. So no mutex lock inside.
+				if (container.empty()) { return; }
+
+				auto expired = [](const auto& value_ptr) { return value_ptr.expired(); };
+				GenericRemoveIf(container, expired, policy);
+			};
+
+			/**
+			 * Erase custom n number of expired weak_ptr from container
+			 * Complexity: O(n)
+			 * Mutex: write
+			 */
+			template<typename ContainerType, typename ExecPolicyType>
+			inline void EraseNExpiredWeakPtr(ContainerType& container,
+											const size_t expired_count,
+											ExecPolicyType policy = std::execution::seq) {
 				if (container.empty() || expired_count == 0) { return; } // Precondition
 				//static_assert(std::is_same_v<typename ContainerType::value_type, std::weak_ptr<ValueType>>,
 								//"The type mismatch between container elements and weak_ptr");
@@ -104,22 +434,80 @@ namespace pattern {
 				size_t find_count{};
 				auto expired_fn = [&expired_count, &find_count](const typename ContainerType::value_type& value_ptr) {
 					if (find_count < expired_count && value_ptr.expired()) { // after N expired found, value_ptr.expired() is not called
-                        ++find_count;
+						++find_count;
 						return true;
 					}
 					return false;
-				};
-				if constexpr (std::is_same_v<ContainerType, std::forward_list<typename ContainerType::value_type>>) { // for Forward_list
-					container.remove_if(expired_fn); // erase-remove idiom is not for forward_list
-				} else { // All other containers
-					container.erase(std::remove_if(policy, container.begin(),
-													container.end(), expired_fn), container.end());
-				}
+				}; // !lambda
+				GenericRemoveIf(container, expired_fn, policy);
 			};
 
 
 			/**
+			 * Erase first weak_ptr in container, that is alive and has same stored pointer. Container stores weak_ptr.
+			 * Complexity: O(n)
+			 * Mutex: write
+			 *
+			 * \param container
+			 * \param searched_ptr
+			 * \param policy
+			 * @return	count of expired weak_ptr
+			 */
+			template<typename ContainerType, typename ValueType, typename ExecPolicyType>
+			inline size_t EraseEqualWeakPtr(ContainerType& container,
+											const std::weak_ptr<ValueType> searched_ptr,
+											ExecPolicyType policy = std::execution::seq) {
+				size_t expired_count{};
+				if (container.empty() || searched_ptr.expired()) { return expired_count; }
+				static_assert(std::is_same_v<typename ContainerType::value_type, std::weak_ptr<ValueType>>,
+								"The type mismatch between container elements and weak_ptr");
+
+				auto it_equal{ container.end() };
+				if constexpr (std::is_same_v<ContainerType, std::forward_list<typename ContainerType::value_type>>) { // forward_list
+					std::shared_ptr<ValueType> searched_shared{};
+					auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
+						if (current_ptr.expired()) { ++expired_count; }
+						return IsEqualWeakPtr(searched_shared, current_ptr);
+					}; // !lambda end
+					{
+						searched_shared = searched_ptr.lock();
+						if (searched_shared) { container.remove_if(equal_owner); }	// O(n)
+					}
+				} else { // All other types of containers
+					// std::move(searched_ptr) is no necessary, cause weak_ptr hold 2 pointers.
+					// Copy or Move operations are equal in performance.
+					auto result_fn{ FindEqualWeakPtr(container, searched_ptr, policy) }; // O(n)
+					it_equal = result_fn.first;
+					expired_count = result_fn.second;
+					if (it_equal != container.end()) { container.erase(it_equal); }
+				}
+				return expired_count;
+			}
+
+			/**
+			 * Erase first weak_ptr in container, that is alive and has same stored pointer. Container stores weak_ptr.
+			 * With auto clean of expired weak_ptrs.
+			 * Complexity: O(n)
+			 * Mutex: write
+			 *
+			 * \param container
+			 * \param searched_ptr
+			 * \param policy
+			 */
+			template<typename ContainerType, typename ValueType, typename ExecPolicyType>
+			inline void EraseEqualWeakPtrNClean(ContainerType& container,
+												const std::weak_ptr<ValueType> searched_ptr,
+												ExecPolicyType policy = std::execution::seq) {
+				size_t expired_count{ EraseEqualWeakPtr(container, searched_ptr, policy) };
+				// Cleanup expired weak_ptr
+				EraseNExpiredWeakPtr(container, expired_count, policy);
+			}
+
+//===========================Find weak_ptr====================================================
+
+			/**
 			 * Compares if two weak_ptr are alive and have the same stored pointers.
+			 * Complexity: amortized O(1)
 			 *
 			 * @param shared_ptr search ptr. Is shared for decreasing number of locks.
 			 * @param current_ptr
@@ -128,100 +516,122 @@ namespace pattern {
 			template<typename ValueType>
 			inline bool IsEqualWeakPtr(const std::shared_ptr<ValueType>& searched_shared,
 									   const std::weak_ptr<ValueType>& current_ptr) noexcept {
-				if (current_ptr.expired() || !searched_shared) { return false; }
+				if (current_ptr.expired() || !searched_shared) { return false; } // first less expensive expired(), then lock
                 auto current_shared = current_ptr.lock();
 				return current_shared && searched_shared.get() == current_shared.get();
 			}
 
 			/**
-             * Find first weak_ptr, that is alive and has same stored pointer.
-             * With auto clean of expired weak_ptrs.
-             *
-             * @return	First = of pair of iterator to equal weak_ptr or to and.
-             *			Second = size_t count of expired weak_ptr for cleanup.
-             */
-			template<typename ValueType, typename ContainerType, typename ExecPolicyType>
-			inline auto FindEqualWeakPtr(ContainerType& container,
-										std::weak_ptr<ValueType> searched_ptr,
+			 * Find first weak_ptr, that is alive and has same stored pointer.
+			 * Complexity: O(n)
+			 * Mutex: read
+			 *
+			 * @return	First = iterator to equal weak_ptr or to end.
+			 *			Second = size_t count of expired weak_ptr for cleanup.
+			 */
+			template<typename ContainerType, typename ValueType, typename ExecPolicyType>
+			inline auto FindEqualWeakPtr(const ContainerType& container,
+										const std::weak_ptr<ValueType> searched_ptr,
 										ExecPolicyType policy = std::execution::seq)
-					-> decltype(container.end()) {
-				if (container.empty() || searched_ptr.expired()) { return container.end(); }
+					-> std::pair<decltype(container.end()), size_t>
+			{
+				auto result_fn{ std::make_pair(container.end(), size_t{}) };
+				if (container.empty() || searched_ptr.expired()) { return result_fn; } // precondition
 				static_assert(std::is_same_v<typename ContainerType::value_type, std::weak_ptr<ValueType>>,
-							  "The type mismatch between container elements and weak_ptr");
+								"The type mismatch between container elements and weak_ptr");
 
-				auto it_equal{ container.end() };
-				size_t expired_count{};
+				auto&	it_equal		{ result_fn.first };
+				size_t& expired_count	{ result_fn.second };
 
-				// mustn't lock for long time, cause of resource use and life time
-				// But better to lock for lowering number of locks in IsEqualWeakPtr
-				if (auto searched_shared = searched_ptr.lock()) {
-					auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
-						if (current_ptr.expired()) { ++expired_count; }
-						return IsEqualWeakPtr(searched_shared, current_ptr);
-					};
-					it_equal = std::find_if(policy, container.begin(), container.end(), equal_owner);
-				}
-				// Cleanup expired weak_ptr
-				EraseNExpired(container, expired_count, ExecPolicyType());
-				return it_equal;
+				std::shared_ptr<ValueType> searched_shared{};
+				auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
+					if (current_ptr.expired()) { ++expired_count; }
+					return IsEqualWeakPtr(searched_shared, current_ptr);
+				};
+				{
+					// mustn't lock for long time, cause of resource use and life time
+					// But better to lock for lowering number of locks in IsEqualWeakPtr
+					searched_shared = searched_ptr.lock();
+					if (searched_shared) { // minimal lock section
+						it_equal = std::find_if(policy, container.begin(), container.end(), equal_owner); // O(n)
+					}
+				} // !weak_ptr lock
+
+				return result_fn;
 			}
 
 			/**
-			 * Erase first weak_ptr in container, that is alive and has same stored pointer. Container stores weak_ptr..
+			 * Find first weak_ptr, that is alive and has same stored pointer.
+			 * With auto clean of expired weak_ptrs.
+			 * Complexity: O(n)
+			 * Mutex: read + write
 			 *
-			 * \param container
-			 * \param searched_ptr
-			 * \param policy
-			 * @return	count of expired weak_ptr
+			 * @return	iterator to equal weak_ptr or to end.
 			 */
-			template<typename ContainerType, typename ExecPolicyType>
-			inline void EraseEqualWeakPtr(ContainerType& container,
-											typename ContainerType::value_type searched_ptr,
-											ExecPolicyType policy = std::execution::seq) {
-				if (container.empty() || searched_ptr.expired()) { return; }
-				//static_assert(std::is_same_v<typename ContainerType::value_type, std::weak_ptr<ValueType>,
-								// "Value of container must be weak_ptr");
-
-				auto it_equal{ container.end() };
-				size_t expired_count{};
-
-				if constexpr (std::is_same_v<ContainerType, std::forward_list<typename ContainerType::value_type>>) { // forward_list
-					if (auto searched_shared = searched_ptr.lock()) {
-						auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
-							if (current_ptr.expired()) { ++expired_count; }
-							return IsEqualWeakPtr(searched_shared, current_ptr);
-						}; // !lambda end
-
-						container.remove_if(equal_owner);
-					}
-				} else { // All other types of containers
-					// std::move(searched_ptr) is no necessary, cause weak_ptr hold 2 pointers.
-					// Copy or Move operations are equal in performance.
-					it_equal = FindEqualWeakPtr(container, searched_ptr, policy);
-					if (it_equal != container.end()) { container.erase(it_equal); }
-				}
-
+			template<typename ContainerType, typename ValueType, typename ExecPolicyType>
+			inline auto FindEqualWeakPtrNClean(ContainerType& container,
+												const std::weak_ptr<ValueType> searched_ptr,
+												ExecPolicyType policy = std::execution::seq)
+					-> decltype(container.end())
+			{
+				auto result_fn{ FindEqualWeakPtr(container, searched_ptr, policy) };
 				// Cleanup expired weak_ptr
-				EraseNExpired(container, expired_count, ExecPolicyType());
+				EraseNExpiredWeakPtr(container, result_fn.second, policy);
+				return result_fn.first;
 			}
 
+//=====================Notify=====================================================================
 
-			/** Erase all expired weak_ptr from container */
-			template<typename ContainerType, typename ExecPolicyType>
-			inline void EraseAllExpired(ContainerType& container, ExecPolicyType policy = std::execution::seq) {
-				if (container.empty()) { return; }
+			/**
+			 * Notify all observers in container by lambda function, that
+			 * encapsulate observer update function call.
+			 * Complexity: O(n)
+			 * Mutex: read
+			 *
+			 * @param observers
+			 * @param observer_update_fn		lambda that encapsulate observer update function call, f.e. observer->Update()
+			 * @return	count of expired weak_ptr
+			 */
+			template<typename ContainerType, typename UpdateFunctionType, typename ExecPolicyType>
+			inline size_t GenericNotifyWeakObservers(const ContainerType& observers,
+													UpdateFunctionType observer_update_fn,
+													ExecPolicyType policy = std::execution::seq) {
+				size_t expired_count{};
+				if (observers.empty) { return expired_count; } // precondition
 
-				auto expired = [](const auto& value_ptr) { return value_ptr.expired(); };
-				if constexpr (std::is_same_v<ContainerType, std::forward_list<typename ContainerType::value_type>>) { // for Forward_list
-					container.remove_if(expired); // erase-remove idiom is not for forward_list
-				} else { // All other containers
-					container.erase(std::remove_if(policy, container.begin(),
-															container.end(), expired), container.end());
-				}
-			};
+				auto update_fn = [&observer_update_fn, &expired_count](const auto& observer_ptr) {
+					if (observer_ptr.expired()) { // expired is less expensive, then lock. Thats why it is first
+						++expired_count;
+						return;
+					}
+					if (auto observer_shared{ observer_ptr.lock() }) {
+						observer_update_fn(observer_shared);
+					}
+				}; // !lambda
+				std::for_each(policy, observers.begin(), observers.end(), update_fn);
+				return expired_count;
+			}
 
+			/**
+			 * Notify all observers in container by lambda function, that
+			 * encapsulate observer update function call.
+			 * Complexity: O(n)
+			 * Mutex: read + write
+			 *
+			 * @param observers
+			 * @param observer_update_fn		lambda that encapsulate observer update function call, f.e. observer->Update()
+			 */
+			template<typename ContainerType, typename UpdateFunctionType, typename ExecPolicyType>
+			inline void GenericNotifyWeakObserversNClean(ContainerType& observers,
+														UpdateFunctionType observer_update_fn,
+														ExecPolicyType policy = std::execution::seq) {
+				size_t expired_count{ GenericNotifyWeakObservers(observers, observer_update_fn, policy) };
+				// Cleanup expired weak_ptr
+				EraseNExpiredWeakPtr(observers, expired_count, policy);
+			}
 
-//============================Single Observer Interfaces====================================
+//==========================Simple Weak Observer version===========================================
+
 
 			/**
 			 * Abstract. Stateless. Interface of Observer.
@@ -239,36 +649,6 @@ namespace pattern {
 
 				/** Update the information about Subject */
 				virtual void Update(const std::string& message) = 0;
-			};
-
-
-			/** Empty messages code enum for default template arguments */
-			enum class ObserverEmptyEnum {};
-
-			/**
-			 * Abstract. Stateless. Interface of Observer.
-			 * Alternative name - Subscriber.
-			 */
-			template<typename EnumType = ObserverEmptyEnum>
-			class IObserverWeakExtended : public IObserverWeak {
-			public:
-				using IObserverWeak::Update; // cause name hiding
-
-			protected:
-				IObserverWeakExtended() = default;
-				IObserverWeakExtended(const IObserverWeakExtended&) = delete; // C.67	C.21 Abstract suppress Copy & Move
-				IObserverWeakExtended& operator=(const IObserverWeakExtended&) = delete;
-				IObserverWeakExtended(IObserverWeakExtended&&) noexcept = delete;
-				IObserverWeakExtended& operator=(IObserverWeakExtended&&) noexcept = delete;
-			public:
-				~IObserverWeakExtended() override = default;
-
-
-				/** Update the information about Subject */
-				virtual void Update() = 0;
-
-				/** Update the information about Subject */
-				virtual void Update(const EnumType message) = 0;	// more convenient for switch statement
 			};
 
 
@@ -312,28 +692,177 @@ namespace pattern {
 			*/
 
 
+
+//==========================Extended version===========================================
+
+			/** Empty messages code enum for default template arguments */
+			enum class ObserverEmptyEnum {};
+
+			/** Empty state of Subject for default template arguments */
+			struct SubjectStateEmpty {};
+
+
+			/**
+			 * Abstract. Stateless. Interface of Observer.
+			 * Alternative name - Subscriber.
+			 * Hub means base class for many possible realizations.
+			 * Use name hiding do make relevant Derived class.
+			 */
+			template<typename UpdateDataType>
+			class IObserverWeakHub {
+			protected:
+				IObserverWeakHub() = default;
+				IObserverWeakHub(const IObserverWeakHub&) = delete; // C.67	C.21 Abstract suppress Copy & Move
+				IObserverWeakHub& operator=(const IObserverWeakHub&) = delete;
+				IObserverWeakHub(IObserverWeakHub&&) noexcept = delete;
+				IObserverWeakHub& operator=(IObserverWeakHub&&) noexcept = delete;
+			public:
+				~IObserverWeakHub() override = default;
+
+				/** Update the information about Subject */
+				virtual void Update() = 0;
+
+				/** Update the information about Subject */
+				virtual void Update(const std::string& message) = 0;
+
+
+				/** Generic Update the information about Subject */
+				virtual void Update(UpdateDataType data) = 0;
+
+				/** Generic Update the information about Subject */
+				virtual void Update(const UpdateDataType& data) = 0;
+
+				/** Generic Update the information about Subject */
+				virtual void Update(UpdateDataType&& data) = 0;
+			}; // !class IObserverWeakHub
+			/*
+			* ChatGPT 4.5 | DeepSeek | Midjourney | Telegram | GigaChat
+			* Design Choices:					Update() function.
+			* 1. No Parameters:					void update()
+			* 2. State Information:				void update(int state)
+			* 3. Complex State Information:		void update(const StateType& state)
+			* 4. Context Information:			void update(const Context& context)		Contextual information related to the update
+			* 5. Multiple Parameters:			void update(int value, const std::string& message)
+			* 6. Update Returning Status:		bool update()
+			* 7. Callback Function:				void update(std::function<void()> callback)
+			*
+			* 8. Template-based Update Function:	template <typename T> class Observer { void update(const T& data); }
+			* 9. Priorities or Importance Levels:	void update(int priority, const std::string& message)
+			* 10. Asynchronous:						std::future<void> update()
+			* 11. Subject reference/pointer:		void update(Subject* subject)
+			* 12. EventData:						void update(const EventData& event_data)
+			*		The notification may contain the specific event type, the value of the new state, and other useful data.
+			* 13. Generic Interface:				void update(IEvent* event)
+			*	class StateChangeEvent : public IEvent {
+				public:
+					int new_state;
+				};
+
+				void MyObserver::update(IEvent* event) {
+					if(auto change_event = dynamic_cast<StateChangeEvent*>(event)) {}
+				}
+			* 14. Signal: Boost library
+			*
+			class Subject {
+			private:
+				boost::signals2::signal<void()> signal_;
+
+			public:
+				void notifyObservers() {
+					signal_();
+				}
+
+				boost::signals2::connection connect(boost::signals2::slot<void()> slot) {
+					return signal_.connect(slot);
+				}
+			};
+			*
+			*
+			*/
+
+			// Helper Type alias for different Update realizations
+			using IObserverWeakMsg = IObserverWeakHub<std::string>;
+
+			template<typename EnumType = ObserverEmptyEnum>
+			//requires std::is_enum_v<EnumType>	// c++20 requires
+			using IObserverWeakEnum = IObserverWeakHub<EnumType>;
+
+			template<typename StateType = SubjectStateEmpty>
+			using IObserverWeakState = IObserverWeakHub<StateType>;
+
+			template<typename ContextType>
+			using IObserverWeakContext = IObserverWeakHub<ContextType>;
+			using IObserverWeakCallback = IObserverWeakHub<std::function<void()>>;
+
+
+			/**
+			 * Abstract. Stateless. Subject with weak_ptr dependencies.
+			 * Alternative name - Publisher.
+			 * weak_ptr helps to prevent dangling pointers and lapsed listener problem.
+			 */
+			template<typename UpdateDataType>
+			class ISubjectWeakHub {
+			public:
+				using WeakPtrIObserverWeakHub = std::weak_ptr<IObserverWeakHub<UpdateDataType>>;
+
+			protected:
+				ISubjectWeakHub() = default;
+				ISubjectWeakHub(const ISubjectWeakHub&) = delete; // C.67	C.21
+				ISubjectWeakHub& operator=(const ISubjectWeakHub&) = delete;
+				ISubjectWeakHub(ISubjectWeakHub&&) noexcept = delete;
+				ISubjectWeakHub& operator=(ISubjectWeakHub&&) noexcept = delete;
+			public:
+				virtual ~ISubjectWeakHub() = default;
+
+
+				/** Update all attached observers */
+				virtual void NotifyObservers(const std::string& message) const = 0;
+
+				/**
+				 * Add Observer to list of notification in Subject.
+				 * There is shared_ptr<ObserverT> outside of class. Subject stores weak_ptr to that Observer.
+				 */
+				virtual void AttachObserver(const WeakPtrIObserverWeakHub observer_ptr) = 0;
+				// not const, cause must attach subject in observer ptr
+
+				/** Detach observer from notifying list */
+				virtual void DetachObserver(const WeakPtrIObserverWeakHub observer_ptr) = 0;
+			};
+			/*
+			* Design choices. Params in functions. Weak_ptr vs shared_ptr:
+			* Best) weak_ptr in params gives guaranty, that we won't use destructed objects.
+			* 2) If we use const shared_ptr& outside code must guaranty, that object will be alive, while function is working.
+			* 3) If we use shared_ptr we increment strong counter of shared_ptr, increasing life cycle of object.
+			*/
+
+
+//=============================Base Concrete Classes==============================================================
+
 			/**
 			 * Concrete. Simple observer class realize Upate() and Update(Subject&) functions.
+			 * Class with empty function members. Stub for inheritance and name hiding.
 			 *
 			 * Invariant: don't attach expired weak_ptr. Value type must be weak_ptr. Mustn't duplicate weak_ptr.
 			 * @tparam EnumType is enum class for messages for one of realization of Update.
 			 *
 			 * [[Testlevel(0)]]
 			 */
-			template<typename EnumType = ObserverEmptyEnum>
-			//requires std::is_enum_v<EnumType>	// c++20 requires
-			class ObserverWeak : public IObserverWeakExtended<EnumType> {
+			template<typename UpdateDataType>
+			class ObserverWeakHubDefault : public IObserverWeakHub<UpdateDataType> {
 			public:
-				ObserverWeak() = default;
+				ObserverWeakHubDefault() = default;
 				// Observer may be constructed without observable Subjects
 
 			protected:
-				ObserverWeak(const ObserverWeak&) = delete; // C.67	C.21
-				ObserverWeak& operator=(const ObserverWeak&) = delete;
-				ObserverWeak(ObserverWeak&&) noexcept = delete;
-				ObserverWeak& operator=(ObserverWeak&&) noexcept = delete;
+				ObserverWeakHubDefault(const ObserverWeakHubDefault&) = delete; // C.67	C.21
+				ObserverWeakHubDefault& operator=(const ObserverWeakHubDefault&) = delete;
+				ObserverWeakHubDefault(ObserverWeakHubDefault&&) noexcept = delete;
+				ObserverWeakHubDefault& operator=(ObserverWeakHubDefault&&) noexcept = delete;
 			public:
-				~ObserverWeak() override = default;
+				~ObserverWeakHubDefault() override = default;
+
+				/** Update the information about Subject */
+				void Update() override {};
 
 				/**
 				* Update the information about Subject
@@ -347,17 +876,52 @@ namespace pattern {
 					//(void)message;  // suppress unused parameter warning
 				};
 
-				/** Update the information about Subject */
-				void Update() override {
-				};
+				/** Generic Update the information about Subject */
+				void Update(UpdateDataType data) override {};
 
-				/** Update the information about Subject */
-				void Update(const EnumType message) override {
-				};
+				/** Generic Update the information about Subject */
+				void Update(const UpdateDataType& data) override {};
+
+				/** Generic Update the information about Subject */
+				void Update(UpdateDataType&& data) override {};
 
 			};	// !class ObserverWeak
 			// Design choices: subject weak_ptr is necessary, when you need get more data for updating process.
 			// In most cases subject weak_ptr is not needed.
+			//
+			// Design choices: param of template maybe: Types...	to give opportunity to send more args to Update function.
+
+
+			/** Subject Stub. Class with default minimal realization. */
+			template<typename UpdateDataType>
+			class SubjectWeakHubDefault {
+			public:
+				using WeakPtrIObserverWeakHub = std::weak_ptr<IObserverWeakHub<UpdateDataType>>;
+
+			protected:
+				SubjectWeakHubDefault() = default;
+				SubjectWeakHubDefault(const SubjectWeakHubDefault&) = delete; // C.67	C.21
+				SubjectWeakHubDefault& operator=(const SubjectWeakHubDefault&) = delete;
+				SubjectWeakHubDefault(SubjectWeakHubDefault&&) noexcept = delete;
+				SubjectWeakHubDefault& operator=(SubjectWeakHubDefault&&) noexcept = delete;
+			public:
+				virtual ~SubjectWeakHubDefault() = default;
+
+
+				/** Update all attached observers */
+				virtual void NotifyObservers(const std::string& message) const {};
+
+				/**
+				 * Add Observer to list of notification in Subject.
+				 * There is shared_ptr<ObserverT> outside of class. Subject stores weak_ptr to that Observer.
+				 */
+				virtual void AttachObserver(const WeakPtrIObserverWeakHub observer_ptr) {};
+				// not const, cause must attach subject in observer ptr
+
+				/** Detach observer from notifying list */
+				virtual void DetachObserver(const WeakPtrIObserverWeakHub observer_ptr) {};
+			};
+			// Design: for template notification with ExecPolicy in SubjectWeakHub and name hiding. (TODO: refactor?)
 
 
 			/**
@@ -372,222 +936,362 @@ namespace pattern {
 			 *
 			 * Invariant: don't attach & store expired weak_ptr. Mustn't duplicate weak_ptr.
 			 *
-			 * @tparam ExecPolicyType Execution policy (e.g., std::execution::sequenced_policy)
-			 * @tparam ContainerType_t Container type holding weak_ptrs to observers
+			 * @tparam UpdateDataType		type of update data in param of update function in observer
+			 * @tparam ExecPolicyType		Execution policy (e.g., std::execution::sequenced_policy)
+			 * @tparam ContainerType_t		Container type holding weak_ptrs to observers
 			 *
 			 * [[Testlevel(0)]]
 			 */
-			template<typename ExecPolicyType = std::execution::sequenced_policy, typename EnumType = ObserverEmptyEnum,
-					 typename ContainerType = std::list<std::weak_ptr<IObserverWeak>> >
+			template<typename UpdateDataType,
+					 typename ContainerType = std::set<std::weak_ptr<IObserverWeakHub<UpdateDataType>>> >
 			//requires std::is_execution_policy_v<ExecPolicyType> && std::is_enum_v<EnumType>	// c++20 requires
-			class SubjectWeak : public ISubjectWeak
-								//public std::enable_shared_from_this<SubjectWeak<typename ExecPolicyType, typename ContainerType_t>>
+			class SubjectWeakHub : public SubjectWeakHubDefault<UpdateDataType>
+				//public std::enable_shared_from_this<SubjectWeak<typename ExecPolicyType, typename ContainerType_t>>
 			{
 			public:
-                using value_type	= typename ContainerType::value_type;
-				//using iterator		= typename ContainerType::iterator;
-
-				using WeakPtrIObserverWeak = std::weak_ptr<IObserverWeak>;	// not from derived for clarity
-
-				//using container_type = ContainerType;
-				//using iterator = std::iterator<std::input_iterator_tag, WeakPtrIObserverWeak>;
+				using value_type = typename ContainerType::value_type;
+				using WeakPtrIObserverWeakHub = std::weak_ptr<IObserverWeakHub<UpdateDataType>>;	// not from derived for clarity
+				//using IteratorNExpiredCount = std::pair<decltype(observers_.end()), size_t>;
 
 				static_assert(std::is_object_v<value_type>, "The C++ Standard forbids containers of non-object types "
 															"because of [container.requirements].");
 
 				// Container Types Alternatives
-				using ContainerList			= std::list<WeakPtrIObserverWeak>;
-				using ContainerForwardList	= std::forward_list<WeakPtrIObserverWeak>;
-				//using ContainerSet		= std::set<WeakPtrIObserverWeak, std::owner_less<WeakPtrIObserverWeak>>;
+				using ContainerSet			= std::set<WeakPtrIObserverWeakHub, std::owner_less<WeakPtrIObserverWeakHub>>;
+				using ContainerList			= std::list<WeakPtrIObserverWeakHub>;
+				using ContainerForwardList	= std::forward_list<WeakPtrIObserverWeakHub>;
 				//using ContainerVector		= std::vector<WeakPtrIObserverWeak>;
 				//using ContainerDeque		= std::deque<WeakPtrIObserverWeak>;
 
-				SubjectWeak() = default;
+				SubjectWeakHub() = default;
 				// Subject may be constructed without observable Subjects
 
-				template<typename IteratorType>
-				SubjectWeak(IteratorType begin, IteratorType end) {
-					AttachObserver(begin, end);
+				template<typename IteratorType, typename ExecPolicyType>
+				SubjectWeakHub(IteratorType begin, IteratorType end, ExecPolicyType policy = std::execution::seq) {
+					AttachObserver(begin, end, policy);
 				}
 
-				explicit SubjectWeak(const std::initializer_list<WeakPtrIObserverWeak>& init_list) {
-						//: observers_{ init_list.begin(), init_list.end() } {
-					AttachObserver(init_list.begin(), init_list.end());
+				template<typename ExecPolicyType>
+				explicit SubjectWeakHub(const std::initializer_list<WeakPtrIObserverWeakHub>& init_list,
+										ExecPolicyType policy = std::execution::seq) {
+					//: observers_{ init_list.begin(), init_list.end() } {
+					AttachObserver(init_list.begin(), init_list.end(), policy);
 				};
 
-				template<typename ContainerType>
-				explicit SubjectWeak(const ContainerType& container) {
-					AttachObserver(container.begin(), container.end());
+				template<typename ContainerType, typename ExecPolicyType>
+				explicit SubjectWeakHub(const ContainerType& container,
+										ExecPolicyType policy = std::execution::seq) {
+					static_assert(std::is_same_v<typename ContainerType::value_type, WeakPtrIObserverWeakHub>,
+								"Elements of container, when AttachObserver must be weak_ptr to observer interface");
+					AttachObserver(container.begin(), container.end(), policy);
 				};
 
-				explicit SubjectWeak(const WeakPtrIObserverWeak observer_ptr) {
-					AttachObserver(observer_ptr); // No differrence with std::move(observer_ptr)
+				template<typename ExecPolicyType>
+				explicit SubjectWeakHub(const WeakPtrIObserverWeakHub observer_ptr,
+										ExecPolicyType policy = std::execution::seq) {
+					AttachObserver(observer_ptr, policy); // No differrence with std::move(observer_ptr)
 				};
-
 
 			protected:
-				SubjectWeak(const SubjectWeak&) = delete; // C.67	C.21
-				SubjectWeak& operator=(const SubjectWeak&) = delete;
-				SubjectWeak(SubjectWeak&&) noexcept = delete;
-				SubjectWeak& operator=(SubjectWeak&&) noexcept = delete;
+				SubjectWeakHub(const SubjectWeakHub&) = delete; // C.67	C.21
+				SubjectWeakHub& operator=(const SubjectWeakHub&) = delete;
+				SubjectWeakHub(SubjectWeakHub&&) noexcept = delete;
+				SubjectWeakHub& operator=(SubjectWeakHub&&) noexcept = delete;
 			public:
-				~SubjectWeak() override = default;
+				~SubjectWeakHub() override = default;
 
 
 				/*
 				 * Update all attached observers.
-				 * Complexity: O()
+				 * Complexity: set = O(log n), Other containers = O(n).
 				 *
 				 * @param message	message with information needed for Update.
 				 */
-				void NotifyObservers(const std::string& message = "") const override { // not const, cause cleanup operations
-					size_t expired_count{};
-					auto update_fn = [&message, &expired_count](const auto& observer_ptr) {
-						if (observer_ptr.expired()) { // expired is less expensive, then lock. Thats why it is first
-							++expired_count;
-							return;
-						}
-						if (auto observer_shared{ observer_ptr.lock() }) {
-							observer_shared->Update(message);
-						}
+				template<typename ExecPolicyType>
+				void NotifyObservers(const std::string& message = "",
+									const bool run_in_new_thread = true,
+									ExecPolicyType policy = std::execution::seq) const {
+					auto observer_update_fn = [&message](std::shared_ptr<IObserverWeakHub<UpdateDataType>> observer_ptr) {
+						// observer_ptr in lambda is shared_ptr, cause in GenericNotify it is locked
+						observer_ptr->Update(message);
 					};
-					std::for_each(ExecPolicyType{}, observers_.begin(), observers_.end(), update_fn);
-					// Cleanup expired weak_ptr
-					EraseNExpired(observers_, expired_count, ExecPolicyType{});
+					MutexNotifyObserversNClean(observer_update_fn, policy);
+				};
+				// TODO: Notification in another thread. Wait the end of notification process
+				// TODO: bool run_in_new_thread = false
+				// In new std::thread
+				// Async variant
+
+				/*void Update(UpdateDataType data) override {};
+				void Update(const UpdateDataType& data) override {};
+				void Update(UpdateDataType&& data) override {};*/
+
+
+				/*
+				 * Update all attached observers.
+				 * Complexity: list = O(n). set = O(log n)
+				 *
+				 * @param message	message with information needed for Update.
+				 */
+				template<typename ExecPolicyType>
+				void NotifyObservers(ExecPolicyType policy = std::execution::seq) const {
+					auto observer_update_fn = [](std::shared_ptr<IObserverWeakHub<UpdateDataType>> observer_ptr) {
+						observer_ptr->Update();
+					};
+					MutexNotifyObserversNClean(observer_update_fn, policy);
 				};
 
 
 				/**
-				* Add Observer to list of Observers.
+				* Add Multiple Observer to list of Observers.
 				* Only alive weak_ptr can be attached to container and only that is not duplicates.
+				* Complexity: O(n)
 				*
-				* @param begin		start of range of observers, that will be added to Subject
-				* @param end		end of range of observers, that will be added to Subject
+				* @param attachable_begin		start of range of observers, that will be added to Subject
+				* @param attachable_end			end of range of observers, that will be added to Subject
 				*/
-				template<typename IteratorType>
-				void AttachObserver(IteratorType begin, IteratorType end)
+				template<typename IteratorType, typename ExecPolicyType>
+				void AttachObserver(IteratorType attachable_begin, IteratorType attachable_end,
+									ExecPolicyType policy = std::execution::seq)
 				{ // Main logic in this function to decrease count of function call, so lower overhead resources for call of fn.
-					if (begin == end) { return; }	// Precondition
-					static_assert(std::is_same_v<decltype(*begin), WeakPtrIObserverWeak>,
+					if (attachable_begin == attachable_end) { return; }	// Precondition
+					static_assert(std::is_same_v<decltype(*attachable_begin), WeakPtrIObserverWeakHub>,
 									"Iterator be dereferencable to weak_ptr to observer interface");
 
-					auto attach_observer_fn = [this](const auto& observer_ptr) {
-						if (!HasObserver(observer_ptr)) { // Duplicate control. Mustn't duplicate weak_ptr
-							if constexpr (std::is_same_v<ContainerType, ContainerForwardList>) { // forward_list
-								observers_.emplace_after(observers_.before_begin(), observer_ptr);
-							} else { // All other types of containers, except forward_list
-								observers_.emplace(observer_ptr);
-							} // TODO: std::set implementation
+					auto attach_observer_fn = [this, &policy](const auto& observer_ptr) {
+						auto has_observer{ HasObserver(observer_ptr, policy) };
+						if (!has_observer.first) { // Duplicate control. Mustn't duplicate weak_ptr
+							GenericAddElement(observers_, observer_ptr);
 						}
-					};
-					std::for_each(ExecPolicyType{}, begin, end, attach_observer_fn);
+						UpdateExpiredObserversCount(has_observer.second);
+					}; // !lambda
+					{
+						std::unique_lock lock{ observers_shared_mtx_ };
+						std::for_each(policy, attachable_begin, attachable_end, attach_observer_fn); // write
+					} // !lock
+					CleanFoundExpiredObservers(policy);
 				};
 
 				/**
-				 * Add Observer to list of Observers.
+				 * Add Observer to list of Observers. Wrapper.
 				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 * Complexity: O(n)
 				 */
-				inline void AttachObserver(const std::initializer_list<WeakPtrIObserverWeak>& init_list) {
+				template<typename ExecPolicyType>
+				inline void AttachObserver(const std::initializer_list<WeakPtrIObserverWeakHub>& init_list,
+											ExecPolicyType policy = std::execution::seq) {
 					if (init_list.size() == 0) { return; }	// Precondition
-					AttachObserver(init_list.begin(), init_list.end());
+					AttachObserver(init_list.begin(), init_list.end(), policy);
 				};
 
 				/**
-				 * Add Observer to list of Observers.
+				 * Add Observer to list of Observers. Wrapper.
 				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 * Complexity: O(n)
 				 */
-				template<typename ContainerType>
-				inline void AttachObserver(const ContainerType& container) {
+				template<typename ContainerType, typename ExecPolicyType>
+				inline void AttachObserver(const ContainerType& container, ExecPolicyType policy = std::execution::seq) {
 					if (container.empty()) { return; }	// Precondition
-					static_assert(std::is_same_v<typename ContainerType::value_type, WeakPtrIObserverWeak>,
-									"Elements of container, when AttachObserver must be weak_ptr to subject");
+					static_assert(std::is_same_v<typename ContainerType::value_type, WeakPtrIObserverWeakHub>,
+									"Elements of container, when AttachObserver must be weak_ptr to observer interface");
 
-					AttachObserver(container.begin(), container.end());
+					AttachObserver(container.begin(), container.end(), policy);
 				};
 
 				/**
-				 * Add Observer to list of Observers.
+				 * Add Observer to list of Observers. Wrapper.
 				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 * Complexity: O(n)
 				 *
 				 * @param observer_ptr	weak pointer to observer.
 				 */
-				inline void AttachObserver(const WeakPtrIObserverWeak observer_ptr) override {
+				template<typename ExecPolicyType>
+				inline void AttachObserver(const WeakPtrIObserverWeakHub observer_ptr,
+											ExecPolicyType policy = std::execution::seq) {
 					if (observer_ptr.expired()) { return; }	// Precondition
-					AttachObserver({ observer_ptr });
+					AttachObserver({ observer_ptr }, policy);	// for HasObserver
 				};
 				// not const, cause must attach subject in observer ptr
 
 
 				/**
-				 * Detach Observer.
+				 * Detach Multiple Observers.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 * Complexity: O(n)
+				 *
+				 * @param erasable_begin	begin of container with observers, that must be detached
+				 * @param erasable_end		end of container with observers, that must be detached
 				 */
-				template<typename IteratorType>		// TODO: add exec policy to templ param?
-				inline void DetachObserver(IteratorType begin, IteratorType end) {
-					if (begin == end) { return; }	// Precondition
-					static_assert(std::is_same_v<decltype(*begin), WeakPtrIObserverWeak>,
+				template<typename IteratorType, typename ExecPolicyType>
+				inline void DetachObserver(IteratorType erasable_begin, IteratorType erasable_end,
+											ExecPolicyType policy = std::execution::seq) {
+					if (erasable_begin == erasable_end) { return; }	// Precondition
+					static_assert(std::is_same_v<decltype(*erasable_begin), WeakPtrIObserverWeakHub>,
 									"Iterator be dereferencable to weak_ptr to observer interface");
 
-					auto detach_observer_fn = [this](const auto& observer_ptr) {
+					size_t expired_count{};
+					auto detach_observer_fn = [this, expired_count](const auto& observer_ptr) {
 						// Can Detach only alive objects
-						EraseEqualWeakPtr(observers_, observer_ptr, ExecPolicyType{});
-					};
-					std::for_each(ExecPolicyType{}, begin, end, detach_observer_fn);
+						expired_count = EraseEqualWeakPtr(observers_, observer_ptr, policy);
+						UpdateExpiredObserversCount(expired_count);
+					}; // !lambda
+
+					{
+						std::unique_lock lock{ observers_shared_mtx_ }; // write
+						std::for_each(policy, erasable_begin, erasable_end, detach_observer_fn); // write
+						CleanFoundExpiredObservers(policy);
+					} // !lock
 				};
 
 				/**
-				 * Detach Observer.
+				 * Detach Observer. Wrapper.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 * Complexity: O(n)
 				 */
-				inline void DetachObserver(const std::initializer_list<WeakPtrIObserverWeak>& init_list) {
+				template<typename ExecPolicyType>
+				inline void DetachObserver(const std::initializer_list<WeakPtrIObserverWeakHub>& init_list,
+											ExecPolicyType policy = std::execution::seq) {
 					if (init_list.size() == 0) { return; }	// Precondition
-					DetachObserver(init_list.begin(), init_list.end());
+					DetachObserver(init_list.begin(), init_list.end(), policy);
 				};
 
 				/**
-				 * Detach Observer.
+				 * Detach Observer. Wrapper.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 * Complexity: O(n)
 				 */
-				template<typename ContainerType>
-				inline void DetachObserver(const ContainerType& container) {
+				template<typename ContainerType, typename ExecPolicyType>
+				inline void DetachObserver(const ContainerType& container,
+											ExecPolicyType policy = std::execution::seq) {
 					if (container.empty()) { return; }	// Precondition
-					static_assert(std::is_same_v<typename ContainerType::value_type, WeakPtrIObserverWeak>,
-									"Elements of container, when AttachObserver must be weak_ptr to subject");
+					static_assert(std::is_same_v<typename ContainerType::value_type, WeakPtrIObserverWeakHub>,
+									"Elements of container, when AttachObserver must be weak_ptr to observer interface");
 
-					DetachObserver(container.begin(), container.end());
+					DetachObserver(container.begin(), container.end(), policy);
 				};
 
 				/**
 				 * Detach Observer.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 * Complexity: O(n)
 				 *
 				 * @param observer_ptr weak pointer to observer.
 				 */
-				inline void DetachObserver(const WeakPtrIObserverWeak observer_ptr) override {
+				template<typename ExecPolicyType>
+				inline void DetachObserver(const WeakPtrIObserverWeakHub observer_ptr,
+											ExecPolicyType policy = std::execution::seq) {
+					std::unique_lock lock{ observers_shared_mtx_ }; // write
 					// Can Detach only alive objects
-					EraseEqualWeakPtr(observers_, observer_ptr, ExecPolicyType{});
+					size_t expired_count{ EraseEqualWeakPtr(observers_, observer_ptr, policy) };
+					UpdateNCleanExpiredObservers(expired_count, policy);
 				};
 
 
-				/** Detach all expired weak_ptr objects in container */
-				inline void CleanupAllExpiredObservers() const {
-					EraseAllExpired(observers_, ExecPolicyType{});
+				/**
+				 * Detach all expired weak_ptr objects in container
+				 * Complexity: O(n)
+				 */
+				template<typename ExecPolicyType>
+				inline void CleanupAllExpiredObservers(ExecPolicyType policy = std::execution::seq) const {
+					std::unique_lock lock{ observers_shared_mtx_ }; // write
+					EraseAllExpired(observers_, policy);
 					// if subject is expired, it is deleted, so we don't need to detach observer in subject
 				};
 
 				/**
 				 * Check if there is observer in Subject.
 				 * Cleanup expired weak_ptr subjects in container.
+				 * Complexity: O(n)
 				 *
 				 * \param subject_ptr
 				 * \param policy
 				 * \return
 				 */
-				inline bool HasObserver(const WeakPtrIObserverWeak observer_ptr) const {
-					return FindEqualWeakPtr(observers_, observer_ptr, ExecPolicyType{}) != observers_.cend();
+				template<typename ExecPolicyType>
+				inline bool HasObserverNClean(const WeakPtrIObserverWeakHub observer_ptr,
+										ExecPolicyType policy = std::execution::seq) const {
+					std::pair<bool, size_t> has_observer{ HasObserver(observer_ptr, policy) };
+					UpdateNCleanExpiredObservers(has_observer.second, policy);
+					return has_observer.first;
 				};
 
 			private:
+				template<typename ExecPolicyType>
+				inline std::pair<bool, size_t> HasObserver(const WeakPtrIObserverWeakHub observer_ptr,
+															ExecPolicyType policy = std::execution::seq) const {
+					std::pair<bool, size_t> has_observer{};
+					std::pair<decltype(observers_.end()), size_t> find_result{};
+					{
+						std::shared_lock lock{ observers_shared_mtx_ }; // read
+						find_result = FindEqualWeakPtr(observers_, observer_ptr, policy);
+					} // !lock
+
+					has_observer.first = find_result.first != observers_.end();
+					has_observer.second = find_result.second;
+					return has_observer; // iterators maybe invalidated after cleanup
+				};
+
+				/**
+				 * Detach all expired weak_ptr objects in container. Concurrent sync by mutex.
+				 * Helps to minimize count of calls Cleanup in concurrent usage of this class.
+				 * Cause many blocked threads may found equal expired weak_ptr.
+				 * But cleanup is only done by counter found_expired_observers_.
+				 * Locked with unique mutex.
+				 * Complexity: O(n)
+				 */
+				template<typename ExecPolicyType>
+				inline void CleanFoundExpiredObservers(ExecPolicyType policy = std::execution::seq) const {
+					if (found_expired_observers_ > 0) { // precondition
+						{
+							std::unique_lock lock{ observers_shared_mtx_ };
+							// Cleanup expired weak_ptr
+							EraseNExpiredWeakPtr(observers_, found_expired_observers_, policy); // write
+						} // !lock
+						ResetExpiredObserversCount();
+					}
+				}
+
+				/** Modify count of expired observers, if new count bigger */
+				inline void UpdateExpiredObserversCount(const size_t new_count) const noexcept {
+					if (new_count > found_expired_observers_) {
+						found_expired_observers_ = new_count;
+					}
+                }
+				/** Set count of expired observer to 0 */
+				inline void ResetExpiredObserversCount() const noexcept {
+					found_expired_observers_ = 0;
+				}
+
+				/**
+				 * Update count of expired observers and clean observers container.
+				 * Locked with mutex.
+				 */
+				template<typename ExecPolicyType>
+				inline void UpdateNCleanExpiredObservers(const size_t new_count,
+														ExecPolicyType policy = std::execution::seq) const {
+					UpdateExpiredObserversCount(new_count);
+					CleanFoundExpiredObservers(policy);
+				}
+
+				/**
+				 * Thread safe. Notify all observers of Subject.
+				 * Used mutex to block shared resource.
+				 */
+				template<typename UpdateFunctionType, typename ExecPolicyType>
+				void MutexNotifyObserversNClean(UpdateFunctionType observer_update_fn,
+												ExecPolicyType policy = std::execution::seq) const {
+					size_t expired_count{};
+					{
+						std::shared_lock lock{ observers_shared_mtx_ };
+						expired_count = GenericNotifyWeakObservers(observers_, observer_update_fn, policy); // read
+					} // !lock
+
+					UpdateNCleanExpiredObservers(expired_count, policy);
+				}
+
+
+//=========================SubjectWeakHub Data==============================================================
+
 				/**
 				 * List of observers, that will be attach to Subject.
 				 * Subject is not interested in owning of its Observers.
@@ -598,11 +1302,23 @@ namespace pattern {
 				mutable ContainerType observers_{}; // mutable is for const fn notify function cleaning of expired weak_ptr
 				// Is not const, cause Attach, Detach functions call.
 
+				/**
+				 * Mutex for thread safety class operations.
+				 * Helps to read data without lock. And to write data with lock.
+				 */
+				mutable std::shared_mutex observers_shared_mtx_{};
+				/* Maybe order of concurent thread calls must be detach, attach, notify. First delete, then add, then notify */
+
+				/**
+				 * Atomic variable for concurrent auto cleaning of found by read operation expired observers.
+				 * Necessary for decreasing number of calls cleanup function.
+				 */
+				mutable std::atomic_size_t found_expired_observers_{};
 
 				/** Execution policy, that will work for all functions */
-				ExecPolicyType policy_{};
+				//ExecPolicyType policy_{};
 
-			};	// !class SubjectWeak
+			};	// !class SubjectWeakHub
 			/*
 			* list
 			* Pros: Efficient in terms of insertion and removal (O(1)), maintains order, can store duplicates.
@@ -644,11 +1360,6 @@ namespace pattern {
 			* - Use **std::list** if you need to allow duplicates and maintain insertion order.
 			* - Use **std::set** if you need to ensure that observers are unique and you don’t mind the overhead for maintaining sorted order.
 			*/
-
-			// TODO: Partial notification of observers (rare use case?)
-			// Normal Cleanup
-			// Execution policy, different types of policy
-			//
 
 
 
@@ -763,6 +1474,12 @@ namespace pattern {
 
 			//	StateSingle state_{};	// is public for testing
 			//};
+
+
+//===================================Shared Subject==========================================
+
+
+
 
 
 //=============================Multi Observer Interfaces===========================================
@@ -1061,6 +1778,9 @@ namespace pattern {
 						}
 					}
 					EraseEqualWeakPtr(subjects_, subject_ptr, ExecPolicyType());
+
+					// Cleanup expired weak_ptr
+					//EraseNExpiredWeakPtr(container, expired_count, policy);
 				};
 
 				/**
@@ -1071,7 +1791,7 @@ namespace pattern {
 				 */
 				inline void DetachNExpired(const size_t expired_count, bool to_erase_all_expired = false) override {
 					if (to_erase_all_expired) { EraseAllExpired(subjects_, ExecPolicyType()); }
-					else { EraseNExpired(subjects_, expired_count, ExecPolicyType()); }
+					else { EraseNExpiredWeakPtr(subjects_, expired_count, ExecPolicyType()); }
 					// if subject is expired, it is deleted, so we don't need to detach observer in subject
 				};
 
@@ -1084,7 +1804,7 @@ namespace pattern {
 				 * \return
 				 */
 				inline bool HasSubject(const WeakPtrISubjectType subject_ptr) override {
-					return FindEqualWeakPtr(subjects_, subject_ptr, ExecPolicyType()) != subjects_.cend();
+					return FindEqualWeakPtr(subjects_, subject_ptr, ExecPolicyType()).first != subjects_.cend();
 				};
 				// not const, cause autoclean
 
@@ -1130,14 +1850,7 @@ namespace pattern {
 
 
 
-			/**
-			 * Concrete. Simple observer class realize Upate() and Update(Subject&) functions.
-			 * One Observer may has many Subjects.
-			 * weak_ptr helps to prevent dangling pointers and lapsed listener problem.
-			 * Don't use unordered_set with weak_ptr, cause may give undefined behavior.
-			 * Not recommend to use vector, as bad performance of remove_if.
-			 * Invariant: don't attach expired weak_ptr. Value type must be weak_ptr. Mustn't duplicate weak_ptr.
-			 */
+			// TODO: Broken auto clean of expired weak_ptr functionality.
 
 			/**
 			 * Concrete. Observers will be notified on Subject state changes.
@@ -1145,6 +1858,8 @@ namespace pattern {
 			 * weak_ptr helps to prevent dangling pointers and lapsed listener problem.
 			 * Not recommend to use vector, as bad performance of remove_if.
 			 * Don't forget to Notify Observers, where it is necessary, when Subject state changes.
+			 * Invariant: don't attach expired weak_ptr. Value type must be weak_ptr. Mustn't duplicate weak_ptr.
+			 *
 			 * [[Testlevel(35, Hand debug)]]
 			 */
 			template<typename ExecPolicyType = std::execution::sequenced_policy,
@@ -1204,7 +1919,7 @@ namespace pattern {
 					};
 					std::for_each(ExecPolicyType(), observers_.begin(), observers_.end(), update_fn);
 					// Cleanup expired weak_ptr
-					EraseNExpired(observers_, expired_count, ExecPolicyType());
+					EraseNExpiredWeakPtr(observers_, expired_count, ExecPolicyType());
 
 				};
 
@@ -1268,6 +1983,9 @@ namespace pattern {
 						}
 					}
 					EraseEqualWeakPtr(observers_, observer_ptr, ExecPolicyType());
+
+					// Cleanup expired weak_ptr
+					//EraseNExpiredWeakPtr(container, expired_count, policy);
 				};
 
 				/**
@@ -1278,7 +1996,7 @@ namespace pattern {
 				 */
 				inline void DetachNExpired(const size_t expired_count, bool to_erase_all_expired = false) override {
 					if (to_erase_all_expired) { EraseAllExpired(observers_, ExecPolicyType()); }
-					else { EraseNExpired(observers_, expired_count, ExecPolicyType()); }
+					else { EraseNExpiredWeakPtr(observers_, expired_count, ExecPolicyType()); }
 					// if subject is expired, it is deleted, so we don't need to detach observer in subject
 				}; // TODO: refactor, maybe extract function.
 
@@ -1291,7 +2009,7 @@ namespace pattern {
 				 * \return
 				 */
 				inline bool HasObserver(const WeakPtrIObserverType observer_ptr) override {
-					return FindEqualWeakPtr(observers_, observer_ptr, ExecPolicyType()) != observers_.cend();
+					return FindEqualWeakPtr(observers_, observer_ptr, ExecPolicyType()).first != observers_.end();
 				};
 				// not const, cause autoclean
 

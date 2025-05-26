@@ -101,7 +101,8 @@ namespace pattern {
 			};
 
 
-			/** Helper Function
+			/**
+			* Helper Function
 			* Creates Command Action from Member Function. Arguments are binded with std::function(void()).
 			* Command pattern is designed to have object, that invokes request, and object, that receives request.
 			* Invoker mustn't know the concrete receiver object. Use only command interface.
@@ -116,7 +117,7 @@ namespace pattern {
 			inline std::function<void()>
 				CreateActionByMemberFn(const MemberFunctionPtrType<ReturnType, ReceiverType, ParamTypes...> action_ptr,
 									  ReceiverType& receiver_p,	// mustn't be const. Command execution may change state
-									  ParamTypes&&... action_args_p) {
+									  ParamTypes&&... action_args_p) {	// noexcept: bind maybe has exceptions
 
 				// Type can be converted from any pointer to fn type to void(), if all arguments of fn are binded
 				// Only reinterpret_cast helps to convert one pointer to member function to another, of another type

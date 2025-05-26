@@ -1,4 +1,4 @@
-#ifndef OBJECT_POOL_HPP
+﻿#ifndef OBJECT_POOL_HPP
 #define OBJECT_POOL_HPP
 
 #include <memory>
@@ -13,6 +13,11 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace creational {
+
+		namespace object_pool_boost {
+			// https://www.boost.org/doc/libs/1_40_0/libs/pool/doc/index.html
+		}
+
 		namespace object_pool {
 			// https://sourcemaking.com/design_patterns/object_pool/cpp/1
 			// https://gameprogrammingpatterns.com/object-pool.html

@@ -1,4 +1,4 @@
-#ifndef FACTORY_METHOD_HPP
+﻿#ifndef FACTORY_METHOD_HPP
 #define FACTORY_METHOD_HPP
 
 #include <memory>
@@ -20,6 +20,11 @@ namespace pattern {
 		// 4) Create function in ICreator Interface class is a template.
 		//
 		// Friend patterns: Abstract Factory, Template Method, Prototype
+
+
+		namespace factory_method_boost {
+			// https://www.boost.org/doc/libs/1_81_0/libs/functional/factory/doc/html/index.html
+		}
 
 		namespace factory_method {
 			enum class ProductID : unsigned int {

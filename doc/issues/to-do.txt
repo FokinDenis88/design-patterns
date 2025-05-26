@@ -1,2 +1,21 @@
-﻿Separate classes to different files to make less includes
+﻿General:
+Separate classes to different files to make less includes
 
+Observer:
+    ObserverWeak:
+// TODO:
+// command pattern instead Update
+// SubjectWeakMultiShared - class with shared_ptr
+// std::set implementation to all functions. all operations O(log n)
+// Update(state)
+// add ranges from c++ 20
+// Maybe make macroses to decrease count of includes. ObserverWeak is for all containers... too many includes
+//
+// refactoring: Function extraction from member methods of ObserverWeakMulti
+//		and SubjectWeakMulti. Many equal code in functions.
+//
+// Partial notification of observers (rare use case?)
+//
+// Mutex, exec notify in another thread to stop freezes of main thread.
+//
+//
