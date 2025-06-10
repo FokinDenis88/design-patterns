@@ -7,7 +7,7 @@
 
 #include "behavioral/observer.hpp"
 #include "behavioral/strategy.hpp"
-#include "general/ieditor.hpp"
+#include "ieditor.hpp"
 #include "structural/composite.hpp"
 
 

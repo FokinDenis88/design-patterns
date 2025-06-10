@@ -1,6 +1,7 @@
 ﻿General:
 Separate classes to different files to make less includes
 
+=====================================Observer Pattern=====================================
 Observer:
     ObserverWeak:
 // TODO:
@@ -19,3 +20,12 @@ Observer:
 // Mutex, exec notify in another thread to stop freezes of main thread.
 //
 //
+
+Set implementation of CleanExpiredWeakPtr can be less complex = O(log n)
+
+Write Another Subject class Just with Set container
+
+
+1) Object_pool, new thread, async thread notify
+2) Atomic
+3) Raw Observer

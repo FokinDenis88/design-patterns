@@ -7,12 +7,14 @@
 #include <execution> // execution policies
 #include <forward_list>
 #include <functional>
+#include <future>	// for Async Update
 #include <memory>
 #include <mutex>
 #include <iterator>
 #include <initializer_list>	// for AttachObservers
 #include <string>
 #include <shared_mutex>
+#include <system_error>	// thread execution exception
 #include <set>
 #include <thread>	// concurrency and thread safety SubjectWeakHub
 #include <type_traits>
@@ -20,6 +22,9 @@
 #include <utility> // pair
 #include <unordered_set>
 #include <vector>
+
+#include "error/custom-exception.hpp"
+//#include "error/error.hpp"
 
 
 // TODO: maybe separate classes to different files to make less includes
@@ -94,186 +99,9 @@ namespace pattern {
 
 //=============================Helper Functions for ObserverMulti & SubjectMulti=====================================
 
-			/*
-			*
-#include <string>
-#include <sstream>
-#include <exception>
-
-			class CustomException : public std::exception {
-			private:
-				std::string message_;
-				std::string file_name_;
-				size_t line_number_;
-				std::string reason_;
-
-			public:
-				CustomException(const std::string& msg, const std::string& file, size_t line, const std::string& reason = "")
-					: message_(msg),
-					file_name_(file),
-					line_number_(line),
-					reason_(reason) {
-				}
-
-				virtual const char* what() const noexcept override {
-					std::ostringstream oss;
-					oss << "Custom Exception:\n"
-						<< "Message: " << message_
-						<< "\nFile: " << file_name_
-						<< "\nLine: " << line_number_
-						<< "\nReason: " << reason_;
-					return oss.str().c_str();
-				}
-
-				// Метод для удобного вывода диагностической информации
-				friend std::ostream& operator<<(std::ostream& os, const CustomException& ex) {
-					os << ex.what();
-					return os;
-				}
-			};
-
-			// Макросы для упрощенного использования класса
-#define THROW_CUSTOM_EXCEPTION(msg, reason) \
-    throw CustomException(msg, __FILE__, __LINE__, reason);
-
-// Использование макросов
-#define LOG_AND_THROW_CUSTOM_EXCEPTION(msg, reason) \
-    do {                                           \
-        std::cerr << "Error occurred: " << msg << std::endl; \
-        THROW_CUSTOM_EXCEPTION(msg, reason);       \
-    } while(false)
-
-// Пример использования
-			void testFunction(int value) {
-				if (value <= 0) {
-					LOG_AND_THROW_CUSTOM_EXCEPTION("Invalid input value", "Value must be positive.");
-				}
-				std::cout << "Valid value: " << value << std::endl;
-			}
-
-			int main() {
-				try {
-					testFunction(-10);
-				}
-				catch (const CustomException& ex) {
-					std::cerr << ex << std::endl;
-				}
-
-				return 0;
-			}
-
-
-
-			// Создаем собственный класс исключения
-			class MyCustomException : public std::exception {
-			public:
-				const char* what() const noexcept override { return "My custom exception"; }
-			};
-
-
-
-
-#include <thread>
-#include <vector>
-#include <queue>
-#include <functional>
-#include <future>
-#include <mutex>
-#include <condition_variable>
-#include <atomic>
-
-			class ThreadPool {
-			private:
-				using Task = std::function<void()>;
-
-				std::vector<std::thread> workers_;           // Рабочие потоки
-				std::queue<Task> task_queue_;                 // Очередь задач
-				std::mutex queue_mutex_;                      // Мьютекс для защиты очереди
-				std::condition_variable condition_;          // Условная переменная для уведомления потоков
-				std::atomic<bool> stop_{ false };              // Флаг остановки потока
-
-			public:
-				explicit ThreadPool(size_t thread_count)
-					: workers_(thread_count) {
-					for (size_t i = 0; i < thread_count; ++i) {
-						workers_[i] = std::thread([this]() {
-							while (!stop_) {
-								Task task;
-								{
-									std::unique_lock<std::mutex> lock(queue_mutex_);
-									condition_.wait(lock, [this]() { return !task_queue_.empty() || stop_; });
-
-									if (stop_ && task_queue_.empty()) break;
-
-									task = std::move(task_queue_.front());
-									task_queue_.pop();
-								}
-
-								task();  // Выполняем задачу вне мьютекса
-							}
-							});
-					}
-				}
-
-				~ThreadPool() {
-					stop_ = true;
-					condition_.notify_all();
-					for (auto& worker : workers_)
-						worker.join();
-				}
-
-				template<typename F, typename... Args>
-				auto enqueue(F&& f, Args&&... args) -> std::future<typename std::invoke_result<F, Args...>::type> {
-					using ReturnType = typename std::invoke_result<F, Args...>::type;
-
-					auto task = std::make_shared<std::packaged_task<ReturnType()>>(
-						std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-
-					std::future<ReturnType> result = task->get_future();
-					{
-						std::lock_guard<std::mutex> lock(queue_mutex_);
-						task_queue_.emplace([task]() { (*task)(); });
-					}
-					condition_.notify_one();
-					return result;
-				}
-
-				void shutdown() {
-					stop_ = true;
-					condition_.notify_all();
-					for (auto& worker : workers_)
-						worker.join();
-				}
-			};
-
-			// Простое использование
-			int main() {
-				ThreadPool pool(4); // Используем 4 потока
-
-				// Добавляем задачу в пул
-				auto future = pool.enqueue([]() {
-					std::this_thread::sleep_for(std::chrono::seconds(2)); // Имитация длительной задачи
-					return 42;
-					});
-
-				// Ждем завершения задачи
-				int result = future.get();
-				std::cout << "Result is: " << result << std::endl;
-
-				return 0;
-			}
-
-			*/
-
-
-
-
-
-
-
 			/* Class for calling member functions of objects, that maybe already destructed and expired */
 			template<typename ObjectType>
-			class WeakMemberFunction {
+			class WeakMemberFunction { // For Observer with weak_ptr std::function inside Subject
 			public:
 				using MemberFunctionType = std::function<void()>;
 
@@ -320,44 +148,52 @@ namespace pattern {
 				std::weak_ptr<ObjectType> object_;
 				MemberFunctionType member_function{};
 				// TODO: it is important to store all args of std::function seperately for duplicate check in Observer Pattern
+				// Design choices:
+				// 1) To store container in Subject of WeakMemberFunction objects
+				// 2) To store 2 containers in Subject of pair(weak_ptr to observers, std::function to member of observer)
 			};
 
 
-			class UpdateException {
+			class UpdateException : public general::error::CodeException<std::system_error> {
+			public:
+				using CodeExceptionSysError = general::error::CodeException<std::system_error>;
+				using FormatterType = CodeExceptionSysError::FormatterType;
+				using CodeExceptionSysError::DefaultFormatter;
 
-			};
+			protected:
+				UpdateException(const UpdateException&) = delete; // polymorphic class suppress copy/move C.67
+				UpdateException& operator=(const UpdateException&) = delete;
+				UpdateException(UpdateException&&) noexcept = delete;
+				UpdateException& operator=(UpdateException&&) noexcept = delete;
+			public:
+				~UpdateException() override = default;
 
-			class ThreadPool {
-				// Best count of threads is: max threads of CPU + 1 (or 2)
-			};
-			/*
-			* Container choices:
-			* 1) vector
-			* This is the most common and simplest option due to its ease of memory management and good performance
-			* characteristics. A thread pool is usually implemented in such a way that a fixed number of threads are
-			* allocated in advance and stored in a vector.
-			*
-			* It is important to note that inserting and deleting elements from the middle of a vector can cause all
-			* subsequent elements to be moved, which slows down the operation. However, this problem can be solved
-			* by pre-reserving memory (reserve()).
-			*
-			* 2) list, forward_list
-			* If you expect threads to be frequently removed from arbitrary positions in the list (e.g. one thread has
-			* finished its work and is removed from the pool), a doubly linked list (std::list) is a better choice, since
-			* it provides constant time for removing an element across iterators.
-			* Note: Make sure to use mutex protection to safely access the list from different threads.
-			*
-			* 3) deque
-			* A queue allows you to efficiently add and remove items from both the front and back of a queue. It is especially
-			* useful if you need to implement a priority task queue where items can be added and removed asynchronously by
-			* different threads.
-			*
-			* 4) Intel TBB (Threaded Building Blocks) Containers for multithread work.
-			*/
 
-			class TasksQueue {
+				UpdateException(const std::system_error& exception,
+								const general::error::ErrorInfoCode& info,
+								FormatterType formatter = DefaultFormatter)
+						:	CodeExceptionSysError{ exception, info, std::move(formatter) } { // move formatter, cause resources maybe in fn
+				};
+				UpdateException(const std::system_error& exception,
+								general::error::ErrorInfoCode&& info,
+								FormatterType formatter = DefaultFormatter)
+						:	CodeExceptionSysError{ exception, std::move(info), std::move(formatter) } {
+				};
 
-			};
+
+				// Additional information from system error_code
+				/*const char* what() const noexcept override {
+					this->CodeExceptionSysError::what();
+					LazyWhatFormatting();
+					return what_.c_str();
+				};*/
+
+				/** Get base exception system_error error_code. */
+				inline const std::error_code& base_error_code() const noexcept {
+					return this->code();
+				}
+
+			}; // class UpdateException
 
 
 //===========================Generic Container Element Modification================================
@@ -373,9 +209,9 @@ namespace pattern {
 
 				if constexpr (std::is_same_v<std::remove_cvref_t<ContainerType>,
 											 std::forward_list<value_type>>) { // forward_list
-					container.emplace_front(std::forward<value_type>(value));
+					container.emplace_front(std::forward<value_type>(value));			// O(1)
 				} else { // All other types of containers, except forward_list
-					container.emplace(std::forward<value_type>(value));
+					container.emplace(std::forward<value_type>(value));					// O(1)
 					// emplace_back is better for  vector, deque and list
 				}
 			}
@@ -384,6 +220,8 @@ namespace pattern {
 			 * Remove element from any type of container.
 			 * Complexity: O(n)
 			 * Mutex: write
+			 *
+			 * @param predicate for remove_if operation
 			 */
 			template<typename ContainerType, typename ExecPolicyType>
 			inline void GenericRemoveIf(ContainerType& container,
@@ -394,11 +232,13 @@ namespace pattern {
 				if constexpr (std::is_same_v<ContainerType,
 											std::forward_list<typename ContainerType::value_type>>) { // for Forward_list
 					container.remove_if(predicate); // erase-remove idiom is not for forward_list
+					// std::remove_if is not working with forward_list
 				} else { // All other containers
 					container.erase(std::remove_if(policy, container.begin(),
 													container.end(), predicate), container.end()); // O(n)
 				}
 			}
+			// TODO: GenericErase(), GenericFind() ?
 
 //============================Process weak_ptr Container. Erase============================================
 
@@ -406,6 +246,7 @@ namespace pattern {
 
 			/**
 			 * Erase all expired weak_ptr from container
+			 *
 			 * Complexity: O(n)
 			 * Mutex: write
 			 */
@@ -415,11 +256,12 @@ namespace pattern {
 				if (container.empty()) { return; }
 
 				auto expired = [](const auto& value_ptr) { return value_ptr.expired(); };
-				GenericRemoveIf(container, expired, policy);
+				GenericRemoveIf(container, expired, policy);		// O(n)
 			};
 
 			/**
 			 * Erase custom n number of expired weak_ptr from container
+			 *
 			 * Complexity: O(n)
 			 * Mutex: write
 			 */
@@ -439,14 +281,16 @@ namespace pattern {
 					}
 					return false;
 				}; // !lambda
-				GenericRemoveIf(container, expired_fn, policy);
+				GenericRemoveIf(container, expired_fn, policy);		// O(n)
 			};
+			// TODO: may work not on expired_count, but on it_last_expired - iterator to last expired.
 
 
 			/**
 			 * Erase first weak_ptr in container, that is alive and has same stored pointer. Container stores weak_ptr.
-			 * Complexity: O(n)
-			 * Mutex: write
+			 *
+			 * Complexity: set = O(log n). Other containers = O(n).
+			 * Mutex: write.
 			 *
 			 * \param container
 			 * \param searched_ptr
@@ -467,26 +311,28 @@ namespace pattern {
 					std::shared_ptr<ValueType> searched_shared{};
 					auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
 						if (current_ptr.expired()) { ++expired_count; }
-						return IsEqualWeakPtr(searched_shared, current_ptr);
+						return IsEqualWeakPtr(searched_shared, current_ptr);		// O(1)
 					}; // !lambda end
 					{
-						searched_shared = searched_ptr.lock();
+						searched_shared = searched_ptr.lock();	// weak_ptr
 						if (searched_shared) { container.remove_if(equal_owner); }	// O(n)
 					}
 				} else { // All other types of containers
 					// std::move(searched_ptr) is no necessary, cause weak_ptr hold 2 pointers.
 					// Copy or Move operations are equal in performance.
-					auto result_fn{ FindEqualWeakPtr(container, searched_ptr, policy) }; // O(n)
+					auto result_fn{ FindEqualWeakPtr(container, searched_ptr, policy) }; // set = O(log n) ; others = O(n)
 					it_equal = result_fn.first;
 					expired_count = result_fn.second;
 					if (it_equal != container.end()) { container.erase(it_equal); }
 				}
 				return expired_count;
 			}
+			// TODO: refactor -> 1) First GenericFind(). 2) GenericErase(). Deletion for set is simple
 
 			/**
 			 * Erase first weak_ptr in container, that is alive and has same stored pointer. Container stores weak_ptr.
 			 * With auto clean of expired weak_ptrs.
+			 *
 			 * Complexity: O(n)
 			 * Mutex: write
 			 *
@@ -507,6 +353,7 @@ namespace pattern {
 
 			/**
 			 * Compares if two weak_ptr are alive and have the same stored pointers.
+			 *
 			 * Complexity: amortized O(1)
 			 *
 			 * @param shared_ptr search ptr. Is shared for decreasing number of locks.
@@ -523,7 +370,8 @@ namespace pattern {
 
 			/**
 			 * Find first weak_ptr, that is alive and has same stored pointer.
-			 * Complexity: O(n)
+			 *
+			 * Complexity: set = O(log n). Other containers = O(n).
 			 * Mutex: read
 			 *
 			 * @return	First = iterator to equal weak_ptr or to end.
@@ -543,19 +391,24 @@ namespace pattern {
 				auto&	it_equal		{ result_fn.first };
 				size_t& expired_count	{ result_fn.second };
 
-				std::shared_ptr<ValueType> searched_shared{};
-				auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
-					if (current_ptr.expired()) { ++expired_count; }
-					return IsEqualWeakPtr(searched_shared, current_ptr);
-				};
-				{
-					// mustn't lock for long time, cause of resource use and life time
-					// But better to lock for lowering number of locks in IsEqualWeakPtr
-					searched_shared = searched_ptr.lock();
-					if (searched_shared) { // minimal lock section
-						it_equal = std::find_if(policy, container.begin(), container.end(), equal_owner); // O(n)
-					}
-				} // !weak_ptr lock
+				if constexpr (std::is_same_v<ContainerType, std::set<typename ContainerType::value_type>>) { // set
+					// set must be compared with owner_less in declaration of set variable
+					it_equal = container.find(searched_ptr);												// O(log n)
+				} else { // All other types of containers
+					std::shared_ptr<ValueType> searched_shared{};
+					auto equal_owner = [&searched_shared, &expired_count](const auto& current_ptr) {
+						if (current_ptr.expired()) { ++expired_count; }
+						return IsEqualWeakPtr(searched_shared, current_ptr);								// O(1)
+						};
+					{
+						// mustn't lock for long time, cause of resource use and life time
+						// But better to lock for lowering number of locks in IsEqualWeakPtr
+						searched_shared = searched_ptr.lock();
+						if (searched_shared) { // minimal lock section
+							it_equal = std::find_if(policy, container.begin(), container.end(), equal_owner); // O(n)
+						}
+					} // !weak_ptr lock
+				}
 
 				return result_fn;
 			}
@@ -563,6 +416,7 @@ namespace pattern {
 			/**
 			 * Find first weak_ptr, that is alive and has same stored pointer.
 			 * With auto clean of expired weak_ptrs.
+			 *
 			 * Complexity: O(n)
 			 * Mutex: read + write
 			 *
@@ -585,6 +439,8 @@ namespace pattern {
 			/**
 			 * Notify all observers in container by lambda function, that
 			 * encapsulate observer update function call.
+			 * Can freeze main thread, if it is long to Update observer.
+			 *
 			 * Complexity: O(n)
 			 * Mutex: read
 			 *
@@ -615,6 +471,8 @@ namespace pattern {
 			/**
 			 * Notify all observers in container by lambda function, that
 			 * encapsulate observer update function call.
+			 * Can freeze main thread, if it is long to Update observer.
+			 *
 			 * Complexity: O(n)
 			 * Mutex: read + write
 			 *
@@ -936,6 +794,8 @@ namespace pattern {
 			 *
 			 * Invariant: don't attach & store expired weak_ptr. Mustn't duplicate weak_ptr.
 			 *
+			 * Complexity: maybe best for std::set = O(log n). But CleanOps are O(n)
+			 *
 			 * @tparam UpdateDataType		type of update data in param of update function in observer
 			 * @tparam ExecPolicyType		Execution policy (e.g., std::execution::sequenced_policy)
 			 * @tparam ContainerType_t		Container type holding weak_ptrs to observers
@@ -960,8 +820,8 @@ namespace pattern {
 				using ContainerSet			= std::set<WeakPtrIObserverWeakHub, std::owner_less<WeakPtrIObserverWeakHub>>;
 				using ContainerList			= std::list<WeakPtrIObserverWeakHub>;
 				using ContainerForwardList	= std::forward_list<WeakPtrIObserverWeakHub>;
-				//using ContainerVector		= std::vector<WeakPtrIObserverWeak>;
-				//using ContainerDeque		= std::deque<WeakPtrIObserverWeak>;
+				//using ContainerVector		= std::vector<WeakPtrIObserverWeakHub>;
+				//using ContainerDeque		= std::deque<WeakPtrIObserverWeakHub>;
 
 				SubjectWeakHub() = default;
 				// Subject may be constructed without observable Subjects
@@ -1000,9 +860,11 @@ namespace pattern {
 			public:
 				~SubjectWeakHub() override = default;
 
+				// TODO: write notify methods for all stubs in ObserverHub class. With all variants of Update fn of observer.
 
 				/*
-				 * Update all attached observers.
+				 * Update all attached observers in main thread.
+				 *
 				 * Complexity: set = O(log n), Other containers = O(n).
 				 *
 				 * @param message	message with information needed for Update.
@@ -1017,6 +879,27 @@ namespace pattern {
 					};
 					MutexNotifyObserversNClean(observer_update_fn, policy);
 				};
+
+				/*
+				 * Update all attached observers in main thread.
+				 *
+				 * Complexity: set = O(log n), Other containers = O(n).
+				 *
+				 * @param message		message with information needed for Update.
+				 * @param new_thread	one thread from thread pool.
+				 */
+				template<typename ExecPolicyType>
+				void NotifyObservers(std::thread& new_thread,
+									const std::string& message = "",
+									ExecPolicyType policy = std::execution::seq) const {
+					auto observer_update_fn = [&message](std::shared_ptr<IObserverWeakHub<UpdateDataType>> observer_ptr) {
+						// observer_ptr in lambda is shared_ptr, cause in GenericNotify it is locked
+						observer_ptr->Update(message);
+						};
+					MutexNotifyObserversNClean(observer_update_fn, policy);
+				};
+
+
 				// TODO: Notification in another thread. Wait the end of notification process
 				// TODO: bool run_in_new_thread = false
 				// In new std::thread
@@ -1029,6 +912,7 @@ namespace pattern {
 
 				/*
 				 * Update all attached observers.
+				 *
 				 * Complexity: list = O(n). set = O(log n)
 				 *
 				 * @param message	message with information needed for Update.
@@ -1045,7 +929,9 @@ namespace pattern {
 				/**
 				* Add Multiple Observer to list of Observers.
 				* Only alive weak_ptr can be attached to container and only that is not duplicates.
-				* Complexity: O(n)
+				*
+				* Complexity: O(K), K - count of attachable observers.
+				* Complexity of adding each observer: maybe O(1), but is O(n), cause CleanOps.
 				*
 				* @param attachable_begin		start of range of observers, that will be added to Subject
 				* @param attachable_end			end of range of observers, that will be added to Subject
@@ -1061,20 +947,21 @@ namespace pattern {
 					auto attach_observer_fn = [this, &policy](const auto& observer_ptr) {
 						auto has_observer{ HasObserver(observer_ptr, policy) };
 						if (!has_observer.first) { // Duplicate control. Mustn't duplicate weak_ptr
-							GenericAddElement(observers_, observer_ptr);
+							GenericAddElement(observers_, observer_ptr);		// O(1)
 						}
 						UpdateExpiredObserversCount(has_observer.second);
 					}; // !lambda
 					{
 						std::unique_lock lock{ observers_shared_mtx_ };
-						std::for_each(policy, attachable_begin, attachable_end, attach_observer_fn); // write
+						std::for_each(policy, attachable_begin, attachable_end, attach_observer_fn); // write	O(n)
 					} // !lock
-					CleanFoundExpiredObservers(policy);
+					CleanFoundExpiredObservers(policy);							// O(n)
 				};
 
 				/**
 				 * Add Observer to list of Observers. Wrapper.
 				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 *
 				 * Complexity: O(n)
 				 */
 				template<typename ExecPolicyType>
@@ -1087,6 +974,7 @@ namespace pattern {
 				/**
 				 * Add Observer to list of Observers. Wrapper.
 				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 *
 				 * Complexity: O(n)
 				 */
 				template<typename ContainerType, typename ExecPolicyType>
@@ -1101,6 +989,7 @@ namespace pattern {
 				/**
 				 * Add Observer to list of Observers. Wrapper.
 				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 *
 				 * Complexity: O(n)
 				 *
 				 * @param observer_ptr	weak pointer to observer.
@@ -1117,7 +1006,9 @@ namespace pattern {
 				/**
 				 * Detach Multiple Observers.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
-				 * Complexity: O(n)
+				 *
+				 * Complexity: O(k*n), k - count of detachable observers.
+				 * Complexity of detaching each observer: maybe O(n), but is O(n), cause CleanOps.
 				 *
 				 * @param erasable_begin	begin of container with observers, that must be detached
 				 * @param erasable_end		end of container with observers, that must be detached
@@ -1132,20 +1023,21 @@ namespace pattern {
 					size_t expired_count{};
 					auto detach_observer_fn = [this, expired_count](const auto& observer_ptr) {
 						// Can Detach only alive objects
-						expired_count = EraseEqualWeakPtr(observers_, observer_ptr, policy);
+						expired_count = EraseEqualWeakPtr(observers_, observer_ptr, policy);			// O(n)
 						UpdateExpiredObserversCount(expired_count);
 					}; // !lambda
 
 					{
 						std::unique_lock lock{ observers_shared_mtx_ }; // write
-						std::for_each(policy, erasable_begin, erasable_end, detach_observer_fn); // write
-						CleanFoundExpiredObservers(policy);
+						std::for_each(policy, erasable_begin, erasable_end, detach_observer_fn); // write	O(k*n)
+						CleanFoundExpiredObservers(policy);												// O(n)
 					} // !lock
 				};
 
 				/**
 				 * Detach Observer. Wrapper.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 *
 				 * Complexity: O(n)
 				 */
 				template<typename ExecPolicyType>
@@ -1158,6 +1050,7 @@ namespace pattern {
 				/**
 				 * Detach Observer. Wrapper.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 *
 				 * Complexity: O(n)
 				 */
 				template<typename ContainerType, typename ExecPolicyType>
@@ -1173,6 +1066,7 @@ namespace pattern {
 				/**
 				 * Detach Observer.
 				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 *
 				 * Complexity: O(n)
 				 *
 				 * @param observer_ptr weak pointer to observer.
@@ -1182,13 +1076,14 @@ namespace pattern {
 											ExecPolicyType policy = std::execution::seq) {
 					std::unique_lock lock{ observers_shared_mtx_ }; // write
 					// Can Detach only alive objects
-					size_t expired_count{ EraseEqualWeakPtr(observers_, observer_ptr, policy) };
-					UpdateNCleanExpiredObservers(expired_count, policy);
+					size_t expired_count{ EraseEqualWeakPtr(observers_, observer_ptr, policy) };	// O(n)
+					UpdateCountNCleanExpiredObservers(expired_count, policy);
 				};
 
 
 				/**
 				 * Detach all expired weak_ptr objects in container
+				 *
 				 * Complexity: O(n)
 				 */
 				template<typename ExecPolicyType>
@@ -1201,6 +1096,7 @@ namespace pattern {
 				/**
 				 * Check if there is observer in Subject.
 				 * Cleanup expired weak_ptr subjects in container.
+				 *
 				 * Complexity: O(n)
 				 *
 				 * \param subject_ptr
@@ -1211,24 +1107,23 @@ namespace pattern {
 				inline bool HasObserverNClean(const WeakPtrIObserverWeakHub observer_ptr,
 										ExecPolicyType policy = std::execution::seq) const {
 					std::pair<bool, size_t> has_observer{ HasObserver(observer_ptr, policy) };
-					UpdateNCleanExpiredObservers(has_observer.second, policy);
+					UpdateCountNCleanExpiredObservers(has_observer.second, policy);
 					return has_observer.first;
 				};
 
 			private:
+				/* Complexity: O(n) */
 				template<typename ExecPolicyType>
 				inline std::pair<bool, size_t> HasObserver(const WeakPtrIObserverWeakHub observer_ptr,
 															ExecPolicyType policy = std::execution::seq) const {
-					std::pair<bool, size_t> has_observer{};
 					std::pair<decltype(observers_.end()), size_t> find_result{};
 					{
 						std::shared_lock lock{ observers_shared_mtx_ }; // read
-						find_result = FindEqualWeakPtr(observers_, observer_ptr, policy);
+						find_result = FindEqualWeakPtr(observers_, observer_ptr, policy);	// O(n)
 					} // !lock
 
-					has_observer.first = find_result.first != observers_.end();
-					has_observer.second = find_result.second;
-					return has_observer; // iterators maybe invalidated after cleanup
+					bool has_observer = find_result.first != observers_.end();
+					return std::make_pair(has_observer, find_result.second); // iterators maybe invalidated after cleanup
 				};
 
 				/**
@@ -1237,19 +1132,21 @@ namespace pattern {
 				 * Cause many blocked threads may found equal expired weak_ptr.
 				 * But cleanup is only done by counter found_expired_observers_.
 				 * Locked with unique mutex.
+				 *
 				 * Complexity: O(n)
 				 */
 				template<typename ExecPolicyType>
 				inline void CleanFoundExpiredObservers(ExecPolicyType policy = std::execution::seq) const {
-					if (found_expired_observers_ > 0) { // precondition
+					if (found_expired_observers_.load(std::memory_order_relaxed) > 0) { // precondition
 						{
 							std::unique_lock lock{ observers_shared_mtx_ };
 							// Cleanup expired weak_ptr
-							EraseNExpiredWeakPtr(observers_, found_expired_observers_, policy); // write
+							EraseNExpiredWeakPtr(observers_, found_expired_observers_, policy); // write	O(n)
 						} // !lock
 						ResetExpiredObserversCount();
 					}
 				}
+				// TODO: Decrease the Complexity of cleaning to make attach & detach complexity = O(log n).
 
 				/** Modify count of expired observers, if new count bigger */
 				inline void UpdateExpiredObserversCount(const size_t new_count) const noexcept {
@@ -1261,21 +1158,26 @@ namespace pattern {
 				inline void ResetExpiredObserversCount() const noexcept {
 					found_expired_observers_ = 0;
 				}
+				// TODO: replace assign of atomic with quicker ops = load(relaxed) + compare_exchange_weak
 
 				/**
 				 * Update count of expired observers and clean observers container.
 				 * Locked with mutex.
+				 *
+				 * Complexity: O(n)
 				 */
 				template<typename ExecPolicyType>
-				inline void UpdateNCleanExpiredObservers(const size_t new_count,
-														ExecPolicyType policy = std::execution::seq) const {
+				inline void UpdateCountNCleanExpiredObservers(const size_t new_count,
+															ExecPolicyType policy = std::execution::seq) const {
 					UpdateExpiredObserversCount(new_count);
 					CleanFoundExpiredObservers(policy);
 				}
 
 				/**
-				 * Thread safe. Notify all observers of Subject.
+				 * Thread safe. Notify all observers of Subject. In same thread.
 				 * Used mutex to block shared resource.
+				 *
+				 * Complexity: O(n)
 				 */
 				template<typename UpdateFunctionType, typename ExecPolicyType>
 				void MutexNotifyObserversNClean(UpdateFunctionType observer_update_fn,
@@ -1283,14 +1185,57 @@ namespace pattern {
 					size_t expired_count{};
 					{
 						std::shared_lock lock{ observers_shared_mtx_ };
-						expired_count = GenericNotifyWeakObservers(observers_, observer_update_fn, policy); // read
+						expired_count = GenericNotifyWeakObservers(observers_, observer_update_fn, policy); // read	O(n)
 					} // !lock
 
-					UpdateNCleanExpiredObservers(expired_count, policy);
+					UpdateCountNCleanExpiredObservers(expired_count, policy);						// O(n)
+				}
+
+				/**
+				 * Thread safe. Notify all observers of Subject in new thread of execution.
+				 * Used mutex to block shared resource.
+				 */
+				template<typename ThreadPoolType, typename UpdateFunctionType, typename ExecPolicyType>
+				void ThreadNotifyObserversNClean(ThreadPoolType& thread_pool,
+												UpdateFunctionType observer_update_fn,
+												ExecPolicyType policy = std::execution::seq) const {
+					//thread_pool.enqueue(&SubjectWeakHub::MutexNotifyObserversNClean, this, observer_update_fn, policy);
+					thread_pool.enqueue([this, &observer_update_fn, &policy]() {
+											MutexNotifyObserversNClean(observer_update_fn, policy);
+					});
+				}
+				/**
+				 * Thread safe. Notify all observers of Subject in new thread of execution.
+				 * Used mutex to block shared resource.
+				 */
+				template<typename ThreadPoolType, typename UpdateFunctionType, typename ExecPolicyType>
+				void ThreadNotifyObserversNClean(UpdateFunctionType observer_update_fn,
+													ExecPolicyType policy = std::execution::seq) const {
+					try {
+						std::thread notify_thread(&SubjectWeakHub::MutexNotifyObserversNClean, this, observer_update_fn, policy);
+						notify_thread.detach();	// Thread will work separately
+						// instead of detach thread object can be global, so you can monitor it
+					}
+					catch (const std::system_error& exp) {
+						throw UpdateException(exp, general::error::ErrorInfoCode{ FILE_N_LINE,
+												"Critical error. Error in updating process ThreadNotifyObserversNClean().", 1 });
+					}
+					// TODO: refactor try catch may be deleted, cause it is critical error with termination
+				}
+
+				/**
+				 * Thread safe. Notify all observers of Subject in new thread of execution.
+				 * Used mutex to block shared resource.
+				 */
+				template<typename ThreadPoolType, typename UpdateFunctionType, typename ExecPolicyType>
+				void ThreadNotifyObserversNCleanAsync(UpdateFunctionType observer_update_fn,
+														ExecPolicyType policy = std::execution::seq) const {
+					std::future result{ std::async(std::launch::async, &SubjectWeakHub::MutexNotifyObserversNClean,
+											this, observer_update_fn, policy) };
 				}
 
 
-//=========================SubjectWeakHub Data==============================================================
+//-----------------------SubjectWeakHub Data-------------------------------------------------
 
 				/**
 				 * List of observers, that will be attach to Subject.

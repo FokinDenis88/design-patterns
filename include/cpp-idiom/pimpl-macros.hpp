@@ -9,13 +9,14 @@
  * Only declare, not define.Default Destructor and Constructors for Class
  * with pImpl(Pointer to Implementation). Use in header.hpp file, in class declaration.
  */
-#define DECLARE_PIMPL_CONSTRUCTORS(ClassName)	public:													\
-													ClassName();										\
-													~ClassName();										\
-													ClassName(const ClassName& obj);					\
-													ClassName& operator=(const ClassName& rhs);			\
-													ClassName(ClassName&& obj) noexcept;				\
-													ClassName& operator=(ClassName&& rhs) noexcept;
+#define DECLARE_PIMPL_CONSTRUCTORS(ClassName)				\
+	public:													\
+		ClassName();										\
+		~ClassName();										\
+		ClassName(const ClassName& obj);					\
+		ClassName& operator=(const ClassName& rhs);			\
+		ClassName(ClassName&& obj) noexcept;				\
+		ClassName& operator=(ClassName&& rhs) noexcept;
 
 /**
  * Declare all private data and non virtual functions of Class with pImpl idiom.
@@ -36,22 +37,24 @@
  * Define all Constructors and Default Destructor.
  * Use in source.cpp file after defining Impl structure..
  */
-#define DEFINE_PIMPL(ClassName)	ClassName::ClassName() = default;										\
-								ClassName::~ClassName() = default;										\
-								ClassName::ClassName(const ClassName& obj) : pImpl_{ nullptr } {		\
-									if (obj.pImpl_) {													\
-										pImpl_ = std::make_unique<ClassName::Impl>(*obj.pImpl_);		\
-									}																	\
-								};																		\
-								ClassName& ClassName::operator=(const ClassName& rhs) {					\
-									using pattern::cpp_idiom::pimpl::CopyUniquePtrOwnedObjects;			\
-									if (this != &rhs) {													\
-										CopyUniquePtrOwnedObjects(rhs.pImpl_, pImpl_);					\
-									}																	\
-									return *this;														\
-								};																		\
-								ClassName::ClassName(ClassName&& obj) noexcept = default;				\
-								ClassName& ClassName::operator=(ClassName&& rhs) noexcept = default;
+#define DEFINE_PIMPL(ClassName)												\
+	ClassName::ClassName() = default;										\
+	ClassName::~ClassName() = default;										\
+	ClassName::ClassName(const ClassName& obj) : pImpl_{ nullptr } {		\
+		if (obj.pImpl_) {													\
+			pImpl_ = std::make_unique<ClassName::Impl>(*obj.pImpl_);		\
+		}																	\
+	};																		\
+	ClassName& ClassName::operator=(const ClassName& rhs) {					\
+		using pattern::cpp_idiom::pimpl::CopyUniquePtrOwnedObjects;			\
+		if (this != &rhs) {													\
+			CopyUniquePtrOwnedObjects(rhs.pImpl_, pImpl_);					\
+		}																	\
+		return *this;														\
+	};																		\
+	ClassName::ClassName(ClassName&& obj) noexcept = default;				\
+	ClassName& ClassName::operator=(ClassName&& rhs) noexcept = default;
+
 
  /** C++ Idioms */
 namespace pattern {

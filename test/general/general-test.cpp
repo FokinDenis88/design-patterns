@@ -645,6 +645,35 @@ namespace {
     } // !namespace refactoring
 
 
+	namespace general {
+		namespace error {
+			using namespace ::general::error;
+
+			TEST(ErrorTest, ErrorClass) {
+				Error<ErrorInfoDetailed> my_error{};
+
+				//EXPECT_EQ(GlobalVarsType::get_variable<GlobalVariablesEnum::a>(), -33);
+				//EXPECT_EQ(GlobalVarsType::get_variable<GlobalVariablesEnum::b>(), 66.0);
+			}
+
+			TEST(ErrorTest, ExceptionClass) {
+				GeneralException my_exception{ std::exception{}, ErrorInfoGeneral{FILE_N_LINE, "Hello World"} };
+
+				//EXPECT_EQ(GlobalVarsType::get_variable<GlobalVariablesEnum::a>(), -33);
+				//EXPECT_EQ(GlobalVarsType::get_variable<GlobalVariablesEnum::b>(), 66.0);
+			}
+
+		} // !namespace error
+
+
+		namespace thread {
+			using namespace ::general::thread;
+
+		} // !namespace thread
+
+	} // !namespace general
+
+
     /** https://google.github.io/googletest/primer.html */
     namespace help {
         // Info

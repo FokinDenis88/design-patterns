@@ -12,6 +12,8 @@ GameDev
 Structural
 UI
 Refactoring
+
+General
 */
 
 #ifndef ALL_HEADERS_HPP
@@ -49,5 +51,9 @@ Refactoring
 
 // Refactoring
 #include "header-collection/refactoring-headers.hpp"
+
+
+// General for Support
+#include "header-collection/general-headers.hpp"
 
 #endif // !ALL_HEADERS_HPP

@@ -142,12 +142,6 @@ set(SOURCES_FILTER_STRUCTURAL)
 set(HEADERS_FILTER_UI)
 set(SOURCES_FILTER_UI)
 
-set(INCLUDE_GENERAL include/general/)
-set(HEADERS_FILTER_GENERAL
-	${INCLUDE_GENERAL}general.hpp
-	${INCLUDE_GENERAL}ieditor.hpp)
-set(SOURCES_FILTER_GENERAL)
-
 
 set(INCLUDE_REFACTORING include/refactoring/)
 set(HEADERS_FILTER_REFACTORING
@@ -155,6 +149,18 @@ set(HEADERS_FILTER_REFACTORING
 	${INCLUDE_REFACTORING}encapsulate-variable.hpp
 	)
 set(SOURCES_FILTER_REFACTORING)
+
+
+set(INCLUDE_EXTERNAL_GENERAL external/cpp-general/include/)
+set(HEADERS_FILTER_EXTERNAL_GENERAL
+	${INCLUDE_EXTERNAL_GENERAL}general.hpp
+	${INCLUDE_EXTERNAL_GENERAL}ieditor.hpp
+	${INCLUDE_EXTERNAL_GENERAL}interface-macros.hpp
+	${INCLUDE_EXTERNAL_GENERAL}/concurrency/thread.hpp
+	${INCLUDE_EXTERNAL_GENERAL}/error/custom-exception.hpp
+	${INCLUDE_EXTERNAL_GENERAL}/error/error.hpp
+	)
+set(SOURCES_FILTER_EXTERNAL_GENERAL)
 
 
 # Many headers in every file
@@ -170,6 +176,7 @@ set(HEADERS_FILTER_HEADER_COLLECTION
 	${INCLUDE_HEADER_COLLECTION}database-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}distributed-system-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}gamedev-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}general-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}refactoring-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}ui-headers.hpp
 )
@@ -185,11 +192,11 @@ set(ALL_SOURCES
 	${SOURCES_FILTER_CREATIONAL}
 	${SOURCES_FILTER_DATABASE}
 	${SOURCES_FILTER_DISTRIBUTED-SYSTEM}
+	${SOURCES_FILTER_EXTERNAL_GENERAL}
 	${SOURCES_FILTER_GAMEDEV}
 	${SOURCES_FILTER_STRUCTURAL}
 	${SOURCES_FILTER_REFACTORING}
-	${SOURCES_FILTER_UI}
-	${SOURCES_FILTER_GENERAL})
+	${SOURCES_FILTER_UI})
 
 set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_AI}
@@ -201,12 +208,12 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_CREATIONAL}
 	${HEADERS_FILTER_DATABASE}
 	${HEADERS_FILTER_DISTRIBUTED-SYSTEM}
+	${HEADERS_FILTER_EXTERNAL_GENERAL}
 	${HEADERS_FILTER_GAMEDEV}
 	${HEADERS_FILTER_HEADER_COLLECTION}
 	${HEADERS_FILTER_STRUCTURAL}
 	${HEADERS_FILTER_REFACTORING}
-	${HEADERS_FILTER_UI}
-	${HEADERS_FILTER_GENERAL})
+	${HEADERS_FILTER_UI})
 
 set(DOC_FILTER
 	.gitlab-ci.yml
@@ -251,12 +258,12 @@ source_group("Cpp-Idioms/Headers"			FILES ${HEADERS_FILTER_CPP-IDIOMS})
 source_group("Creational/Headers"			FILES ${HEADERS_FILTER_CREATIONAL})
 source_group("Database/Headers"				FILES ${HEADERS_FILTER_DATABASE})
 source_group("Distributed-System/Headers"	FILES ${HEADERS_FILTER_DISTRIBUTED-SYSTEM})
+source_group("External/cpp-general/Headers"	FILES ${HEADERS_FILTER_EXTERNAL_GENERAL})
 source_group("GameDev/Headers"				FILES ${HEADERS_FILTER_GAMEDEV})
 source_group("Header Collection"			FILES ${HEADERS_FILTER_HEADER_COLLECTION})
 source_group("Structural/Headers"			FILES ${HEADERS_FILTER_STRUCTURAL})
 source_group("Refactoring/Headers"			FILES ${HEADERS_FILTER_REFACTORING})
 source_group("UI/Headers"					FILES ${HEADERS_FILTER_UI})
-source_group("General/Headers"				FILES ${HEADERS_FILTER_GENERAL})
 
 # Sources
 source_group("AI/Source"					FILES ${SOURCES_FILTER_AI})
@@ -268,11 +275,11 @@ source_group("Cpp-Idioms/Source"			FILES ${SOURCES_FILTER_CPP-IDIOMS})
 source_group("Creational/Source"			FILES ${SOURCES_FILTER_CREATIONAL})
 source_group("Database/Source"				FILES ${SOURCES_FILTER_DATABASE})
 source_group("Distributed-System/Source"	FILES ${SOURCES_FILTER_DISTRIBUTED-SYSTEM})
+source_group("External/cpp-general/Source"	FILES ${SOURCES_FILTER_EXTERNAL_GENERAL})
 source_group("GameDev/Source"				FILES ${SOURCES_FILTER_GAMEDEV})
 source_group("Structural/Source"			FILES ${SOURCES_FILTER_STRUCTURAL})
 source_group("Refactoring/Source"			FILES ${SOURCES_FILTER_REFACTORING})
 source_group("UI/Source"					FILES ${SOURCES_FILTER_UI})
-source_group("General/Source"				FILES ${SOURCES_FILTER_GENERAL})
 
 # Other groups
 source_group("Doc" FILES ${DOC_FILTER})
