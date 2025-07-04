@@ -29,7 +29,14 @@
 // Behavioral
 #include "behavioral/strategy.hpp"
 #include "behavioral/command.hpp"
-#include "behavioral/observer.hpp"
+
+#include "behavioral/observer/generic-observer.hpp"
+#include "behavioral/observer/iobserver.hpp"
+#include "behavioral/observer/observer-others.hpp"
+#include "behavioral/observer/weak-callback-subject.hpp"
+#include "behavioral/observer/observer-weak-msg.hpp"
+#include "behavioral/observer/observer-weak-multi.hpp"
+
 #include "behavioral/state.hpp"
 #include "behavioral/mediator.hpp"
 #include "behavioral/chain-of-responsibility.hpp"
@@ -37,5 +44,7 @@
 #include "behavioral/iterator.hpp"
 #include "behavioral/memento.hpp"
 #include "behavioral/null-object.hpp"
+
+
 
 #endif // !CLASSIC_HEADERS_HPP

@@ -1,4 +1,4 @@
-#ifndef GAMEDEV_HEADERS_HPP
+﻿#ifndef GAMEDEV_HEADERS_HPP
 #define GAMEDEV_HEADERS_HPP
 
 
@@ -30,7 +30,7 @@ Sequencing Patterns
 Behavioral Patterns
 11. Bytecode
 12. Subclass Sandbox
-13. Type Object
+13. T Object
 
 Decoupling Patterns
 14. Component

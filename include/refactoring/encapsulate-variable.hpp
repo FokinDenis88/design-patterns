@@ -3,7 +3,7 @@
 
 #include "creational/singleton.hpp"
 
-#include <tuple.hpp>
+#include <tuple>
 #include <type_traits>
 
 namespace refactoring {
@@ -64,16 +64,16 @@ namespace refactoring {
         class GlobalVariablesTuple {
         public:
             /** Used for selection of variable for set/get operations */
-            using EnumType = EnumT;
+            //using EnumT = EnumT;
 
-            template<EnumType VariableIndex, typename ArgT>
+            template<EnumT VariableIndex, typename ArgT>
             static void set_variable(const ArgT&& new_value) {
                 //static_assert(std::is_same_v<decltype(std::get<VariableIndex>(global_variables_)), ArgT>);
                 constexpr size_t index{ static_cast<size_t>(VariableIndex) };
                 std::get<index>(global_variables_) = new_value;
             };
 
-            template<EnumType VariableIndex>
+            template<EnumT VariableIndex>
             static const auto& get_variable() {
                 constexpr size_t index{ static_cast<size_t>(VariableIndex) };
                 return std::get<index>(global_variables_);

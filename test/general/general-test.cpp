@@ -146,29 +146,30 @@ namespace {
 			namespace null_object{}
 			namespace observer {
 
-                namespace observer_weak_ptr {
-					using namespace ::pattern::behavioral::observer_weak_ptr;
+				template<typename ObserverType, typename SubjectPtrType>
+				inline void AttachManyExpired(SubjectPtrType& subject_ptr) {
+					std::shared_ptr<ObserverType> observer_1{ std::make_shared<ObserverType>() };
+					std::shared_ptr<ObserverType> observer_2{ std::make_shared<ObserverType>() };
+					std::shared_ptr<ObserverType> observer_3{ std::make_shared<ObserverType>() };
+					std::shared_ptr<ObserverType> observer_4{ std::make_shared<ObserverType>() };
+					std::shared_ptr<ObserverType> observer_5{ std::make_shared<ObserverType>() };
+					std::shared_ptr<ObserverType> observer_6{ std::make_shared<ObserverType>() };
+					std::shared_ptr<ObserverType> observer_7{ std::make_shared<ObserverType>() };
 
-					template<typename ObserverType, typename SubjectPtrType>
-					inline void AttachManyExpired(SubjectPtrType& subject_ptr) {
-						std::shared_ptr<ObserverType> observer_1{ std::make_shared<ObserverType>() };
-						std::shared_ptr<ObserverType> observer_2{ std::make_shared<ObserverType>() };
-						std::shared_ptr<ObserverType> observer_3{ std::make_shared<ObserverType>() };
-						std::shared_ptr<ObserverType> observer_4{ std::make_shared<ObserverType>() };
-						std::shared_ptr<ObserverType> observer_5{ std::make_shared<ObserverType>() };
-						std::shared_ptr<ObserverType> observer_6{ std::make_shared<ObserverType>() };
-						std::shared_ptr<ObserverType> observer_7{ std::make_shared<ObserverType>() };
+					subject_ptr->AttachObserver(observer_1);
+					subject_ptr->AttachObserver(observer_2);
+					subject_ptr->AttachObserver(observer_3);
+					subject_ptr->AttachObserver(observer_4);
+					subject_ptr->AttachObserver(observer_5);
+					subject_ptr->AttachObserver(observer_6);
+					subject_ptr->AttachObserver(observer_7);
+				}
 
-						subject_ptr->AttachObserver(observer_1);
-						subject_ptr->AttachObserver(observer_2);
-						subject_ptr->AttachObserver(observer_3);
-						subject_ptr->AttachObserver(observer_4);
-						subject_ptr->AttachObserver(observer_5);
-						subject_ptr->AttachObserver(observer_6);
-						subject_ptr->AttachObserver(observer_7);
-					}
+				namespace weak_callback_subject {
+					using namespace ::pattern::behavioral::observer_weak_msg;
+					using pattern::behavioral::observer::AttachManyExpired;
 
-					TEST(ObserverTest, ObserverWeakClass) {
+					TEST(ObserverTest, WeakObserverHubClass) {
 						//=========Ref============
 						//std::shared_ptr<MySubjectSingle<>> subject_0{};
 						//auto subject_1{ std::make_shared<MySubjectSingle<std::execution::parallel_policy>>() };
@@ -244,9 +245,98 @@ namespace {
 						//AttachManyExpired<MyObserver<>>(subject_1);
 						//subject_1->DetachObserver(observer_5);
 
+						//int a = 2;
+					};
+				} // !namespace weak_callback_subject
+
+
+				namespace observer_weak_msg {
+					using namespace ::pattern::behavioral::observer_weak_msg;
+					using pattern::behavioral::observer::AttachManyExpired;
+
+					TEST(ObserverTest, WeakObserverHubClass) {
+						//=========Ref============
+						std::shared_ptr<MySubjectSingle<>> subject_0{};
+						auto subject_1{ std::make_shared<MySubjectSingle<std::execution::parallel_policy>>() };
+						std::shared_ptr<MySubjectSingle<>> subject_2{ std::make_shared<MySubjectSingle<>>() };
+						std::shared_ptr<MySubjectSingle<>> subject_3{ std::make_shared<MySubjectSingle<>>() };
+
+						auto observer_1{ std::make_shared<MyObserverSingle>() };
+						subject_1->AttachObserver(observer_1);
+						subject_1->AttachObserver(observer_1); // duplicate check
+
+						std::shared_ptr<MyObserverSingle> observer_2{ std::make_shared<MyObserverSingle>() };
+						subject_2->AttachObserver(observer_2);
+						std::shared_ptr<MyObserverSingle> observer_3{ std::make_shared<MyObserverSingle>() };
+						subject_3->AttachObserver(observer_3);
+
+						subject_1->state_.a_ = 1;
+						subject_1->state_.b_ = 2;
+						subject_2->state_.a_ = 3;
+						subject_2->state_.b_ = 4;
+						subject_3->state_.a_ = 5;
+						subject_3->state_.b_ = 6;
+
+						observer_1->state_.a_ = 1;
+						observer_1->state_.b_ = 2;
+						observer_2->state_.a_ = 3;
+						observer_2->state_.b_ = 4;
+						observer_3->state_.a_ = 5;
+						observer_3->state_.b_ = 6;
+
+						subject_1->AttachObserver(observer_1);
+						subject_1->AttachObserver(observer_2);
+
+						subject_2->AttachObserver(observer_2);
+						subject_2->AttachObserver(observer_3);
+
+						subject_3->AttachObserver(observer_1);
+						subject_3->AttachObserver(observer_3);
+
+						subject_1->NotifyObserversMulti();
+						subject_2->NotifyObserversMulti();
+						subject_3->NotifyObserversMulti();
+
+						subject_1->DetachObserver(observer_1);
+						subject_1->DetachObserver(observer_2);
+						subject_1->DetachObserver(observer_3);
+						subject_1->AttachObserver(observer_3);
+
+						subject_3->AttachObserver(observer_2);
+
+						std::shared_ptr<MySubject<>> subject_4{ std::make_shared<MySubject<>>() };
+						subject_4->state_.a_ = 44;
+						subject_4->state_.b_ = 44;
+						{ // Destructor test
+							std::shared_ptr<MySubject<>> subject_5{};
+							std::shared_ptr<MyObserver<>> observer_4{ std::make_shared<MyObserver<>>() };
+							observer_4->state_.a_ = 77;
+							observer_4->state_.b_ = 77;
+							observer_4->AttachSubject(subject_4);
+						}
+						subject_1->DetachNExpired(0, true);
+						observer_1->DetachNExpired(0, true);
+
+						subject_1->AttachObserver(observer_1);
+						subject_1->AttachObserver(observer_2);
+						subject_1->AttachObserver(observer_3);
+						AttachManyExpired<MyObserver<>>(subject_1);
+						subject_1->NotifyObservers();
+
+						AttachManyExpired<MyObserver<>>(subject_1);
+						std::shared_ptr<MyObserver<>> observer_5{ std::make_shared<MyObserver<>>() };
+						subject_1->AttachObserver(observer_5);
+
+						AttachManyExpired<MyObserver<>>(subject_1);
+						subject_1->DetachObserver(observer_5);
+
 						int a = 2;
 					};
+				} // !namespace observer_weak
 
+				namespace weak_observer_multi {
+					using namespace ::pattern::behavioral::weak_observer_multi;
+					using pattern::behavioral::observer::AttachManyExpired;
 
                     TEST(ObserverTest, ObserverWeakMultiClass) {
                         //=========Ref============
@@ -320,12 +410,14 @@ namespace {
 						std::shared_ptr<MyObserver<>> observer_5{ std::make_shared<MyObserver<>>() };
 						subject_1->AttachObserver(observer_5);
 
+
 						AttachManyExpired<MyObserver<>>(subject_1);
 						subject_1->DetachObserver(observer_5);
 
                         int a = 2;
                     };
-                } // !namespace observer_weak_ptr
+                } // !namespace weak_observer_multi
+
 
 				namespace observer_ref {
 					using namespace ::pattern::behavioral::observer_ref;
@@ -645,9 +737,9 @@ namespace {
     } // !namespace refactoring
 
 
-	namespace general {
+	namespace common {
 		namespace error {
-			using namespace ::general::error;
+			using namespace ::error;
 
 			TEST(ErrorTest, ErrorClass) {
 				Error<ErrorInfoDetailed> my_error{};
@@ -667,11 +759,11 @@ namespace {
 
 
 		namespace thread {
-			using namespace ::general::thread;
+			//using namespace ::common::thread;
 
 		} // !namespace thread
 
-	} // !namespace general
+	} // !namespace common
 
 
     /** https://google.github.io/googletest/primer.html */

@@ -53,7 +53,7 @@ General
 #include "header-collection/refactoring-headers.hpp"
 
 
-// General for Support
-#include "header-collection/general-headers.hpp"
+// Support headers
+#include "header-collection/support-headers.hpp"
 
 #endif // !ALL_HEADERS_HPP

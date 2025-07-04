@@ -28,9 +28,9 @@ namespace pattern {
 
 		namespace factory_method {
 			enum class ProductID : unsigned int {
-				TypeA = 0,
-				TypeB,
-				TypeC
+				TA = 0,
+				TB,
+				TC
 			};
 
 			class IProduct {
@@ -52,8 +52,8 @@ namespace pattern {
 
 
 			/** Abstract. Factory Method Class. Allows to redefine what objects will be instantiated in sublasses. */
-			template<typename IProductType, typename ProductID_Type>
-			requires std::is_enum_v<ProductID_Type>
+			template<typename IProductT, typename ProductID_T>
+			requires std::is_enum_v<ProductID_T>
 			class IFactoryMethod {
 			protected:
 				IFactoryMethod() = default;
@@ -65,7 +65,7 @@ namespace pattern {
 				virtual ~IFactoryMethod() = default;
 
 				/** Create product of type ProductID */
-				virtual std::unique_ptr<IProductType> Create(ProductID_Type product_id) const = 0;
+				virtual std::unique_ptr<IProductT> Create(ProductID_T product_id) const = 0;
 			};
 
 
@@ -75,13 +75,13 @@ namespace pattern {
 				std::unique_ptr<IProduct> Create(ProductID product_id) const override {
 					switch (product_id) {
 						using enum ProductID;
-					case TypeA:
+					case TA:
 						return std::make_unique<ProductA>();
 						break;
-					case TypeB:
+					case TB:
 						return std::make_unique<ProductB>();
 						break;
-					case TypeC:
+					case TC:
 						return std::make_unique<ProductC>();
 						break;
 					default:
@@ -120,20 +120,20 @@ namespace pattern {
 				delete product_ptr;
 			};
 
-			template<typename... ArgTypes>
-			std::unique_ptr<IProduct, decltype(custom_deleter)> CreateProduct(ArgTypes&&... args) {
-			//auto CreateProduct(ArgTypes&&... args) {
+			template<typename... ArgTs>
+			std::unique_ptr<IProduct, decltype(custom_deleter)> CreateProduct(ArgTs&&... args) {
+			//auto CreateProduct(ArgTs&&... args) {
 				std::unique_ptr<IProduct, decltype(custom_deleter)> product_ptr(nullptr, custom_deleter);
 				size_t switch_value{ 0 };
 				switch (switch_value) {
 				case 0:
-					product_ptr.reset(new Product1(std::forward<ArgTypes>(args)...));
+					product_ptr.reset(new Product1(std::forward<ArgTs>(args)...));
 					break;
 				case 1:
-					product_ptr.reset(new Product2(std::forward<ArgTypes>(args)...));
+					product_ptr.reset(new Product2(std::forward<ArgTs>(args)...));
 					break;
 				case 2:
-					product_ptr.reset(new Product3(std::forward<ArgTypes>(args)...));
+					product_ptr.reset(new Product3(std::forward<ArgTs>(args)...));
 					break;
 				default:
 					break;
@@ -328,11 +328,11 @@ namespace pattern {
 				virtual ~Product2() = default;
 			};
 
-			template<typename ProductType>
+			template<typename ProductT>
 			class FactoryMethodA {
 			public:
 				std::unique_ptr<IProduct> Create() const noexcept {
-					return std::make_unique<ProductType>();
+					return std::make_unique<ProductT>();
 				};
 			};
 

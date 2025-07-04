@@ -1,4 +1,4 @@
-#ifndef FLYWEIGHT_HPP
+﻿#ifndef FLYWEIGHT_HPP
 #define FLYWEIGHT_HPP
 
 #include <iostream>
@@ -11,7 +11,7 @@ namespace pattern {
 		namespace flyweight {
 			// http://cpp-reference.ru/patterns/structural-patterns/flyweight/
 
-			template<typename extrinsicStateType>
+			template<typename extrinsicStateT>
 			class IFlyweight {
 			protected:
 				IFlyweight() = default;
@@ -22,7 +22,7 @@ namespace pattern {
 			public:
 				virtual ~IFlyweight() = default;
 
-				virtual void operation(extrinsicStateType extrinsicState) = 0;
+				virtual void operation(extrinsicStateT extrinsicState) = 0;
 
 				;
 			};
@@ -44,23 +44,23 @@ namespace pattern {
 			};
 
 			/** Flyweight Cache Fabric class */
-			template<typename CacheKeyType, typename CachedFlyweightType, typename extrinsicStateType>
-			requires std::is_base_of_v<IFlyweight<extrinsicStateType>, CachedFlyweightType>
+			template<typename CacheKeyT, typename CachedFlyweightT, typename extrinsicStateT>
+			requires std::is_base_of_v<IFlyweight<extrinsicStateT>, CachedFlyweightT>
 			class FlyweightFabric {
 			public:
 				// Output can be weak or shared. Depends on who owns cache.
-				std::shared_ptr<CachedFlyweightType> GetFlyweight(CacheKeyType cache_key) {
+				std::shared_ptr<CachedFlyweightT> GetFlyweight(CacheKeyT cache_key) {
 					if (cache_.contains(cache_key) && !cache_[cache_key].expired()) { // item has been created
 						return cache_[cache_key].lock();
 					} else {
 						// Deleter, that will clean cache
-						auto deleter = [this, &cache_key](CachedFlyweightType* cached_flyweight_ptr) {
+						auto deleter = [this, &cache_key](CachedFlyweightT* cached_flyweight_ptr) {
 							this->cache_.erase(cache_key);
 							delete cached_flyweight_ptr;
 						};
 
-						//std::shared_ptr<CachedFlyweightType> ptr{ std::make_shared<CachedFlyweightType>() };
-						std::shared_ptr<CachedFlyweightType> ptr(new CachedFlyweightType(), deleter);
+						//std::shared_ptr<CachedFlyweightT> ptr{ std::make_shared<CachedFlyweightT>() };
+						std::shared_ptr<CachedFlyweightT> ptr(new CachedFlyweightT(), deleter);
 						cache_[cache_key] = ptr;
 						return ptr;
 					}
@@ -68,15 +68,15 @@ namespace pattern {
 
 			private:
 				// Can be unoredered_set
-				// Can include option of removing unused cache. CachedFlyweightType = weak_ptr<Object> ???
-				// Without option of removing unused cache. CachedFlyweightType = unique_ptr<Object>
+				// Can include option of removing unused cache. CachedFlyweightT = weak_ptr<Object> ???
+				// Without option of removing unused cache. CachedFlyweightT = unique_ptr<Object>
 				// Can be weak or shared
-				std::unordered_map<CacheKeyType, std::weak_ptr<CachedFlyweightType>> cache_{};
+				std::unordered_map<CacheKeyT, std::weak_ptr<CachedFlyweightT>> cache_{};
 			};
 
 
 			// Deleter for cleaning cache
-			//auto deleter = [this](CachedFlyweightType* cached_flyweight_ptr) {
+			//auto deleter = [this](CachedFlyweightT* cached_flyweight_ptr) {
 			//	auto search_ptr = std::find_if(this->cache_.begin(), this->cache_.end(),
 			//		[cached_flyweight_ptr](auto& elem) {
 			//			// weak_ptr is expired on the moment of deleter call

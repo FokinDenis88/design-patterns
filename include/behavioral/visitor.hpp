@@ -1,4 +1,4 @@
-#ifndef VISITOR_HPP
+﻿#ifndef VISITOR_HPP
 #define VISITOR_HPP
 
 #include <memory>
@@ -12,6 +12,12 @@ namespace pattern {
 			// Separate algorithm from object structure
 			// Class Structure mustn't change frequently.
 			// Operations on Class Structure added frequently.
+
+			//
+			// Standard library type is std::variant. It is realization of Visitor Pattern.
+			//
+
+
 
 			class IVisitor;
 			class ElementA;

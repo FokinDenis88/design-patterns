@@ -13,7 +13,7 @@
 //#include <concepts>
 //#include <variant>	// for CommandListVariant
 
-#include "tuple.hpp"
+#include "general-utilities-library/functional/functional.hpp"
 
 
 /** Software Design Patterns */
@@ -53,9 +53,9 @@ namespace pattern {
 
 
 
-            /** Type Pointer to Member Function */
-            template<typename ActionReturnType, typename ReceiverType, typename... ActionParamTypes>
-            using MemberFunctionPtrType = ActionReturnType(ReceiverType::*)(ActionParamTypes...);
+            /** T Pointer to Member Function */
+            template<typename ActionReturnT, typename ReceiverT, typename... ActionParamTs>
+            using MemberFunctionPtrT = ActionReturnT(ReceiverT::*)(ActionParamTs...);
 
 
 			/** Abstract. Interface of commands. */
@@ -112,18 +112,18 @@ namespace pattern {
 			* @param ...action_args_p	arguments for member function call
 			* @return					type: void(). Function object with binded arguments
 			*/
-			template<typename ReturnType, typename ReceiverType, typename... ParamTypes>
-			requires std::is_class_v<ReceiverType>
+			template<typename ReturnT, typename ReceiverT, typename... ParamTs>
+			requires std::is_class_v<ReceiverT>
 			inline std::function<void()>
-				CreateActionByMemberFn(const MemberFunctionPtrType<ReturnType, ReceiverType, ParamTypes...> action_ptr,
-									  ReceiverType& receiver_p,	// mustn't be const. Command execution may change state
-									  ParamTypes&&... action_args_p) {	// noexcept: bind maybe has exceptions
+				CreateActionByMemberFn(const MemberFunctionPtrT<ReturnT, ReceiverT, ParamTs...> action_ptr,
+									  ReceiverT& receiver_p,	// mustn't be const. Command execution may change state
+									  ParamTs&&... action_args_p) {	// noexcept: bind maybe has exceptions
 
-				// Type can be converted from any pointer to fn type to void(), if all arguments of fn are binded
+				// T can be converted from any pointer to fn type to void(), if all arguments of fn are binded
 				// Only reinterpret_cast helps to convert one pointer to member function to another, of another type
 				// void() is unified type for all command functions.
 				std::function<void()> new_action = std::bind(action_ptr, &receiver_p,
-															 std::forward<ParamTypes>(action_args_p)...);
+															 std::forward<ParamTs>(action_args_p)...);
 				return new_action;
 			};
 
@@ -138,8 +138,8 @@ namespace pattern {
 			*/
 			class Command : public ICommand {
 			public:
-				using ActionType = void();
-				using ActionWithArgsType = std::function<ActionType>;
+				using ActionT = void();
+				using ActionWithArgsT = std::function<ActionT>;
 
 				/** Create empty command with no action. */
 				Command() = default; // f.e. for creating empty vector of commands
@@ -148,17 +148,17 @@ namespace pattern {
 				 *
                  * @param new_action callable object must be binded with args, if there are params in function.
                  */
-                explicit Command(const ActionWithArgsType& new_action) : action_{ new_action } {
+                explicit Command(const ActionWithArgsT& new_action) : action_{ new_action } {
                 };
 
                 /** Construction from pointer to member function with sinature: void(params...). */
-                template<typename ActionReturnType, typename ReceiverType, typename... ActionParamTypes>
-				requires std::is_class_v<ReceiverType>
-                explicit Command(const MemberFunctionPtrType<ActionReturnType, ReceiverType, ActionParamTypes...> action_ptr,
-								ReceiverType& receiver_p, // mustn't be const. Command execution may change state
-								ActionParamTypes&&... action_args_p)
+                template<typename ActionReturnT, typename ReceiverT, typename... ActionParamTs>
+				requires std::is_class_v<ReceiverT>
+                explicit Command(const MemberFunctionPtrT<ActionReturnT, ReceiverT, ActionParamTs...> action_ptr,
+								ReceiverT& receiver_p, // mustn't be const. Command execution may change state
+								ActionParamTs&&... action_args_p)
                     : action_{ CreateActionByMemberFn(action_ptr, receiver_p,
-														std::forward<ActionParamTypes>(action_args_p)...) } {
+														std::forward<ActionParamTs>(action_args_p)...) } {
                 };
 
 			protected:
@@ -176,7 +176,7 @@ namespace pattern {
 				};
 
 				/** Assign new action object from std::function and execute it. */
-				inline void Execute(const ActionWithArgsType& new_action) {
+				inline void Execute(const ActionWithArgsT& new_action) {
                     action_ = new_action;
                     Execute();
                 };
@@ -190,12 +190,12 @@ namespace pattern {
 				 * @param ...action_args_p	arguments for member function call
 				 * @return					function object with binded arguments
 				 */
-				template<typename ActionReturnType, typename ReceiverType, typename... ActionParamTypes>
-				requires std::is_class_v<ReceiverType>
-				inline void Execute(const MemberFunctionPtrType<ActionReturnType, ReceiverType, ActionParamTypes...> action_ptr,
-									ReceiverType& receiver_p,
-									ActionParamTypes&&... action_args_p) {
-					action_ = CreateActionByMemberFn(action_ptr, receiver_p, std::forward<ActionParamTypes>(action_args_p)...);
+				template<typename ActionReturnT, typename ReceiverT, typename... ActionParamTs>
+				requires std::is_class_v<ReceiverT>
+				inline void Execute(const MemberFunctionPtrT<ActionReturnT, ReceiverT, ActionParamTs...> action_ptr,
+									ReceiverT& receiver_p,
+									ActionParamTs&&... action_args_p) {
+					action_ = CreateActionByMemberFn(action_ptr, receiver_p, std::forward<ActionParamTs>(action_args_p)...);
 					Execute();
 				};
 
@@ -204,7 +204,7 @@ namespace pattern {
 				* Action of some Receiver. with args binded. Callable Function object
 				* must be binded with args for each param. No Invariant.
 				*/
-				ActionWithArgsType action_{};
+				ActionWithArgsT action_{};
 
 				/*
 				* Class Design:
@@ -227,14 +227,14 @@ namespace pattern {
 			 *
 			 * Invariant: must hold member function pointer, receiver and args.
 			 */
-			template<typename ActionReturnType, typename ReceiverType, typename... ActionParamTypes>
-			requires std::is_class_v<ReceiverType>
+			template<typename ActionReturnT, typename ReceiverT, typename... ActionParamTs>
+			requires std::is_class_v<ReceiverT>
 			class CommandMemberFn : public ICommand {
 			public:
 				/** Pointer to member function */
-				using ActionType = MemberFunctionPtrType<ActionReturnType, ReceiverType, ActionParamTypes...>;
-				using ReceiverPtrType = std::shared_ptr<ReceiverType>;
-				using ArgsTupleTypes = std::tuple<ActionParamTypes&&...>;
+				using ActionT = MemberFunctionPtrT<ActionReturnT, ReceiverT, ActionParamTs...>;
+				using ReceiverPtrT = std::shared_ptr<ReceiverT>;
+				using ArgsTupleTs = std::tuple<ActionParamTs&&...>;
 
 				CommandMemberFn() = default;
 
@@ -247,8 +247,8 @@ namespace pattern {
 			public:
 				~CommandMemberFn() override = default;
 
-				explicit CommandMemberFn(const ReceiverPtrType& receiver_p,
-										 const ActionType action_p, ActionParamTypes... action_args_p) // TODO: Maybe ref to args?
+				explicit CommandMemberFn(const ReceiverPtrT& receiver_p,
+										 const ActionT action_p, ActionParamTs... action_args_p) // TODO: Maybe ref to args?
 							: receiver_{ receiver_p },
 							  action_{ action_p },
 							  action_args_{ std::make_tuple(action_args_p...) } {
@@ -261,69 +261,69 @@ namespace pattern {
 
 				// TODO: refactor - replace setters and getters
 
-				inline void set_receiver(const ReceiverPtrType& new_receiver) noexcept {
+				inline void set_receiver(const ReceiverPtrT& new_receiver) noexcept {
 					receiver_ = new_receiver;
 				};
-				inline void set_action(const ActionType new_action) noexcept {
+				inline void set_action(const ActionT new_action) noexcept {
 					action_ = new_action;
 				};
-				inline void set_action_args(const ArgsTupleTypes& new_action_args) noexcept {
+				inline void set_action_args(const ArgsTupleTs& new_action_args) noexcept {
 					action_args_ = new_action_args;
 				};
 				/** Change N argument in tuple */
-				template<typename ArgType, size_t index>
-				inline void set_concrete_action_arg(const ArgType& new_arg) noexcept {
+				template<typename ArgT, size_t index>
+				inline void set_concrete_action_arg(const ArgT& new_arg) noexcept {
 					std::get<index>(action_args_) = new_arg;
 				};
 
 
-				inline std::weak_ptr<ReceiverType> receiver() const noexcept {
+				inline std::weak_ptr<ReceiverT> receiver() const noexcept {
 					return receiver_;
 				};
-				inline const ActionType action() const noexcept {
+				inline const ActionT action() const noexcept {
 					return action_;
 				};
-				inline const ArgsTupleTypes& action_args() const noexcept {
+				inline const ArgsTupleTs& action_args() const noexcept {
 					return receiver_;
 				};
 				/** Get N argument in tuple */
-				template<typename ArgType, size_t index>
-				inline const ArgType& concrete_action_arg() const noexcept {
+				template<typename ArgT, size_t index>
+				inline const ArgT& concrete_action_arg() const noexcept {
 					return std::get<index>(action_args_);
 				};
 
 			private:
-				using STDFunctionType = std::function<ActionReturnType(ActionParamTypes...)>;
+				using STDFunctionT = std::function<ActionReturnT(ActionParamTs...)>;
 
 				/** Implementation function for Execute(). Needs C++ 11. */
 				inline void Execute_11() {
 					if (!receiver_.expired()) {
-						STDFunctionType action_fn = std::bind_front(action_, receiver_.lock().get());
-						cpp::ApplyTuple(action_fn, action_args_);
+						STDFunctionT action_fn = std::bind_front(action_, receiver_.lock().get());
+						common::Apply(action_fn, action_args_);
 					}
 				};
 
 				/** Implementation function for Execute(). Needs C++ 17. */
 				inline void Execute_17() {
 					if (!receiver_.expired()) {
-						STDFunctionType action_call = std::bind_front(action_, receiver_.lock().get());
+						STDFunctionT action_call = std::bind_front(action_, receiver_.lock().get());
 						std::apply(action_call, action_args_);	// Needs C++ 17
 					}
 				};
 
 				/* Receiver is stored by aggregation, not composition */
-				std::weak_ptr<ReceiverType> receiver_{};
-				ActionType action_{};
-				ArgsTupleTypes action_args_{};
+				std::weak_ptr<ReceiverT> receiver_{};
+				ActionT action_{};
+				ArgsTupleTs action_args_{};
 			};	// !class CommandMemberFn
 
 
 
 
-			template<typename ActionType>
+			template<typename ActionT>
 			class TestClass {
 			public:
-				ActionType member_function_ptr{};
+				ActionT member_function_ptr{};
 			};
 
 
@@ -387,13 +387,13 @@ namespace pattern {
 
 //===============================Macro Commands=======================================
 
-			/** Types for containers derived from ICommand */
-			template<typename... CommandTypes>
-			concept ICommandDerivedTypes = (std::derived_from<CommandTypes, ICommand> && ...);
+			/** Ts for containers derived from ICommand */
+			template<typename... CommandTs>
+			concept ICommandDerivedTs = (std::derived_from<CommandTs, ICommand> && ...);
 
-			/*template<typename... CommandTypes>
-			requires ICommandDerivedTypes<CommandTypes...>
-			using CommandListVariant = std::list<std::variant<CommandTypes...>>;*/
+			/*template<typename... CommandTs>
+			requires ICommandDerivedTs<CommandTs...>
+			using CommandListVariant = std::list<std::variant<CommandTs...>>;*/
 
 
 			/**
@@ -404,20 +404,20 @@ namespace pattern {
 			 *
 			 * Invariant: elements of Container maybe ICommand, ptr or ref to ICommand.
 			 */
-			template<typename ContainerType = std::vector<ICommand>>
-			requires std::is_same_v<ContainerType, std::vector<ICommand>> ||
-					 std::is_same_v<ContainerType, std::forward_list<ICommand>> ||
-					 std::is_same_v<ContainerType, std::list<ICommand>>
-					 //std::is_same_v<ContainerType, std::deque<ICommand>> ||
+			template<typename ContainerT = std::vector<ICommand>>
+			requires std::is_same_v<ContainerT, std::vector<ICommand>> ||
+					 std::is_same_v<ContainerT, std::forward_list<ICommand>> ||
+					 std::is_same_v<ContainerT, std::list<ICommand>>
+					 //std::is_same_v<ContainerT, std::deque<ICommand>> ||
 			struct MacroCommand: public ICommand {
 			public:
-				using ICommandType = ICommand;
-				using ICommandPtrType = std::unique_ptr<ICommand>;
-				using ICommandRefType = std::reference_wrapper<ICommand>;
+				using ICommandT = ICommand;
+				using ICommandPtrT = std::unique_ptr<ICommand>;
+				using ICommandRefT = std::reference_wrapper<ICommand>;
 
-				// Container Types variants: vector, list, deque
-				using ContainerVectorType = std::vector<ICommand>;
-				using ContainerForwardListType = std::forward_list<ICommand>;
+				// Container Ts variants: vector, list, deque
+				using ContainerVectorT = std::vector<ICommand>;
+				using ContainerForwardListT = std::forward_list<ICommand>;
 
 				MacroCommand() = default;
 
@@ -436,16 +436,16 @@ namespace pattern {
 					}
 				};
 
-				template<typename ExecutionPolicyType>
-				requires std::is_execution_policy_v<ExecutionPolicyType>
-				void ExecuteWithPolicy(ExecutionPolicyType policy = std::execution::seq) {
+				template<typename ExecutionPolicyT>
+				requires std::is_execution_policy_v<ExecutionPolicyT>
+				void ExecuteWithPolicy(ExecutionPolicyT policy = std::execution::seq) {
 					std::for_each(policy, commands_.begin(), commands_.end(),
 									[](auto& command) { command.Execute(); });
 				};
 
 
 				/** Container with commands */
-				ContainerType commands_{};
+				ContainerT commands_{};
 
 				/*
 				* Class Design:

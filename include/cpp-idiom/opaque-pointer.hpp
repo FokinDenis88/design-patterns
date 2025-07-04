@@ -1,4 +1,4 @@
-#ifndef OPAQUE_POINTER_HPP
+﻿#ifndef OPAQUE_POINTER_HPP
 #define OPAQUE_POINTER_HPP
 
 #include <memory>
@@ -14,10 +14,10 @@ namespace pattern {
 
 			class A {
 			public:
-				/** Unspecified Type */
+				/** Unspecified T */
 				struct SomeStruct;
 
-				/** Opaque Pointer to Unspecified Type */
+				/** Opaque Pointer to Unspecified T */
 				std::unique_ptr<SomeStruct> pStruct_;
 			};
 

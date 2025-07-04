@@ -1,4 +1,4 @@
-#ifndef D_POINTER_HPP
+﻿#ifndef D_POINTER_HPP
 #define D_POINTER_HPP
 
 #include <memory>
@@ -17,10 +17,10 @@ namespace pattern {
 			public:
 
 			private:
-				/** Unspecified Type */
+				/** Unspecified T */
 				struct CheshireCat;
 
-				/** d_ptr Opaque Pointer to Unspecified Type */
+				/** d_ptr Opaque Pointer to Unspecified T */
 				std::unique_ptr<CheshireCat> d_ptr_;
 			};
 

@@ -1,4 +1,11 @@
-﻿General:
+﻿Weak-callback-subject  ->  callback-subject. Working with any type of smart pointers in object_ptr member data.
+    Maybe work with generic smart pointer.
+
+
+
+
+
+General:
 Separate classes to different files to make less includes
 
 =====================================Observer Pattern=====================================
@@ -29,3 +36,4 @@ Write Another Subject class Just with Set container
 1) Object_pool, new thread, async thread notify
 2) Atomic
 3) Raw Observer
+

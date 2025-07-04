@@ -76,7 +76,7 @@
 * Service-Locator
 * Spatial-Partition
 * Subclass-Sandbox
-* Type-Object
+* T-Object
 * Update-Method
 
 **Structural:**
@@ -98,12 +98,10 @@
 * Extract Method - **Not realized**
 
 ## Contact
-**Skype:** live:dragon8806 <br>
 **Telegram:** https://t.me/Furious_Dragon_88 <br>
 **VK (Russia):** https://vk.com/furious__dragon <br>
-**Discord:** ***ID:*** 1203018807162175522 fokin_denis_yurievich_  ***User Name:*** fokin_denis_yurievich_ <br>
-**Email:** fokin-denis-88-code@ya.ru <br>
-**Gitter:** @fokindenis88_gitlab:gitter.im
+**Email:** fokin-denis-88-code@ya.ru
+
 
 ## Support
 ### Bitcoin and other cryptocurrency:  

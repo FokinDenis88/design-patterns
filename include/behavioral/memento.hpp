@@ -1,4 +1,4 @@
-#ifndef MEMENTO_HPP
+﻿#ifndef MEMENTO_HPP
 #define MEMENTO_HPP
 
 
@@ -40,7 +40,7 @@ namespace pattern {
 			template<typename ConcreteOriginatorT, typename OriginatorStateT>
 			class Memento {
 			public:	// Public Interface of Memento
-				using MementoType = Memento<ConcreteOriginatorT, OriginatorStateT>;
+				using MementoT = Memento<ConcreteOriginatorT, OriginatorStateT>;
 
 				friend ConcreteOriginatorT;
 				friend AbstractOriginator<ConcreteOriginatorT, OriginatorStateT>;
@@ -84,13 +84,13 @@ namespace pattern {
                 };
 
 				/** Clone memento and return smart ptr */
-				std::unique_ptr<MementoType> ClonePtr() const noexcept {
-					return std::make_unique<MementoType>(owner_, memento_state_);
+				std::unique_ptr<MementoT> ClonePtr() const noexcept {
+					return std::make_unique<MementoT>(owner_, memento_state_);
 				};
 
-				/** Clone memento and return rvalue MementoType */
-                MementoType CloneValue() const noexcept {
-					return MementoType{ owner_, memento_state_ };
+				/** Clone memento and return rvalue MementoT */
+                MementoT CloneValue() const noexcept {
+					return MementoT{ owner_, memento_state_ };
                 };
 
 			private:	// Private Interface is closed for all classes except owner ConcreteOriginatorT
@@ -170,8 +170,8 @@ namespace pattern {
 			template<typename ConcreteOriginatorT, typename OriginatorStateT>
 			class AbstractOriginator {
 			public:
-				using MementoType = Memento<ConcreteOriginatorT, OriginatorStateT>;
-				using MementoPtr = std::unique_ptr<MementoType>;
+				using MementoT = Memento<ConcreteOriginatorT, OriginatorStateT>;
+				using MementoPtr = std::unique_ptr<MementoT>;
 
 			protected:
 				AbstractOriginator() = default;
@@ -188,7 +188,7 @@ namespace pattern {
 				 * Creating memento by moving from temporary OriginatorStateT object.
 				 * Default Creation is by CreateMementoByValue.
 				 */
-                MementoType CreateMemento() const { return CreateMementoByValue(); };
+                MementoT CreateMemento() const { return CreateMementoByValue(); };
 
                 /**
                  * Create Memento from State of Originator.
@@ -196,8 +196,8 @@ namespace pattern {
                  * Creating memento by moving from temporary OriginatorStateT object.
                  * Additional temporary object OriginatorStateT construction.
                  */
-				MementoType CreateMementoByValue() const {
-                    return MementoType(GetConcreteOriginatorCRef(), std::move(GetOriginatorStateValue()));
+				MementoT CreateMementoByValue() const {
+                    return MementoT(GetConcreteOriginatorCRef(), std::move(GetOriginatorStateValue()));
                 };
 
 				/**
@@ -207,7 +207,7 @@ namespace pattern {
 				 * Additional temporary object OriginatorStateT construction.
 				 */
 				MementoPtr CreateMementoPtrByValue() const {
-					return std::make_unique<MementoType>(GetConcreteOriginatorCRef(), std::move(GetOriginatorStateValue()));
+					return std::make_unique<MementoT>(GetConcreteOriginatorCRef(), std::move(GetOriginatorStateValue()));
 				};
 
 
@@ -217,8 +217,8 @@ namespace pattern {
 				 * Creating memento by coping from const reference to OriginatorStateT object inside Originator.
 				 * No Additional temporary object OriginatorStateT construction.
 				 */
-				MementoType CreateMementoByCRef() const {
-					return MementoType(GetConcreteOriginatorCRef(), GetOriginatorStateCRef());
+				MementoT CreateMementoByCRef() const {
+					return MementoT(GetConcreteOriginatorCRef(), GetOriginatorStateCRef());
 				};
 
 				/**
@@ -228,7 +228,7 @@ namespace pattern {
 				 * No Additional temporary object OriginatorStateT construction.
 				 */
 				MementoPtr CreateMementoPtrByCRef() const {
-					return std::make_unique<MementoType>(GetConcreteOriginatorCRef(), GetOriginatorStateCRef());
+					return std::make_unique<MementoT>(GetConcreteOriginatorCRef(), GetOriginatorStateCRef());
 				};
 
 
@@ -239,7 +239,7 @@ namespace pattern {
 				 * @param memento_p moved pointer to Memento
 				 * @return true if originator is the owner of memento
 				 */
-				bool RestoreByCopy(const MementoType& memento_p, bool to_check_owner = true) {
+				bool RestoreByCopy(const MementoT& memento_p, bool to_check_owner = true) {
 					const std::pair<const OriginatorStateT&, bool>
 						get_state_res{ memento_p.get_state_cref(GetConcreteOriginatorCRef(),
 																to_check_owner) };
@@ -258,7 +258,7 @@ namespace pattern {
 				 * @param memento_p moved pointer to Memento
 				 * @return true if originator is the owner of memento
 				 */
-				bool RestoreByMove(MementoType&& memento_p, bool to_check_owner = true) {
+				bool RestoreByMove(MementoT&& memento_p, bool to_check_owner = true) {
 					std::pair<OriginatorStateT&&, bool>
 						get_state_res{ memento_p.get_state_rvref(GetConcreteOriginatorRef(),																								to_check_owner) };
 
@@ -372,8 +372,8 @@ namespace pattern {
 			template<typename ConcreteOriginatorT, typename OriginatorStateT>
 			class CareTaker final {
 			public:
-				using MementoType = Memento<ConcreteOriginatorT, OriginatorStateT>;
-				using MementoPtr = std::unique_ptr<MementoType>;
+				using MementoT = Memento<ConcreteOriginatorT, OriginatorStateT>;
+				using MementoPtr = std::unique_ptr<MementoT>;
 
 				inline void set_memento(MementoPtr&& memento_p) noexcept {
 					memento_ = std::move(memento_p);
@@ -398,8 +398,8 @@ namespace pattern {
 			template<typename ConcreteOriginatorT, typename OriginatorStateT>
 			class IOriginator {
 			public:
-				using MementoType = Memento<ConcreteOriginatorT, OriginatorStateT>;
-				using MementoPtr = std::unique_ptr<MementoType>;
+				using MementoT = Memento<ConcreteOriginatorT, OriginatorStateT>;
+				using MementoPtr = std::unique_ptr<MementoT>;
 
 			protected:
 				IOriginator() = default;
@@ -443,10 +443,10 @@ namespace pattern {
 			//					Iterator - to execute iterations.
 
 
-			template<typename ConcreteOriginatorT, typename StateType>
+			template<typename ConcreteOriginatorT, typename StateT>
 			class IOriginator;
 
-			template<typename ConcreteOriginatorT, typename StateType>
+			template<typename ConcreteOriginatorT, typename StateT>
 			//requires std::derived_from<ConcreteOriginatorT, IOriginator<ConcreteOriginatorT, OriginatorStateT>>
 			class Memento;
 
@@ -457,12 +457,12 @@ namespace pattern {
 			 *
 			 * @param OriginatorStateT must be state struct or concrete Originator class derived from IOriginator.
 			 */
-			template<typename ConcreteOriginatorT, typename StateType>
+			template<typename ConcreteOriginatorT, typename StateT>
 			class IOriginator {
 			public:
-				using MementoType = Memento<ConcreteOriginatorT, StateType>;
-				using MementoPtr = std::unique_ptr<MementoType>;
-				//using IOriginatorType = IOriginator<OriginatorStateT>;
+				using MementoT = Memento<ConcreteOriginatorT, StateT>;
+				using MementoPtr = std::unique_ptr<MementoT>;
+				//using IOriginatorT = IOriginator<OriginatorStateT>;
 
 			protected:
 				IOriginator() = default;
@@ -482,7 +482,7 @@ namespace pattern {
 				 * For memento initialization needed to get originator's state.
 				 * State can be the whole object or it's part. Depends on the interest.
 				 */
-				//virtual const StateType& GetStateForMemento() const noexcept = 0;
+				//virtual const StateT& GetStateForMemento() const noexcept = 0;
 			};
 
 
@@ -490,12 +490,12 @@ namespace pattern {
 			 * Can be used only by class derived from IOriginator and only by owner, created memento.
 			 * Memento must use only Concrete Originator, not interface.
 			 */
-			template<typename ConcreteOriginatorT, typename StateType>
+			template<typename ConcreteOriginatorT, typename StateT>
 			//requires std::derived_from<ConcreteOriginatorT, IOriginator<ConcreteOriginatorT, OriginatorStateT>>
 			class Memento final {
 			public:
-				//using IOriginatorType = IOriginator<ConcreteOriginatorT, OriginatorStateT>;
-				//friend IOriginatorType;
+				//using IOriginatorT = IOriginator<ConcreteOriginatorT, OriginatorStateT>;
+				//friend IOriginatorT;
 				//friend class IOriginator<ConcreteOriginatorT, OriginatorStateT>;
 				//friend IOriginator<ConcreteOriginatorT, OriginatorStateT>;
 				friend ConcreteOriginatorT;
@@ -511,7 +511,7 @@ namespace pattern {
 				 * Two params let ConcreteOriginatorT to create memento
 				 * with different state, different part of Originator.
 				 */
-				explicit Memento(const ConcreteOriginatorT& owner_p, const StateType& owners_state_p) noexcept
+				explicit Memento(const ConcreteOriginatorT& owner_p, const StateT& owners_state_p) noexcept
 							: owner_{ owner_p }, memento_state_{ owners_state_p } {
 				};
 
@@ -522,7 +522,7 @@ namespace pattern {
 				};
 
 				/** Used Only by OriginatorStateT. */
-				void set_state(const ConcreteOriginatorT& caller, const StateType& state_p) noexcept {
+				void set_state(const ConcreteOriginatorT& caller, const StateT& state_p) noexcept {
 					if (IsOwner(caller)) {
 						memento_state_ = state_p;
 					}
@@ -534,7 +534,7 @@ namespace pattern {
 				 * owner, created memento.
 				 * May be nullptr.
 				 */
-				inline StateType* get_state_cref(const ConcreteOriginatorT& caller) noexcept {
+				inline StateT* get_state_cref(const ConcreteOriginatorT& caller) noexcept {
 					return (IsOwner(caller)) ? &memento_state_ : nullptr;
 				};
 
@@ -546,17 +546,17 @@ namespace pattern {
 				 * State of concrete Originator object.
 				 * From this state originator object will be restored.
 				 */
-				StateType memento_state_{};	// Is Non Const, cause move operation, when restore.
+				StateT memento_state_{};	// Is Non Const, cause move operation, when restore.
 
 			}; // !class Memento
 
 
-			template<typename ConcreteOriginatorT, typename StateType>
+			template<typename ConcreteOriginatorT, typename StateT>
 			//requires std::derived_from<ConcreteOriginatorT, IOriginator<ConcreteOriginatorT, OriginatorStateT>>
 			class CareTaker final {
 			public:
-				using MementoType = Memento<ConcreteOriginatorT, StateType>;
-				using MementoPtr = std::unique_ptr<MementoType>;
+				using MementoT = Memento<ConcreteOriginatorT, StateT>;
+				using MementoPtr = std::unique_ptr<MementoT>;
 
 				inline void set_memento(MementoPtr&& memento_p) noexcept {
 					memento_ = std::move(memento_p);
@@ -586,9 +586,9 @@ namespace pattern {
 			//class Originator final : public IOriginator<Originator<OriginatorStateT>, OriginatorStateT> {
 			class Originator final : public IOriginator<Originator, State> {
 			public:
-				//using MementoType = Memento<Originator<OriginatorStateT>, OriginatorStateT>;
-				using MementoType = Memento<Originator, State>;
-				using MementoPtr = std::unique_ptr<MementoType>;
+				//using MementoT = Memento<Originator<OriginatorStateT>, OriginatorStateT>;
+				using MementoT = Memento<Originator, State>;
+				using MementoPtr = std::unique_ptr<MementoT>;
 
 				Originator() = default;
 				Originator(const Originator&) = delete;
@@ -598,9 +598,9 @@ namespace pattern {
 				~Originator() override = default;
 
 				MementoPtr CreateMementoPtr() const override {
-					//return std::make_unique<MementoType>(*this);
+					//return std::make_unique<MementoT>(*this);
 					return MementoPtr();
-					//return std::make_unique<MementoType>(memento_state_);
+					//return std::make_unique<MementoT>(memento_state_);
 				};
 
 				/**

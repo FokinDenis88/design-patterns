@@ -63,9 +63,9 @@ namespace pattern {
 
 
 			/** Make owned object of two unique_ptr pointers equal. */
-			template<typename ObjectType>
-			inline void CopyUniquePtrOwnedObjects(const std::unique_ptr<ObjectType>& source_ptr,
-				std::unique_ptr<ObjectType>& destination_ptr) {
+			template<typename ObjectT>
+			inline void CopyUniquePtrOwnedObjects(const std::unique_ptr<ObjectT>& source_ptr,
+				std::unique_ptr<ObjectT>& destination_ptr) {
 				if (!source_ptr) { // source_ptr is nullptr
 					destination_ptr.reset();
 				}
@@ -74,7 +74,7 @@ namespace pattern {
 						*destination_ptr = *source_ptr; // Copy assignment of stored object
 					}
 					else { // memory is not allocated for destination_ptr. No stored object
-						destination_ptr = std::make_unique<ObjectType>(*source_ptr);
+						destination_ptr = std::make_unique<ObjectT>(*source_ptr);
 					}
 				}
 			}

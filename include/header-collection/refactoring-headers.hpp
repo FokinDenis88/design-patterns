@@ -153,7 +153,7 @@ Replace Parameter with Query
 Replace Parameter with Method
 Replace Primitive with Object
 
-Replace Data Value with Object • Replace Type Code with Class
+Replace Data Value with Object • Replace T Code with Class
 Replace Query with Parameter
 
 Replace Subclass with Delegate
@@ -163,9 +163,9 @@ Replace Superclass with Delegate
 Replace Inheritance with Delegation
 Replace Temp with Query
 
-Replace Type Code with Subclasses
+Replace T Code with Subclasses
 
-Extract Subclass • Replace Type Code with State/Strategy
+Extract Subclass • Replace T Code with State/Strategy
 Return Modified Value
 
 Separate Query from Modifier

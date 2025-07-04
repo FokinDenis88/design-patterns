@@ -5,10 +5,10 @@
 #include <utility>
 
 
-#include "behavioral/observer.hpp"
+#include "behavioral/observer/observer-others.hpp"
 #include "behavioral/strategy.hpp"
-#include "ieditor.hpp"
 #include "structural/composite.hpp"
+#include "general-utilities-library/ieditor.hpp"
 
 
 //#include "creational/factory-method.hpp"
@@ -98,7 +98,7 @@ namespace pattern {
 			/** In standard realization model and view are not stored in controller. */
 
 
-			using general::IEditor;
+			using common::IEditor;
 			using pattern::behavioral::observer_ref::ObserverRefSetMulti;
 			using pattern::behavioral::observer_ref::SubjectRefSetMulti;
 
@@ -191,7 +191,7 @@ namespace pattern {
             class View : public NonTerminalComponent, public ObserverRefSetMulti {
             public:
                 explicit View(Controller& controller) noexcept
-                    : ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::ISubjectType&>(controller) } {
+                    : ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::ISubjectT&>(controller) } {
                 };
             protected:
                 View(const View&) = delete; // C.67	C.21
