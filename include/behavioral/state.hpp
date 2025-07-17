@@ -1,4 +1,4 @@
-#ifndef STATE_HPP
+﻿#ifndef STATE_HPP
 #define STATE_HPP
 
 #include <memory>

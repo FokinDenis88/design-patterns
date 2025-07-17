@@ -59,7 +59,7 @@ namespace pattern {
 			* to keep the structure clear and reduces the risk of side effects and synchronization issues.
 			*/
 
-			using namespace common;
+			using namespace util;
 
 			class ISubjectWeakMulti;
 
@@ -210,10 +210,10 @@ namespace pattern {
 			 */
 			template<typename ExecPolicyT = std::execution::sequenced_policy,
 				typename ContainerT_t = std::forward_list<std::weak_ptr<ISubjectWeakMulti>>>
-				requires std::is_execution_policy_v<ExecPolicyT>
+			requires std::is_execution_policy_v<ExecPolicyT>
 			class ObserverWeakMulti : public IObserverWeakMulti,
-				public std::enable_shared_from_this<ObserverWeakMulti<typename ExecPolicyT,
-				typename ContainerT_t>>
+									public std::enable_shared_from_this<ObserverWeakMulti<typename ExecPolicyT,
+																						typename ContainerT_t>>
 				// weak_from_this is for creating shared_ptr from
 				// this without doubled control block of shared_ptr with the outside shared_ptr
 			{
@@ -332,10 +332,10 @@ namespace pattern {
 							subject_shared->DetachObserver(this->weak_from_this(), ++recursion_depth);
 						}
 					}
-					EraseEqualWeakPtr(subjects_, subject_ptr, ExecPolicyT());
+					EraseEqualOwner(subjects_, subject_ptr, ExecPolicyT());
 
 					// Cleanup expired weak_ptr
-					//EraseNExpiredWeakPtr(container, expired_count, policy);
+					//EraseNExpired(container, expired_count, policy);
 				};
 
 				/**
@@ -346,7 +346,7 @@ namespace pattern {
 				 */
 				inline void DetachNExpired(const size_t expired_count, bool to_erase_all_expired = false) override {
 					if (to_erase_all_expired) { EraseAllExpired(subjects_, ExecPolicyT()); }
-					else { EraseNExpiredWeakPtr(subjects_, expired_count, ExecPolicyT()); }
+					else { EraseNExpired(subjects_, expired_count, ExecPolicyT()); }
 					// if subject is expired, it is deleted, so we don't need to detach observer in subject
 				};
 
@@ -359,7 +359,7 @@ namespace pattern {
 				 * \return
 				 */
 				inline bool HasSubject(const WeakPtrISubjectT subject_ptr) override {
-					return FindEqualWeakPtr(subjects_, subject_ptr, ExecPolicyT()).first != subjects_.cend();
+					return FindEqualOwner(subjects_, subject_ptr, ExecPolicyT()) != subjects_.cend();
 				};
 				// not const, cause autoclean
 
@@ -474,7 +474,7 @@ namespace pattern {
 						};
 					std::for_each(ExecPolicyT(), observers_.begin(), observers_.end(), update_fn);
 					// Cleanup expired weak_ptr
-					EraseNExpiredWeakPtr(observers_, expired_count, ExecPolicyT());
+					EraseNExpired(observers_, expired_count, ExecPolicyT());
 
 				};
 
@@ -538,10 +538,10 @@ namespace pattern {
 							observer_shared->DetachSubject(this->weak_from_this(), ++recursion_depth);
 						}
 					}
-					EraseEqualWeakPtr(observers_, observer_ptr, ExecPolicyT());
+					EraseEqualOwner(observers_, observer_ptr, ExecPolicyT());
 
 					// Cleanup expired weak_ptr
-					//EraseNExpiredWeakPtr(container, expired_count, policy);
+					//EraseNExpired(container, expired_count, policy);
 				};
 
 				/**
@@ -552,7 +552,7 @@ namespace pattern {
 				 */
 				inline void DetachNExpired(const size_t expired_count, bool to_erase_all_expired = false) override {
 					if (to_erase_all_expired) { EraseAllExpired(observers_, ExecPolicyT()); }
-					else { EraseNExpiredWeakPtr(observers_, expired_count, ExecPolicyT()); }
+					else { EraseNExpired(observers_, expired_count, ExecPolicyT()); }
 					// if subject is expired, it is deleted, so we don't need to detach observer in subject
 				}; // TODO: refactor, maybe extract function.
 
@@ -565,7 +565,7 @@ namespace pattern {
 				 * \return
 				 */
 				inline bool HasObserver(const WeakPtrIObserverT observer_ptr) override {
-					return FindEqualWeakPtr(observers_, observer_ptr, ExecPolicyT()).first != observers_.end();
+					return FindEqualOwner(observers_, observer_ptr, ExecPolicyT()) != observers_.end();
 				};
 				// not const, cause autoclean
 

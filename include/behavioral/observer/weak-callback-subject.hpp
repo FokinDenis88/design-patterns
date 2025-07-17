@@ -29,6 +29,8 @@
 #include "diagnostics-library/custom-exception.hpp"
 #include "general-utilities-library/functional/weak-method-invoker.hpp"
 
+#include "behavioral/observer/iobserver.hpp"
+
 
 /** Software Design Patterns */
 namespace pattern {
@@ -57,10 +59,12 @@ namespace pattern {
 			 *
 			 * [[Testlevel(0)]]
 			 */
-			template<typename ContainerT = std::unordered_set<::common::MethodActionWrap> >
+			template<typename ContainerT = std::unordered_set<::util::MethodActionWrap> >
 			class WeakCallbackSubject {
+				// TODO: Hash of member function in MethodActionInvoker
+				// TODO: Notify observer bug with operator= const MethodActionWrap, const MethodActionWrap
 			public:
-				using MethodActionWrap = ::common::MethodActionWrap;
+				using MethodActionWrap = ::util::MethodActionWrap;
 				using value_type       = typename ContainerT::value_type;
 				using iterator         = ContainerT::iterator;//decltype(callbacks_.end());
 				using const_iterator   = ContainerT::const_iterator;//decltype(callbacks_.cend());
@@ -78,12 +82,12 @@ namespace pattern {
 				WeakCallbackSubject() = default;
 				// Subject may be constructed without observable Subjects
 
-				template<typename IteratorT, typename ExecPolicyT>
+				template<typename IteratorT, typename ExecPolicyT = std::execution::sequenced_policy>
 				WeakCallbackSubject(IteratorT begin, IteratorT end, ExecPolicyT policy = std::execution::seq) {
 					AttachObserver(begin, end, policy);
 				}
 
-				template<typename ExecPolicyT>
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				explicit WeakCallbackSubject(const std::initializer_list<MethodActionWrap>& init_list,
 											ExecPolicyT policy = std::execution::seq) {
 					//: observers_{ init_list.begin(), init_list.end() } {
@@ -91,7 +95,7 @@ namespace pattern {
 				};
 
 				/** Callbacks are stored in any ContainerT. */
-				template<typename ContainerT, typename ExecPolicyT>
+				template<typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
 				explicit WeakCallbackSubject(const ContainerT& container,
 											ExecPolicyT policy = std::execution::seq) {
 					static_assert(std::is_same_v<typename ContainerT::value_type, MethodActionWrap>,
@@ -99,63 +103,64 @@ namespace pattern {
 					AttachObserver(container.begin(), container.end(), policy);
 				};
 
-				template<typename CallbackT, typename ExecPolicyT>
-				explicit WeakCallbackSubject(CallbackT callback,
+				template<typename CallbackT, typename ExecPolicyT = std::execution::sequenced_policy>
+				explicit WeakCallbackSubject(CallbackT&& callback,
 											ExecPolicyT policy = std::execution::seq) {
 					static_assert(std::is_same_v<std::remove_cvref_t<CallbackT>, MethodActionWrap>,
 									"Callback must be MethodAction.");
 					AttachObserver(std::forward<CallbackT>(callback), policy); // No differrence with std::move(callback)
 				};
 
+				template<typename MemFnPtrT, typename ObjectT, typename TupleArgsT,
+						typename ExecPolicyT = std::execution::sequenced_policy>
+				explicit WeakCallbackSubject(MemFnPtrT				mem_fn,
+											std::weak_ptr<ObjectT>	object_ptr,
+											TupleArgsT&&			args,
+											ExecPolicyT				policy = std::execution::seq)
+					: WeakCallbackSubject{ util::MethodActionWrap{ mem_fn, object_ptr, std::forward<TupleArgsT>(args) }, policy }
+				{
+				};
+
+			protected:
+				WeakCallbackSubject(const WeakCallbackSubject&) = delete; // C.67	C.21 Polymorphic suppress copy & move
+				WeakCallbackSubject& operator=(const WeakCallbackSubject&) = delete;
+				WeakCallbackSubject(WeakCallbackSubject&&) noexcept = delete;
+				WeakCallbackSubject& operator=(WeakCallbackSubject&&) noexcept = delete;
+			public:
+				virtual ~WeakCallbackSubject() = default;
+
+
+//_____________________________________________________________________________________________________
 
 				// TODO: write notify methods for all stubs in ObserverHub class. With all variants of Update fn of observer.
 
 				/*
 				 * Update all attached observers in main thread.
+				 * It is better to call in another thread using thread pool.
 				 *
 				 * Complexity: set = O(log n), Other containers = O(n).
 				 *
 				 * @param message	message with information needed for Update.
 				 */
-				template<typename ExecPolicyT>
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				void NotifyObservers(const std::string& message = "",
-									const bool run_in_new_thread = true,
-									ExecPolicyT policy = std::execution::seq) const {
-					auto update_n_clean_fn = [](MethodActionWrap& callback) {
+									 ExecPolicyT policy = std::execution::seq) const {
+					auto update_n_clean_fn = [](const MethodActionWrap& callback) {
 						if (!callback()) { return true; } // if call success -> not to remove
 						return false;
 					};
 
 					// foreach callback: invoke and clean expired callback
 					std::unique_lock lock{ observers_shared_mtx_ };							// write
-					generic::GenericRemoveIf(callbacks_, update_n_clean_fn, policy);		// O(k), k - count of expired callbacks
+					generic::RemoveIf(callbacks_, update_n_clean_fn, policy);		// O(n) + O(k), k - count of expired callbacks
 				};
-
-				/*
-				 * Update all attached observers in main thread.
-				 *
-				 * Complexity: set = O(log n), Other containers = O(n).
-				 *
-				 * @param message		message with information needed for Update.
-				 * @param new_thread	one thread from thread pool.
-				 */
-				//template<typename ExecPolicyT>
-				//void NotifyObservers(std::thread& new_thread,
-				//					const std::string& message = "",
-				//					ExecPolicyT policy = std::execution::seq) const {
-				//	auto observer_update_fn = [&message](MethodActionWrap callback) {
-				//		// callback in lambda is shared_ptr, cause in GenericNotify it is locked
-				//		callback->Update(message);
-				//		};
-				//	MutexNotifyObserversNClean(observer_update_fn, policy);
-				//};
-
 
 				// TODO: Notification in another thread. Wait the end of notification process
 				// TODO: bool run_in_new_thread = false
 				// In new std::thread
 				// Async variant
 
+//________________________________________________________________________________________________________________________
 
 				/**
 				* Add Multiple Observer to list of Observers.
@@ -167,19 +172,20 @@ namespace pattern {
 				* @param attachable_begin		start of range of observers, that will be added to Subject
 				* @param attachable_end			end of range of observers, that will be added to Subject
 				*/
-				template<typename IteratorT, typename ExecPolicyT>
+				template<typename IteratorT, typename ExecPolicyT = std::execution::sequenced_policy>
 				void AttachObserver(IteratorT attachable_begin, IteratorT attachable_end,
 									ExecPolicyT policy = std::execution::seq)
 				{ // Main logic in this function to decrease count of function call, so lower overhead resources for call of fn.
-					if (attachable_begin == attachable_end) { return; }	// Precondition
-					static_assert(std::is_same_v<decltype(*attachable_begin), MethodActionWrap>,
-									"Iterator must be dereferencable to MethodActionWrap");
 
-					auto attach_observer_fn = [&callbacks_, &policy](const auto& callback) { // callback from attachable range
+					static_assert(std::is_same_v< std::remove_cvref_t<decltype(*attachable_begin)>, MethodActionWrap >,
+									"Iterator must be dereferencable to MethodActionWrap");
+					if (attachable_begin == attachable_end) { return; }	// Precondition
+
+					auto attach_observer_fn = [this, policy](const auto& callback) { // callback from attachable range
 						if (callback.expired()) { return; }
 
 						if (!HasCallback(callback, policy)) { // Duplicate control. Mustn't duplicate weak_ptr
-							generic::GenericAddElement(callbacks_, callback);		// O(1)
+							generic::Emplace(callbacks_, callback);		// O(1)
 						}
 						//UpdateExpiredObserversCount(has_observer.second);
 					}; // !lambda
@@ -196,7 +202,7 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				template<typename ExecPolicyT>
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void AttachObserver(const std::initializer_list<MethodActionWrap>& init_list,
 											ExecPolicyT policy = std::execution::seq) {
 					if (init_list.size() == 0) { return; }	// Precondition
@@ -209,11 +215,11 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				template<typename ContainerT, typename ExecPolicyT>
+				template<typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void AttachObserver(const ContainerT& container, ExecPolicyT policy = std::execution::seq) {
-					if (container.empty()) { return; }	// Precondition
 					static_assert(std::is_same_v<typename ContainerT::value_type, MethodActionWrap>,
 									"Elements of container, when AttachObserver must be MethodActionWrap");
+					if (container.empty()) { return; }	// Precondition
 
 					AttachObserver(container.begin(), container.end(), policy);
 				};
@@ -226,14 +232,34 @@ namespace pattern {
 				 *
 				 * @param callback	weak pointer to observer.
 				 */
-				template<typename ExecPolicyT>
-				inline void AttachObserver(const MethodActionWrap callback,
+				template<typename CallbackT, typename ExecPolicyT = std::execution::sequenced_policy>
+				inline void AttachObserver(CallbackT&& callback,
 											ExecPolicyT policy = std::execution::seq) {
+					static_assert(std::is_same_v<std::remove_cvref_t<CallbackT>, MethodActionWrap>,
+									"Callback must be MethodAction.");
 					if (callback.expired()) { return; }	// Precondition
-					AttachObserver({ callback }, policy);	// for HasCallback
+					AttachObserver({ std::forward<CallbackT>(callback) }, policy);	// for HasCallback
 				};
-				// not const, cause must attach subject in observer ptr
 
+				/**
+				 * Add Observer to list of Observers. Wrapper.
+				 * Only alive weak_ptr can be attached to container and only that is not duplicates.
+				 *
+				 * Complexity: O(n)
+				 *
+				 * @param callback	weak pointer to observer.
+				 */
+				template<typename MemFnPtrT, typename ObjectT, typename TupleArgsT,
+						typename ExecPolicyT = std::execution::sequenced_policy>
+				inline void AttachObserver(MemFnPtrT				mem_fn,
+											std::weak_ptr<ObjectT>	object_ptr,
+											TupleArgsT&&			args,
+											ExecPolicyT				policy = std::execution::seq) {
+					util::MethodActionWrap callback{ mem_fn, object_ptr, std::forward<TupleArgsT>(args) };
+                    AttachObserver(callback, policy);
+				};
+
+//______________________________________________________________________________________________________________
 
 				/**
 				 * Detach Multiple Observers.
@@ -245,16 +271,16 @@ namespace pattern {
 				 * @param erasable_begin	begin of container with observers, that must be detached
 				 * @param erasable_end		end of container with observers, that must be detached
 				 */
-				template<typename IteratorT, typename ExecPolicyT>
+				template<typename IteratorT, typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void DetachObserver(IteratorT erasable_begin, IteratorT erasable_end,
 											ExecPolicyT policy = std::execution::seq) {
+					static_assert(std::is_same_v< std::remove_cvref_t<decltype(*erasable_begin)>, MethodActionWrap>,
+								"Iterator must be dereferencable to MethodActionWrap");
 					if (erasable_begin == erasable_end) { return; }	// Precondition
-					static_assert(std::is_same_v<decltype(*erasable_begin), MethodActionWrap>,
-									"Iterator must be dereferencable to MethodActionWrap");
 
 					//size_t expired_count{};
 					auto detach_observer_fn = [&callbacks_, &policy](const auto& callback) {
-						generic::GenericEraseFirst(callbacks_, callback, policy);
+						generic::EraseFirst(callbacks_, callback, policy);
 
 						// Can Detach only alive objects
 						//expired_count = EraseEqualWeakPtr(callbacks_, callback, policy);			// O(n)
@@ -274,7 +300,7 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				template<typename ExecPolicyT>
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void DetachObserver(const std::initializer_list<MethodActionWrap>& init_list,
 											ExecPolicyT policy = std::execution::seq) {
 					if (init_list.size() == 0) { return; }	// Precondition
@@ -287,12 +313,12 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				template<typename ContainerT, typename ExecPolicyT>
+				template<typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void DetachObserver(const ContainerT& container,
 											ExecPolicyT policy = std::execution::seq) {
+					static_assert(std::is_same_v<std::remove_cvref_t<typename ContainerT::value_type>, MethodActionWrap>,
+								"Elements of container, when DetachObserver must be MethodActionWrap");
 					if (container.empty()) { return; }	// Precondition
-					static_assert(std::is_same_v<typename ContainerT::value_type, MethodActionWrap>,
-									"Elements of container, when DetachObserver must be MethodActionWrap");
 
 					DetachObserver(container.begin(), container.end(), policy);
 				};
@@ -305,29 +331,48 @@ namespace pattern {
 				 *
 				 * @param callback weak pointer to observer.
 				 */
-				template<typename ExecPolicyT>
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void DetachObserver(const MethodActionWrap& callback,
 											ExecPolicyT policy = std::execution::seq) {
 					if (callback.expired()) { return; }	// precondition
 
 					std::unique_lock lock{ observers_shared_mtx_ }; // write
-					generic::GenericEraseFirst(callbacks_, callback, policy);
+					generic::EraseFirst(callbacks_, callback, policy);
 					// Can Detach only alive objects
 					//size_t expired_count{ EraseEqualWeakPtr(callbacks_, callback, policy) };	// O(n)
 					//UpdateCountNCleanExpiredObservers(expired_count, policy);
 				};
 
+				/**
+				 * Detach Observer.
+				 * Can Detach only not expired weak_ptr, cause equality defined on alive objects.
+				 *
+				 * Complexity: O(n)
+				 *
+				 * @param callback weak pointer to observer.
+				 */
+				template<typename MemFnPtrT, typename ObjectT, typename TupleArgsT,
+						typename ExecPolicyT = std::execution::sequenced_policy>
+				inline void DetachObserver(MemFnPtrT				mem_fn,
+											std::weak_ptr<ObjectT>	object_ptr,
+											TupleArgsT&&			args,
+											ExecPolicyT				policy = std::execution::seq) {
+					util::MethodActionWrap callback{ mem_fn, object_ptr, std::forward<TupleArgsT>(args) };
+					DetachObserver(callback, policy);
+				};
+
+//______________________________________________________________________________________________________________
 
 				/**
 				 * Detach all expired weak_ptr objects in container
 				 *
 				 * Complexity: O(n)
 				 */
-				template<typename ExecPolicyT>
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void CleanupAllExpired(ExecPolicyT policy = std::execution::seq) const {
 					std::unique_lock lock{ observers_shared_mtx_ };		// write
 					auto expired = [](const auto& callback) { return callback.expired(); };
-					GenericRemoveIf(callbacks_, expired, policy);		// O(n)
+					generic::RemoveIf(callbacks_, expired, policy);		// O(n)
 				};
 
 				/**
@@ -340,7 +385,7 @@ namespace pattern {
 				 * \param policy
 				 * \return
 				 */
-				/*template<typename ExecPolicyT>
+				/*template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline bool HasObserverNClean(const MethodActionWrap callback,
 										ExecPolicyT policy = std::execution::seq) const {
 					std::pair<bool, size_t> has_observer{ Find(callback, policy) };
@@ -354,10 +399,11 @@ namespace pattern {
 				*
 				* Complexity: // O(n) || O(log n) || O(1)
 				*/
-				template<typename ExecPolicyT>
-				inline const_iterator Find(const MethodActionWrap& callback, ExecPolicyT policy = std::execution::seq) const {
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
+				inline const_iterator Find(const MethodActionWrap& callback,
+											ExecPolicyT policy = std::execution::seq) const {
 					std::shared_lock lock{ observers_shared_mtx_ };			// read
-					return GenericFind(callbacks_, callback, policy);		// O(n) || O(log n) || O(1)
+					return generic::Find(callbacks_, callback, policy);		// O(n) || O(log n) || O(1)
 					// TODO: iterator category is const ?
 				};
 
@@ -366,8 +412,9 @@ namespace pattern {
 				*
 				* Complexity: // O(n) || O(log n) || O(1)
 				*/
-				template<typename ExecPolicyT>
-				inline bool HasCallback(const MethodActionWrap& callback, ExecPolicyT policy = std::execution::seq) const noexcept {
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
+				inline bool HasCallback(const MethodActionWrap& callback,
+										ExecPolicyT policy = std::execution::seq) const noexcept {
 					return Find(callback, policy) != callbacks_.end();
 				}
 				// TODO: autoclean, when find. Add in weak-ptr.hpp equal func, that indicate expired state
@@ -381,13 +428,13 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				//template<typename ExecPolicyT>
+				//template<typename ExecPolicyT = std::execution::sequenced_policy>
 				//inline void CleanFoundExpiredObservers(ExecPolicyT policy = std::execution::seq) const {
 				//	if (found_expired_observers_.load(std::memory_order_relaxed) > 0) { // precondition
 				//		{
 				//			std::unique_lock lock{ observers_shared_mtx_ };
 				//			// Cleanup expired weak_ptr
-				//			EraseNExpiredWeakPtr(callbacks_, found_expired_observers_, policy); // write	O(n)
+				//			EraseNExpired(callbacks_, found_expired_observers_, policy); // write	O(n)
 				//		} // !lock
 				//		ResetExpiredObserversCount();
 				//	}
@@ -412,7 +459,7 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				/*template<typename ExecPolicyT>
+				/*template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline void UpdateCountNCleanExpiredObservers(const size_t new_count,
 															ExecPolicyT policy = std::execution::seq) const {
 					UpdateExpiredObserversCount(new_count);
@@ -425,7 +472,7 @@ namespace pattern {
 				 *
 				 * Complexity: O(n)
 				 */
-				template<typename UpdateFunctionT, typename ExecPolicyT>
+				template<typename UpdateFunctionT, typename ExecPolicyT = std::execution::sequenced_policy>
 				void MutexNotifyObserversNClean(UpdateFunctionT observer_update_fn,
 												ExecPolicyT policy = std::execution::seq) const {
 					size_t expired_count{};
@@ -441,7 +488,8 @@ namespace pattern {
 				 * Thread safe. Notify all observers of Subject in new thread of execution.
 				 * Used mutex to block shared resource.
 				 */
-				template<typename ThreadPoolT, typename UpdateFunctionT, typename ExecPolicyT>
+				template<typename ThreadPoolT, typename UpdateFunctionT,
+						typename ExecPolicyT = std::execution::sequenced_policy>
 				void ThreadNotifyObserversNClean(ThreadPoolT& thread_pool,
 												UpdateFunctionT observer_update_fn,
 												ExecPolicyT policy = std::execution::seq) const {
@@ -454,7 +502,8 @@ namespace pattern {
 				 * Thread safe. Notify all observers of Subject in new thread of execution.
 				 * Used mutex to block shared resource.
 				 */
-				template<typename ThreadPoolT, typename UpdateFunctionT, typename ExecPolicyT>
+				template<typename ThreadPoolT, typename UpdateFunctionT,
+						typename ExecPolicyT = std::execution::sequenced_policy>
 				void ThreadNotifyObserversNClean(UpdateFunctionT observer_update_fn,
 													ExecPolicyT policy = std::execution::seq) const {
 					std::thread notify_thread(&WeakCallbackSubject::MutexNotifyObserversNClean, this, observer_update_fn, policy);
@@ -466,15 +515,15 @@ namespace pattern {
 				 * Thread safe. Notify all observers of Subject in new thread of execution.
 				 * Used mutex to block shared resource.
 				 */
-				template<typename ThreadPoolT, typename UpdateFunctionT, typename ExecPolicyT>
+				template<typename ThreadPoolT, typename UpdateFunctionT,
+						typename ExecPolicyT = std::execution::sequenced_policy>
 				void ThreadNotifyObserversNCleanAsync(UpdateFunctionT observer_update_fn,
 														ExecPolicyT policy = std::execution::seq) const {
 					std::future result{ std::async(std::launch::async, &WeakCallbackSubject::MutexNotifyObserversNClean,
 											this, observer_update_fn, policy) };
 				}
 
-
-//-----------------------SubjectWeakHub Data-------------------------------------------------
+//______________________________Data_________________________________________________________________
 
 				/**
 				 * List of observers, that will be attach to Subject.
@@ -499,10 +548,7 @@ namespace pattern {
 				 */
 				mutable std::atomic_size_t found_expired_observers_{};
 
-				/** Execution policy, that will work for all functions */
-				//ExecPolicyT policy_{};
-
-			};	// !class SubjectWeakHub
+			};	// !class WeakCallbackSubject
 			/*
 			* list
 			* Pros: Efficient in terms of insertion and removal (O(1)), maintains order, can store duplicates.
@@ -545,9 +591,16 @@ namespace pattern {
 			* - Use **std::set** if you need to ensure that observers are unique and you don’t mind the overhead for maintaining sorted order.
 			*/
 
+			// TODO: Add constructor, attach, detach function with mem_fn, weak_ptr, args_tuple signature.
+			// TODO: Make Find callback funciton with clean of expired observers feature.
+			// TODO: Delete found_expired_observers_
+			// TODO: Make not shared mutex, but simple.
+			// TODO: Constructor, attach, detach functions - make universal reference to CallbackT.
+			// TODO: Detach(weak_ptr) - for easy detach of observer.
 
 
-			struct StateSingle {
+
+			struct MyState {
 				int a_{ 0 };
 				int b_{ 0 };
 			};
@@ -555,7 +608,7 @@ namespace pattern {
 
 			// Design Choices: Aggregation is better in the meaning of design of software.
 
-			//template<typename ExecPolicyT = std::execution::sequenced_policy>
+			//template<typename ExecPolicyT = std::execution::sequenced_policy = std::execution::sequenced_policy>
 			//class MySubjectAggregation {
 			//public:
 			//	using WeakPtrIObserverWeak		= SubjectWeak<ExecPolicyT>::WeakPtrIObserverWeak;
@@ -616,48 +669,66 @@ namespace pattern {
 
 
 
-			//template<typename ExecPolicyT = std::execution::sequenced_policy>
-			//class MySubjectInheritance : public SubjectWeak<ExecPolicyT> {
-			//public:
-			//	using SybjectT = SubjectWeak<ExecPolicyT>;
-			//	using WeakPtrIObserverWeak = SybjectT::WeakPtrIObserverWeak;
+			class MySubject : public WeakCallbackSubject<> {
+			public:
+				MySubject() = default;
 
-			//	MySubjectSingle() = default;
-			//protected:
-			//	MySubjectSingle(const MySubjectSingle&) = delete; // C.67	C.21
-			//	MySubjectSingle& operator=(const MySubjectSingle&) = delete;
-			//	MySubjectSingle(MySubjectSingle&&) noexcept = delete;
-			//	MySubjectSingle& operator=(MySubjectSingle&&) noexcept = delete;
-			//public:
-			//	~MySubjectSingle() override = default;
+				template<typename IteratorT, typename ExecPolicyT = std::execution::sequenced_policy>
+				MySubject(IteratorT begin, IteratorT end, ExecPolicyT policy = std::execution::seq)
+						: WeakCallbackSubject<>(begin, end, policy) {
+				}
 
-			//	StateSingle state_{};	// is public for testing
-			//};
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
+				explicit MySubject(const std::initializer_list<MethodActionWrap>& init_list,
+									ExecPolicyT policy = std::execution::seq)
+						: WeakCallbackSubject<>(init_list.begin(), init_list.end(), policy) {
+				};
+
+				/** Callbacks are stored in any ContainerT. */
+				template<typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
+				explicit MySubject(const ContainerT& container,
+									ExecPolicyT policy = std::execution::seq)
+						: WeakCallbackSubject<>(container.begin(), container.end(), policy) {
+				};
+
+				template<typename CallbackT, typename ExecPolicyT = std::execution::sequenced_policy>
+				explicit MySubject(CallbackT callback,
+									ExecPolicyT policy = std::execution::seq)
+						: WeakCallbackSubject<>(callback, policy) {
+				};
+
+			protected:
+				MySubject(const MySubject&) = delete; // C.67	C.21
+				MySubject& operator=(const MySubject&) = delete;
+				MySubject(MySubject&&) noexcept = delete;
+				MySubject& operator=(MySubject&&) noexcept = delete;
+			public:
+				~MySubject() override = default;
+
+				MyState state_{};	// is public for testing
+			};
 
 
-			//class MyObserverInheritance : public ObserverWeak<> {
-			//public:
-			//	/*explicit MyObserverSingle(WeakPtrISubjectT subject_ptr) : ObserverWeakMulti(subject_ptr) {
-			//	}*/
+			class MyObserver : public ::pattern::behavioral::iobserver::IObserverMsg {
+			public:
+				MyObserver() = default;
+			protected:
+				MyObserver(const MyObserver&) = delete; // C.67	C.21
+				MyObserver& operator=(const MyObserver&) = delete;
+				MyObserver(MyObserver&&) noexcept = delete;
+				MyObserver& operator=(MyObserver&&) noexcept = delete;
+			public:
+				~MyObserver() override = default;
 
-			//	MyObserverInheritance() = default;
-			//protected:
-			//	MyObserverInheritance(const MyObserverInheritance&) = delete; // C.67	C.21
-			//	MyObserverInheritance& operator=(const MyObserverInheritance&) = delete;
-			//	MyObserverInheritance(MyObserverInheritance&&) noexcept = delete;
-			//	MyObserverInheritance& operator=(MyObserverInheritance&&) noexcept = delete;
-			//public:
-			//	~MyObserverInheritance() override = default;
+				/**
+				 * Update the information about Subject.
+				 */
+				void Update(const std::string& message = "") override {
+					// Some Actions
+				};
 
-			//	/**
-			//	 * Update the information about Subject.
-			//	 */
-			//	void Update(const std::string& message = "") override {
-			//		// Some Actions
-			//	};
-
-			//	StateSingle state_{};	// is public for testing
-			//};
+				MyState state_{};	// is public for testing
+			};
 
 		} // !weak_callback_subject
 

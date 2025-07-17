@@ -1,4 +1,4 @@
-#ifndef BRIDGE_HPP
+﻿#ifndef BRIDGE_HPP
 #define BRIDGE_HPP
 
 #include <memory>

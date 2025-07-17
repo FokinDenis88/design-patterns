@@ -2,6 +2,9 @@
     Maybe work with generic smart pointer.
 
 
+Check lambdas in stadard parallel algorithms for capturing references, cause parallel algorithms mustn't use shared resources.
+
+
 
 
 

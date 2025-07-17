@@ -289,13 +289,13 @@ namespace pattern {
 			template<typename IObserverT>
 			class ISubjectMsg {
 			protected:
-				ISubject() = default;
-				ISubject(const ISubject&) = delete; // C.67	C.21
-				ISubject& operator=(const ISubject&) = delete;
-				ISubject(ISubject&&) noexcept = delete;
-				ISubject& operator=(ISubject&&) noexcept = delete;
+				ISubjectMsg() = default;
+				ISubjectMsg(const ISubjectMsg&) = delete; // C.67	C.21
+				ISubjectMsg& operator=(const ISubjectMsg&) = delete;
+				ISubjectMsg(ISubjectMsg&&) noexcept = delete;
+				ISubjectMsg& operator=(ISubjectMsg&&) noexcept = delete;
 			public:
-				virtual ~ISubject() = default;
+				virtual ~ISubjectMsg() = default;
 
 				/** Update all attached observers */
 				virtual void NotifyObservers(const std::string& message) const = 0;
@@ -314,7 +314,7 @@ namespace pattern {
 			 */
 			class ISubjectWeakMsg {
 			public:
-				using WeakPtrIObserverWeak = std::weak_ptr<IObserverMsg>;
+				using WeakPtrIObserverMsg = std::weak_ptr<IObserverMsg>;
 
 			protected:
 				ISubjectWeakMsg() = default;
@@ -333,11 +333,11 @@ namespace pattern {
 				 * Add Observer to list of notification in Subject.
 				 * There is shared_ptr<ObserverT> outside of class. Subject stores weak_ptr to that Observer.
 				 */
-				virtual void AttachObserver(const WeakPtrIObserverWeak observer_ptr) = 0;
+				virtual void AttachObserver(const WeakPtrIObserverMsg observer_ptr) = 0;
 				// not const, cause must attach subject in observer ptr
 
 				/** Detach observer from notifying list */
-				virtual void DetachObserver(const WeakPtrIObserverWeak observer_ptr) = 0;
+				virtual void DetachObserver(const WeakPtrIObserverMsg observer_ptr) = 0;
 			};
 			/*
 			* Design choices. Params in functions. Weak_ptr vs shared_ptr:

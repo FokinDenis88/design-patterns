@@ -33,55 +33,7 @@
 namespace pattern {
 	namespace behavioral {
 		namespace observer {
-			/**
-			 * Notify all observers in container by lambda function, that
-			 * encapsulate observer update function call.
-			 * Can freeze main thread, if it is long to Update observer.
-			 *
-			 * Complexity: O(n)
-			 * Mutex: read
-			 *
-			 * @param observers
-			 * @param observer_update_fn		lambda that encapsulate observer update function call, f.e. observer->Update()
-			 * @return							count of expired weak_ptr
-			 */
-			template<typename ContainerType, typename UpdateFunctionType, typename ExecPolicyType>
-			inline size_t GenericNotifyWeakObservers(const ContainerType& observers,
-													UpdateFunctionType observer_update_fn,
-													ExecPolicyType policy = std::execution::seq) {
-				size_t expired_count{};
-				if (observers.empty) { return expired_count; } // precondition
-
-				auto update_fn = [&observer_update_fn, &expired_count](const auto& observer_ptr) {
-					if (auto observer_shared{ observer_ptr.lock() }) {
-						observer_update_fn(observer_shared);
-					} else {
-						++expired_count;
-					}
-				}; // !lambda
-				std::for_each(policy, observers.begin(), observers.end(), update_fn);
-				return expired_count;
-			}
-
-			/**
-			 * Notify all observers in container by lambda function, that
-			 * encapsulate observer update function call.
-			 * Can freeze main thread, if it is long to Update observer.
-			 *
-			 * Complexity: O(n)
-			 * Mutex: read + write
-			 *
-			 * @param observers
-			 * @param observer_update_fn		lambda that encapsulate observer update function call, f.e. observer->Update()
-			 */
-			template<typename ContainerType, typename UpdateFunctionType, typename ExecPolicyType>
-			inline void GenericNotifyWeakObserversNClean(ContainerType& observers,
-														UpdateFunctionType observer_update_fn,
-														ExecPolicyType policy = std::execution::seq) {
-				size_t expired_count{ GenericNotifyWeakObservers(observers, observer_update_fn, policy) };
-				// Cleanup expired weak_ptr
-				EraseNExpiredWeakPtr(observers, expired_count, policy);
-			}
+			
 
 		} // !namespace observer
 

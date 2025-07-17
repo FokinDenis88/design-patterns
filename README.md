@@ -6,7 +6,7 @@
 [gitverse (Russia)](https://gitverse.ru/FokinDenis88/design-patterns)
 
 ## Installation
-1. git clone --branch develop --recurse-submodules https://gitlab.com/FokinDenis88/design-patterns.git
+1. git clone __branch develop __recurse-submodules https://gitlab.com/FokinDenis88/design-patterns.git
 2. (From the working dir = design-patterns)  cmake -B build/visual-studio
  
 ## Realized Design Patterns
@@ -106,7 +106,7 @@
 ## Support
 ### Bitcoin and other cryptocurrency:  
 ***Bitcoin (Zengo)***:	3E18A9tKarZSCUUCPiBympih7iy9LFvkG5 <br>
-	![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1W-j3C0oI7UvUr-KsCdG--dqCyM2hZTNY) <br>
+	![3E18A9tKarZSCUUCPiBympih7iy9LFvkG5](https://drive.google.com/uc?export=view&id=1W-j3C0oI7UvUr-KsCdG__dqCyM2hZTNY) <br>
 ***Ethereum (Zengo)***: 0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f <br>
 	![0xa0B86C071A52A14C01f53c0D1E887D0fe08c6C0f](https://drive.google.com/uc?export=view&id=14g0dtqEhl92-tQgBcVXmNJnH61DtM7K2) <br>
 #### Telegram cryptocurrency:

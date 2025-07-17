@@ -299,7 +299,7 @@ namespace pattern {
 				inline void Execute_11() {
 					if (!receiver_.expired()) {
 						STDFunctionT action_fn = std::bind_front(action_, receiver_.lock().get());
-						common::Apply(action_fn, action_args_);
+						util::Apply(action_fn, action_args_);
 					}
 				};
 

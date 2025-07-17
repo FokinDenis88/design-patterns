@@ -1385,7 +1385,7 @@ namespace pattern {
 
 
 			/** Erase duplicates in container */
-			template<typename ContainerT, typename ExecPolicyT>
+			template<typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
 			inline void EraseDuplicates_Cleanup(ContainerT& container, ExecPolicyT policy = std::execution::seq) {
 				auto begin{ container.begin() };
 				auto end{ container.end() };
@@ -1403,10 +1403,11 @@ namespace pattern {
 			}
 
 			/** Erase cleanup list of iterators to elements from input container */
-			template<typename ContainerT, typename IteratorsContainerT, typename ExecPolicyT>
+			template<typename ContainerT, typename IteratorsContainerT,
+					typename ExecPolicyT = std::execution::sequenced_policy>
 			inline void EraseElementsByIterators_Cleanup(ContainerT& container,
-				IteratorsContainerT& iterators_list,
-				ExecPolicyT policy = std::execution::seq) {
+														IteratorsContainerT& iterators_list,
+														ExecPolicyT policy = std::execution::seq) {
 				//static_assert(std::is_same_v<typename ContainerT::iterator, typename IteratorsContainerT::value_type>);
 				//EraseDuplicates(container, policy);
 
@@ -1457,7 +1458,7 @@ namespace pattern {
 			 * @return	First = of pair of iterator to equal weak_ptr or to and.
 			 *			Second = size_t count of expired weak_ptr for cleanup.
 			 */
-			template<typename ValueT, typename ContainerT, typename ExecPolicyT>
+			template<typename ValueT, typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
 			inline auto FindEqualWeakPtr_Cleanup(ContainerT& container,
 				const std::weak_ptr<ValueT>& searched_ptr,
 				ExecPolicyT policy = std::execution::seq) {
@@ -1496,7 +1497,7 @@ namespace pattern {
 			 * \param policy
 			 * @return	count of expired weak_ptr
 			 */
-			template<typename ContainerT, typename ExecPolicyT>
+			template<typename ContainerT, typename ExecPolicyT = std::execution::sequenced_policy>
 			inline void EraseEqualWeakPtr_Cleanup(ContainerT& container, typename ContainerT::value_type searched_ptr,
 				ExecPolicyT policy = std::execution::seq) {
 				//static_assert(std::is_same_v<std::weak_ptr<ValueT>, typename ContainerT::value_type>);
@@ -1519,7 +1520,7 @@ namespace pattern {
 						container.remove_if(equal_owner);
 					}
 					else {
-						result = FindEqualWeakPtr(container, searched_ptr, policy);
+						result = FindEqualOwnerWeakPtr(container, searched_ptr, policy);
 						if (it_equal != end) { container.erase(it_equal); }
 					}
 				}

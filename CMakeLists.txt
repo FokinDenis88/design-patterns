@@ -48,16 +48,18 @@ set(GTEST_INCLUDE_DIR ${gtest_SOURCE_DIR}/include)
 # Header Collection - f.e. all behavioral patterns header
 
 # -External:
-# cpp-common
+# cpp-utility
 
 
 #============================Folders=============================================
 
 set(INCLUDES_FOLDER		include)
 set(SOURCES_FOLDER		src)
-set(EXTERNAL_FOLDER		external)
 set(DOC_FOLDER			doc)
 set(OUTPUT_FOLDER		bin)
+
+set(EXTERNAL_FOLDER				external)
+set(EXTERNAL_CPP_UTILITY		cpp-utility)
 
 #============================Filters=============================================
 
@@ -204,29 +206,29 @@ set(DOC_FILTER
 
 
 # External files
-set(INCLUDE_EXTERNAL_COMMON ${EXTERNAL_FOLDER}/cpp-common/include)
-set(HEADERS_FILTER_EXTERNAL_COMMON
-	${INCLUDE_EXTERNAL_COMMON}/concurrency-support-library/thread.hpp
+set(INCLUDE_EXTERNAL_UTILITY ${EXTERNAL_FOLDER}/${EXTERNAL_CPP_UTILITY}/include)
+set(HEADERS_FILTER_EXTERNAL_UTILITY
+	${INCLUDE_EXTERNAL_UTILITY}/concurrency-support-library/thread.hpp
 
-	${INCLUDE_EXTERNAL_COMMON}/containers-library/generic-container.hpp
-	${INCLUDE_EXTERNAL_COMMON}/diagnostics-library/custom-exception.hpp
-	${INCLUDE_EXTERNAL_COMMON}/diagnostics-library/error.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/containers-library/generic-container.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/diagnostics-library/custom-exception.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/diagnostics-library/error.hpp
 
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/common.hpp
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/iaction.hpp
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/ieditor.hpp
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/interface-macros.hpp
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/tuple.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/utility.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/iaction.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/ieditor.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/interface-macros.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/tuple.hpp
 
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/functional/functional.hpp
-	${INCLUDE_EXTERNAL_COMMON}/general-utilities-library/functional/weak-method-invoker.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/functional/functional.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/general-utilities-library/functional/weak-method-invoker.hpp
 
-	${INCLUDE_EXTERNAL_COMMON}/memory-management-library/weak-ptr/weak-ptr.hpp
-	${INCLUDE_EXTERNAL_COMMON}/memory-management-library/generic-smart-ptr.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/memory-management-library/weak-ptr/weak-ptr.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/memory-management-library/generic-smart-ptr.hpp
 
-	${INCLUDE_EXTERNAL_COMMON}/metaprogramming-library/type-traits/type-traits.hpp
+	${INCLUDE_EXTERNAL_UTILITY}/metaprogramming-library/type-traits/type-traits.hpp
 	)
-set(SOURCES_FILTER_EXTERNAL_COMMON)
+set(SOURCES_FILTER_EXTERNAL_UTILITY)
 
 
 # Many headers in every file
@@ -241,7 +243,7 @@ set(HEADERS_FILTER_HEADER_COLLECTION
 	${INCLUDE_HEADER_COLLECTION}/cpp-idioms-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}/database-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}/distributed-system-headers.hpp
-	${INCLUDE_HEADER_COLLECTION}/external-com-headers.hpp
+	${INCLUDE_HEADER_COLLECTION}/external-cpp-utility-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}/gamedev-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}/refactoring-headers.hpp
 	${INCLUDE_HEADER_COLLECTION}/support-headers.hpp
@@ -267,7 +269,7 @@ set(ALL_HEADERS_FILTER
 	${HEADERS_FILTER_STRUCTURAL}
 	${HEADERS_FILTER_SUPPORT}
 	${HEADERS_FILTER_UI}
-	${HEADERS_FILTER_EXTERNAL_COMMON}
+	${HEADERS_FILTER_EXTERNAL_UTILITY}
 )
 
 # All source files, that will be used in patterns. Used in add_executable.
@@ -286,7 +288,7 @@ set(ALL_SOURCES
 	${SOURCES_FILTER_SUPPORT}
 	${SOURCES_FILTER_REFACTORING}
 	${SOURCES_FILTER_UI}
-	${SOURCES_FILTER_EXTERNAL_COMMON}
+	${SOURCES_FILTER_EXTERNAL_UTILITY}
 )
 
 set(ALL_OTHERS_FILTER
@@ -303,7 +305,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${OUTPUT_FOLDER})
 # Include Directories
 set(INCLUDES
 	${INCLUDES_FOLDER}
-	${EXTERNAL_FOLDER}/cpp-common/include
+	${EXTERNAL_FOLDER}/${EXTERNAL_CPP_UTILITY}/include
 	${GTEST_INCLUDE_DIR}	# for "gtest/gtest.h"
 )
 #target_include_directories(${TARGET_NAME} PUBLIC ${INCLUDES})
@@ -331,7 +333,7 @@ source_group("Cpp-Idioms/Headers"			FILES ${HEADERS_FILTER_CPP-IDIOMS})
 source_group("Creational/Headers"			FILES ${HEADERS_FILTER_CREATIONAL})
 source_group("Database/Headers"				FILES ${HEADERS_FILTER_DATABASE})
 source_group("Distributed-System/Headers"	FILES ${HEADERS_FILTER_DISTRIBUTED-SYSTEM})
-source_group("External/cpp-common/Headers"	FILES ${HEADERS_FILTER_EXTERNAL_COMMON})
+source_group("External/cpp-utility/Headers"	FILES ${HEADERS_FILTER_EXTERNAL_UTILITY})
 source_group("GameDev/Headers"				FILES ${HEADERS_FILTER_GAMEDEV})
 source_group("Header Collection"			FILES ${HEADERS_FILTER_HEADER_COLLECTION})
 source_group("Structural/Headers"			FILES ${HEADERS_FILTER_STRUCTURAL})
@@ -349,7 +351,7 @@ source_group("Cpp-Idioms/Source"			FILES ${SOURCES_FILTER_CPP-IDIOMS})
 source_group("Creational/Source"			FILES ${SOURCES_FILTER_CREATIONAL})
 source_group("Database/Source"				FILES ${SOURCES_FILTER_DATABASE})
 source_group("Distributed-System/Source"	FILES ${SOURCES_FILTER_DISTRIBUTED-SYSTEM})
-source_group("External/cpp-common/Source"	FILES ${SOURCES_FILTER_EXTERNAL_COMMON})
+source_group("External/cpp-utility/Source"	FILES ${SOURCES_FILTER_EXTERNAL_UTILITY})
 source_group("GameDev/Source"				FILES ${SOURCES_FILTER_GAMEDEV})
 source_group("Structural/Source"			FILES ${SOURCES_FILTER_STRUCTURAL})
 source_group("Refactoring/Source"			FILES ${SOURCES_FILTER_REFACTORING})
