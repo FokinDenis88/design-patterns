@@ -1,4 +1,4 @@
-#ifndef COMPOSITE_HPP
+﻿#ifndef COMPOSITE_HPP
 #define COMPOSITE_HPP
 
 #include <memory>
@@ -14,7 +14,7 @@ namespace pattern {
 	namespace structural {
 		namespace composite {
 			// https://en.wikipedia.org/wiki/Composite_pattern
-			// Two variants of realization. 1) Design for Uniformity. 2) Design for Type Safety.
+			// Two variants of realization. 1) Design for Uniformity. 2) Design for T Safety.
 			// The NonTerminalExpression emphasizes uniformity over type safety
 			// Part - Whole
 			// Motivation: one interface for working with part and whole
@@ -41,7 +41,7 @@ namespace pattern {
 			class AbstractComponent {
 			public:
                 using AbstractComponentPtr = std::unique_ptr<AbstractComponent>;
-                using ContainerType = std::forward_list<AbstractComponentPtr>;
+                using ContainerT = std::forward_list<AbstractComponentPtr>;
 
 			protected:
 				AbstractComponent() = default;
@@ -78,7 +78,7 @@ namespace pattern {
 				};
 
                 /** Default for TerminalComponent. Returns const this pointer. Must not be smart, cause const. */
-                virtual inline const ContainerType* GetChildren() const noexcept { return nullptr; };
+                virtual inline const ContainerT* GetChildren() const noexcept { return nullptr; };
 
 			protected:
                 /** Default for TerminalComponent. Checks, if Component is Composite, that can include other components. */
@@ -154,7 +154,7 @@ namespace pattern {
 				};
 
                 /** Returns const this pointer. Must not be smart, cause const. */
-                inline const ContainerType* GetChildren() const noexcept override { return &components_ptrs; };
+                inline const ContainerT* GetChildren() const noexcept override { return &components_ptrs; };
 
             protected:
                 /** Default for TerminalComponent. Checks, if Component is Composite, that can include other components. */
@@ -162,7 +162,7 @@ namespace pattern {
 
 			private:
 				/** Pointers to childern components of Composite. */
-				ContainerType components_ptrs{};
+				ContainerT components_ptrs{};
 			};
 
 		} // !namespace composite

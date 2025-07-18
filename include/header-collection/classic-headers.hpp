@@ -1,4 +1,4 @@
-#ifndef CLASSIC_HEADERS_HPP
+﻿#ifndef CLASSIC_HEADERS_HPP
 #define CLASSIC_HEADERS_HPP
 
 // https://en.wikipedia.org/wiki/Software_design_pattern
@@ -29,7 +29,14 @@
 // Behavioral
 #include "behavioral/strategy.hpp"
 #include "behavioral/command.hpp"
-#include "behavioral/observer.hpp"
+
+#include "behavioral/observer/generic-observer.hpp"
+#include "behavioral/observer/iobserver.hpp"
+#include "behavioral/observer/observer-others.hpp"
+#include "behavioral/observer/weak-callback-subject.hpp"
+#include "behavioral/observer/observer-weak-msg.hpp"
+#include "behavioral/observer/observer-weak-multi.hpp"
+
 #include "behavioral/state.hpp"
 #include "behavioral/mediator.hpp"
 #include "behavioral/chain-of-responsibility.hpp"
@@ -39,8 +46,5 @@
 #include "behavioral/null-object.hpp"
 
 
-// General - for support
-#include "general/general.hpp"
-#include "general/ieditor.hpp"
 
 #endif // !CLASSIC_HEADERS_HPP

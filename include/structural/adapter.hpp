@@ -1,4 +1,4 @@
-#ifndef ADAPTER_HPP
+﻿#ifndef ADAPTER_HPP
 #define ADAPTER_HPP
 
 #include <memory>
@@ -6,6 +6,11 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace structural {
+
+		namespace adapter_boost {
+			// https://www.boost.org/doc/libs/master/libs/iterator/doc/iterator_adaptor.html
+		}
+
 		namespace adapter {
 			// https://en.wikipedia.org/wiki/Adapter_pattern
 			// https://www.modernescpp.com/index.php/the-adapter-pattern/

@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [1.0.0] - 2025-03-26
 
 ### 🚀 Features
 
@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 - Object Pool pattern with million variants and comments
 - ObjectPool, that can use Vector and List
 - Full realization of crtp idiom.
+- *(memento)* Memento pattern
+- *(mvc)* Mvc pattern
+- *(singleton)* Static and Dynamic singleton
 
 ### 🐛 Bug Fixes
 
@@ -25,11 +28,17 @@ All notable changes to this project will be documented in this file.
 - Readme.md payment methods
 - Readme.md payment methods
 - Memento
+- Readme.md payment methods
+- *(memento.hpp)* Create memento from whole struct object and from separated data members
+- *(memento)* Get memento state correct return. std::pair<> error.
+- *(observer)* Memory violation errors. Cross Attach, Detach for Observer, Subject
 
 ### 📚 Documentation
 
 - Readme repo
 - Trailing space change to <br>
+- Readme repo
+- Merge readme <br> in the end of line
 
 ### 🧪 Testing
 

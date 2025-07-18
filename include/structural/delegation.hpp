@@ -1,4 +1,4 @@
-#ifndef DELEGATION_HPP
+﻿#ifndef DELEGATION_HPP
 #define DELEGATION_HPP
 
 #include <memory>

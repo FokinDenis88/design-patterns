@@ -1,4 +1,4 @@
-#ifndef CRTP_HPP
+﻿#ifndef CRTP_HPP
 #define CRTP_HPP
 
 #include <memory>
@@ -26,7 +26,7 @@ namespace pattern {
 			 * (no constructors or destructors). If the derived class calls an inherited function which then calls another member function, then
 			 * that function will never call any derived or overridden member functions in the derived class.
 			 *
-			 * One issue with static polymorphism is that without using a general base class like AbstractShape from the above example,
+			 * One issue with static polymorphism is that without using a com base class like AbstractShape from the above example,
 			 * derived classes cannot be stored homogeneously – that is, putting different types derived from the same base class in the same container.
 			 *
 			 * Another issue is infinite loop, if in Derived class there is no Base class (overriden) function.
@@ -127,9 +127,9 @@ namespace pattern {
 			 * Partial Interface and Partial Extension variant of crtp pattern.
 			 * Will be used only Derived class.
 			 */
-			template<typename ExtendableType>
+			template<typename ExtendableT>
 			struct NotEqual {
-				friend bool operator!=(const ExtendableType& lhs, const ExtendableType& rhs) noexcept {
+				friend bool operator!=(const ExtendableT& lhs, const ExtendableT& rhs) noexcept {
 					return !(lhs == rhs);
 				}
 			};
@@ -149,23 +149,23 @@ namespace pattern {
 			 * Registry with Object Counter.
 			 * Double linked list.
 			 */
-			template<typename ObjectType>
+			template<typename ObjectT>
 			class Registry {
 			public:
-				friend ObjectType;
+				friend ObjectT;
 
 				static size_t count_;
-				static ObjectType* head_;
+				static ObjectT* head_;
 
-				ObjectType* prev_{};
-				ObjectType* next_{};
+				ObjectT* prev_{};
+				ObjectT* next_{};
 
 			private:
 				Registry() {
 					++count_;
 					prev_ = nullptr;
 					next_ = head_;
-					head_ = static_cast<ObjectType*>(this);
+					head_ = static_cast<ObjectT*>(this);
 					if (next_) { next_->prev_ = head_; }
 				}
 				Registry(const Registry&) {
@@ -179,14 +179,14 @@ namespace pattern {
 					if (head_ == this) { head_ = next_; }
 				}
 			};
-			template<typename ObjectType> size_t Registry<ObjectType>::count_{ 0 };
-			template<typename ObjectType> ObjectType* Registry<ObjectType>::head_{ nullptr };
+			template<typename ObjectT> size_t Registry<ObjectT>::count_{ 0 };
+			template<typename ObjectT> ObjectT* Registry<ObjectT>::head_{ nullptr };
 
 			struct Animal {
-				enum Type { Cat, Dog, Rat };
-				Animal(Type t, const char* n) : type{t}, name{n} {}
+				enum T { Cat, Dog, Rat };
+				Animal(T t, const char* n) : type{t}, name{n} {}
 
-				const Type type;
+				const T type;
 				const char* const name;
 			};
 

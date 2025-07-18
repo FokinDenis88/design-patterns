@@ -1,7 +1,4 @@
-#ifndef ALL_HEADERS_HPP
-#define ALL_HEADERS_HPP
-
-/*
+﻿/*
 AI
 Anti-Pattern
 Architectural
@@ -14,37 +11,49 @@ Distributed - System
 GameDev
 Structural
 UI
+Refactoring
+
+General
 */
 
+#ifndef ALL_HEADERS_HPP
+#define ALL_HEADERS_HPP
 
 // AI
-#include "ai-headers.hpp"
+#include "header-collection/ai-headers.hpp"
 
 // Anti - Pattern
-#include "anti-pattern-headers.hpp"
+#include "header-collection/anti-pattern-headers.hpp"
 
 // Architectural
-#include "architectural-headers.hpp"
+#include "header-collection/architectural-headers.hpp"
 
 // Standard Design Patterns
-#include "classic-headers.hpp"
+#include "header-collection/classic-headers.hpp"
 
 // Concurrency
-#include "concurrency-headers.hpp"
+#include "header-collection/concurrency-headers.hpp"
 
 // Cpp-Idioms
-#include "cpp-idioms-headers.hpp"
+#include "header-collection/cpp-idioms-headers.hpp"
 
 // Database
-#include "database-headers.hpp"
+#include "header-collection/database-headers.hpp"
 
 // Distributed-System
-#include "distributed-system-headers.hpp"
+#include "header-collection/distributed-system-headers.hpp"
 
 // GameDev
-#include "gamedev-headers.hpp"
+#include "header-collection/gamedev-headers.hpp"
 
 // UI
-#include "ui-headers.hpp"
+#include "header-collection/ui-headers.hpp"
+
+// Refactoring
+#include "header-collection/refactoring-headers.hpp"
+
+
+// Support headers
+#include "header-collection/support-headers.hpp"
 
 #endif // !ALL_HEADERS_HPP

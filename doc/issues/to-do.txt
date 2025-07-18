@@ -1,0 +1,42 @@
+﻿Weak-callback-subject  ->  callback-subject. Working with any type of smart pointers in object_ptr member data.
+    Maybe work with generic smart pointer.
+
+
+Check lambdas in stadard parallel algorithms for capturing references, cause parallel algorithms mustn't use shared resources.
+
+
+
+
+
+General:
+Separate classes to different files to make less includes
+
+=====================================Observer Pattern=====================================
+Observer:
+    ObserverWeak:
+// TODO:
+// command pattern instead Update
+// SubjectWeakMultiShared - class with shared_ptr
+// std::set implementation to all functions. all operations O(log n)
+// Update(state)
+// add ranges from c++ 20
+// Maybe make macroses to decrease count of includes. ObserverWeak is for all containers... too many includes
+//
+// refactoring: Function extraction from member methods of ObserverWeakMulti
+//		and SubjectWeakMulti. Many equal code in functions.
+//
+// Partial notification of observers (rare use case?)
+//
+// Mutex, exec notify in another thread to stop freezes of main thread.
+//
+//
+
+Set implementation of CleanExpiredWeakPtr can be less complex = O(log n)
+
+Write Another Subject class Just with Set container
+
+
+1) Object_pool, new thread, async thread notify
+2) Atomic
+3) Raw Observer
+

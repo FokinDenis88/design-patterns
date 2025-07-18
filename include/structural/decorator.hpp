@@ -1,4 +1,4 @@
-#ifndef DECORATOR_HPP
+﻿#ifndef DECORATOR_HPP
 #define DECORATOR_HPP
 
 #include <memory>

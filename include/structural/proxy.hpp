@@ -1,4 +1,4 @@
-#ifndef PROXY_HPP
+﻿#ifndef PROXY_HPP
 #define PROXY_HPP
 
 #include <memory>

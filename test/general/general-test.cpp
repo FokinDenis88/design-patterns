@@ -29,10 +29,13 @@ namespace {
 						std::cout << "std::function " << sizeof(a) << "\n";
 						std::cout << "lambda " << sizeof(b) << "\n";
 
+
+                        std::cout << "std::function " << sizeof(a) << "\n";
+
 						//TestClass<decltype(Receiver::Add)> test{};
 						//int a = 66 - 44;
 
-						//std::function<CommandSTDFunction::ActionType> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
+						//std::function<CommandSTDFunction::ActionT> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
 
 						std::shared_ptr<Receiver> receiver{ std::make_shared<Receiver>() };
 						auto command{ std::make_shared<Command>(&Receiver::Add, *receiver, 40, 50) };
@@ -46,6 +49,21 @@ namespace {
 						//std::cout << "Add_result: " << client.InvokeCommand() << '\n';
 
 						//ASSERT_EQ(1, 2) << "Test CommandSTDFunctionClass";
+
+
+						// Test std::function type convertion experiments
+                        std::function<void()> aa = []() -> void {};
+                        std::function<void()> aa1 = []() -> int { return 0; };
+                        std::function<void()> aa2 = []() -> double { return 1.0; };
+                        auto aa3 = []() -> double { return 1.0; };
+						std::function<void()> aa4 = aa3;
+						//void(* aaa1)() = []() -> int { return 0; }; can't convert
+
+                        std::vector<std::function<void()>> vec{ aa, aa1, aa2, aa3 };
+                        bool flag{ typeid(aa).hash_code() == typeid(aa3).hash_code() };
+
+						//void(Receiver::* my_add)(int, int) = &Receiver::Add;
+						//std::function<void(int, int)> aa5 = std::bind(&Receiver::Add, receiver.get());
 					}
 
 					TEST(CommandTest, CommandMemberFnClass) {
@@ -54,12 +72,12 @@ namespace {
 						//(receiver_test.*fn)(20, 30);
 						//auto res_2{ *fn(&receiver_test, 20, 50) };
 						//auto res_2{ receiver_test.*fn(20, 30) };
-						//std::function<CommandFunction::ActionType> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
+						//std::function<CommandFunction::ActionT> func_object = std::bind(&Receiver::Add, receiver.get(), 40, 50);
 
 						Receiver receiver_test{};
 						std::shared_ptr<Receiver> receiver_2{ std::make_shared<Receiver>() };
-						using CommandType = CommandMemberFn<Receiver, int, int, int>;
-						auto command_2{ std::make_shared<CommandType>(receiver_2, &Receiver::Add, 40, 50) };
+						using CommandT = CommandMemberFn<int, Receiver, int, int>;
+						auto command_2{ std::make_shared<CommandT>(receiver_2, &Receiver::Add, 40, 50) };
 						command_2->Execute();
 						std::unique_ptr<Invoker> invoker_2{ std::make_unique<Invoker>() };
 
@@ -111,9 +129,9 @@ namespace {
 				/*namespace memento_templated {
 					using namespace ::pattern::behavioral::memento_templated;
 					TEST(MementoTest, MementoTemplatedClass) {
-						using MyOriginatorType = Originator<State>;
+						using MyOriginatorT = Originator<State>;
 
-						CareTaker<MyOriginatorType> care_take{};
+						CareTaker<MyOriginatorT> care_take{};
 						Originator<State> originator{};
 						care_take.set_memento(originator.CreateMementoPtr());
 						const State new_state{ 99, 99 };
@@ -127,6 +145,333 @@ namespace {
 
 			namespace null_object{}
 			namespace observer {
+
+				template<typename ObserverT, typename InterfaceObserverT, typename SubjectPtrT>
+				inline void AttachManyExpired(SubjectPtrT& subject_ptr) {
+					std::shared_ptr<InterfaceObserverT> observer_1{ std::make_shared<ObserverT>() };
+					std::shared_ptr<InterfaceObserverT> observer_2{ std::make_shared<ObserverT>() };
+					std::shared_ptr<InterfaceObserverT> observer_3{ std::make_shared<ObserverT>() };
+					std::shared_ptr<InterfaceObserverT> observer_4{ std::make_shared<ObserverT>() };
+					std::shared_ptr<InterfaceObserverT> observer_5{ std::make_shared<ObserverT>() };
+					std::shared_ptr<InterfaceObserverT> observer_6{ std::make_shared<ObserverT>() };
+					std::shared_ptr<InterfaceObserverT> observer_7{ std::make_shared<ObserverT>() };
+
+					subject_ptr->AttachObserver(observer_1);
+					subject_ptr->AttachObserver(observer_2);
+					subject_ptr->AttachObserver(observer_3);
+					subject_ptr->AttachObserver(observer_4);
+					subject_ptr->AttachObserver(observer_5);
+					subject_ptr->AttachObserver(observer_6);
+					subject_ptr->AttachObserver(observer_7);
+				}
+
+
+				namespace weak_callback_subject {
+					using namespace ::pattern::behavioral::weak_callback_subject;
+					using pattern::behavioral::observer::AttachManyExpired;
+					using ::util::MethodActionWrap;
+
+					template<typename ObserverT, typename SubjectT>
+					inline void AttachManyExpiredCallbacks(std::shared_ptr<SubjectT>& subject_ptr) {
+						std::shared_ptr<ObserverT> observer_1{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_2{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_3{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_4{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_5{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_6{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_7{ std::make_shared<ObserverT>() };
+
+						MethodActionWrap callback_1{ &ObserverT::Update, observer_1, std::make_tuple("") };
+						MethodActionWrap callback_2{ &ObserverT::Update, observer_2, std::make_tuple("") };
+						MethodActionWrap callback_3{ &ObserverT::Update, observer_3, std::make_tuple("") };
+						MethodActionWrap callback_4{ &ObserverT::Update, observer_4, std::make_tuple("") };
+						MethodActionWrap callback_5{ &ObserverT::Update, observer_5, std::make_tuple("") };
+						MethodActionWrap callback_6{ &ObserverT::Update, observer_6, std::make_tuple("") };
+						MethodActionWrap callback_7{ &ObserverT::Update, observer_7, std::make_tuple("") };
+
+						subject_ptr->AttachObserver(callback_1);
+						subject_ptr->AttachObserver(callback_2);
+						subject_ptr->AttachObserver(callback_3);
+						subject_ptr->AttachObserver(callback_4);
+						subject_ptr->AttachObserver(callback_5);
+						subject_ptr->AttachObserver(callback_6);
+						subject_ptr->AttachObserver(callback_7);
+					}
+
+					TEST(ObserverTest, WeakCallbackSubjectClass) {
+						auto observer_0{ std::make_shared<MyObserver>() };
+						util::WeakMethodInvoker invoker{&MyObserver::Update, observer_0, std::make_tuple("")};
+						auto result{ invoker() };
+						// TODO: make unit tests of WeakMethodInvoker in cpp-utility project
+
+
+						std::shared_ptr<MySubject> subject_0{};
+						auto subject_1{ std::make_shared<MySubject>() };
+						std::shared_ptr<MySubject> subject_2{ std::make_shared<MySubject>() };
+						std::shared_ptr<MySubject> subject_3{ std::make_shared<MySubject>() };
+
+						auto observer_1{ std::make_shared<MyObserver>() };
+						MethodActionWrap callback_1{ &MyObserver::Update, observer_1, std::make_tuple("") };
+						subject_1->AttachObserver(callback_1);
+						subject_1->AttachObserver(callback_1); // duplicate check
+
+						std::shared_ptr<MyObserver> observer_2{ std::make_shared<MyObserver>() };
+						MethodActionWrap callback_2{ &MyObserver::Update, observer_2, std::make_tuple("") };
+						subject_2->AttachObserver(callback_2);
+
+						std::shared_ptr<MyObserver> observer_3{ std::make_shared<MyObserver>() };
+						MethodActionWrap callback_3{ &MyObserver::Update, observer_3, std::make_tuple("") };
+						subject_3->AttachObserver(callback_3);
+
+						subject_1->state_.a_ = 1;
+						subject_1->state_.b_ = 2;
+						subject_2->state_.a_ = 3;
+						subject_2->state_.b_ = 4;
+						subject_3->state_.a_ = 5;
+						subject_3->state_.b_ = 6;
+
+						observer_1->state_.a_ = 1;
+						observer_1->state_.b_ = 2;
+						observer_2->state_.a_ = 3;
+						observer_2->state_.b_ = 4;
+						observer_3->state_.a_ = 5;
+						observer_3->state_.b_ = 6;
+
+						subject_1->AttachObserver(callback_1);
+						subject_1->AttachObserver(callback_2);
+
+						subject_2->AttachObserver(callback_2);
+						subject_2->AttachObserver(callback_3);
+
+						subject_3->AttachObserver(callback_1);
+						subject_3->AttachObserver(callback_3);
+
+						subject_1->NotifyObservers("Hello");
+						subject_2->NotifyObservers("Hello");
+						subject_3->NotifyObservers("Hello");
+
+						subject_1->DetachObserver(callback_1);
+						subject_1->DetachObserver(callback_2);
+						subject_1->DetachObserver(callback_3);
+						subject_1->AttachObserver(callback_3);
+
+						subject_3->AttachObserver(callback_2);
+
+						std::shared_ptr<MySubject> subject_4{ std::make_shared<MySubject>() };
+						subject_4->state_.a_ = 44;
+						subject_4->state_.b_ = 44;
+						{ // Destructor test
+							std::shared_ptr<MySubject> subject_5{};
+							std::shared_ptr<MyObserver> observer_4{ std::make_shared<MyObserver>() };
+							observer_4->state_.a_ = 77;
+							observer_4->state_.b_ = 77;
+						}
+						subject_1->CleanupAllExpired();
+
+						subject_1->AttachObserver(callback_1);
+						subject_1->AttachObserver(callback_2);
+						subject_1->AttachObserver(callback_3);
+						subject_1->HasCallback(callback_3);
+						// TODO: exception after AttachManyExpiredCallbacks on random HasCallback. access violation reading
+						// Problem after cleanup of expired callbacks
+						AttachManyExpiredCallbacks<MyObserver>(subject_1);
+						subject_1->HasCallback(callback_3);
+						//subject_1->NotifyObservers();
+						subject_1->CleanupAllExpired();
+						subject_1->HasCallback(callback_3);
+
+						subject_1->HasCallback(callback_1);
+						subject_1->HasCallback(callback_2);
+						subject_1->HasCallback(callback_3);
+						std::shared_ptr<MyObserver> observer_5{ std::make_shared<MyObserver>() };
+						MethodActionWrap callback_5{ &MyObserver::Update, observer_5, std::make_tuple("") };
+						//AttachManyExpiredCallbacks<MyObserver>(subject_1);
+						subject_1->AttachObserver(callback_5);
+
+						//AttachManyExpiredCallbacks<MyObserver>(subject_1);
+						subject_1->DetachObserver(callback_5);
+
+						int a = 2;
+					};
+				} // !namespace weak_callback_subject
+
+
+				namespace observer_weak_msg {
+					using namespace ::pattern::behavioral::observer_weak_msg;
+					using pattern::behavioral::observer::AttachManyExpired;
+
+					TEST(ObserverTest, ObserverWeakMsgClass) {
+						std::shared_ptr<MySubject> subject_0{};
+						auto subject_1{ std::make_shared<MySubject>() };
+						std::shared_ptr<MySubject> subject_2{ std::make_shared<MySubject>() };
+						std::shared_ptr<MySubject> subject_3{ std::make_shared<MySubject>() };
+
+						auto observer_1{ std::make_shared<MyObserver>() };
+						std::shared_ptr<IObserverMsg> iobserver_1{ observer_1 };
+						subject_1->AttachObserver(iobserver_1);
+						subject_1->AttachObserver(iobserver_1); // duplicate check
+
+						auto observer_2{ std::make_shared<MyObserver>() };
+						std::shared_ptr<IObserverMsg> iobserver_2{ observer_2 };
+						subject_2->AttachObserver(iobserver_2);
+						std::shared_ptr<MyObserver> observer_3{ std::make_shared<MyObserver>() };
+						std::shared_ptr<IObserverMsg> iobserver_3{ observer_3 };
+						subject_3->AttachObserver(iobserver_3);
+
+						subject_1->state_.a_ = 1;
+						subject_1->state_.b_ = 2;
+						subject_2->state_.a_ = 3;
+						subject_2->state_.b_ = 4;
+						subject_3->state_.a_ = 5;
+						subject_3->state_.b_ = 6;
+
+						observer_1->state_.a_ = 1;
+						observer_1->state_.b_ = 2;
+						observer_2->state_.a_ = 3;
+						observer_2->state_.b_ = 4;
+						observer_3->state_.a_ = 5;
+						observer_3->state_.b_ = 6;
+
+						subject_1->AttachObserver(std::static_pointer_cast<IObserverMsg>(observer_1));
+						subject_1->AttachObserver(iobserver_2);
+
+						subject_2->AttachObserver(iobserver_2);
+						subject_2->AttachObserver(iobserver_3);
+
+						subject_3->AttachObserver(iobserver_1);
+						subject_3->AttachObserver(iobserver_3);
+
+						subject_1->NotifyObservers("Hello");
+						subject_2->NotifyObservers("Hello");
+						subject_3->NotifyObservers("Hello");
+
+						subject_1->DetachObserver(iobserver_1);
+						subject_1->DetachObserver(iobserver_2);
+						subject_1->DetachObserver(iobserver_3);
+						subject_1->AttachObserver(iobserver_3);
+
+						subject_3->AttachObserver(iobserver_2);
+
+						std::shared_ptr<MySubject> subject_4{ std::make_shared<MySubject>() };
+						subject_4->state_.a_ = 44;
+						subject_4->state_.b_ = 44;
+						{ // Destructor test
+							std::shared_ptr<MySubject> subject_5{};
+							std::shared_ptr<MyObserver> observer_4{ std::make_shared<MyObserver>() };
+							observer_4->state_.a_ = 77;
+							observer_4->state_.b_ = 77;
+						}
+						subject_1->CleanupAllExpired();
+
+						subject_1->AttachObserver(iobserver_1);
+						subject_1->AttachObserver(iobserver_2);
+						subject_1->AttachObserver(iobserver_3);
+						AttachManyExpired<MyObserver, IObserverMsg>(subject_1);
+						subject_1->NotifyObservers();
+
+						subject_1->HasObserverNClean(iobserver_1);
+						subject_1->HasObserverNClean(iobserver_2);
+						subject_1->HasObserverNClean(iobserver_3);
+						AttachManyExpired<MyObserver, IObserverMsg>(subject_1);
+						std::shared_ptr<MyObserver> observer_5{ std::make_shared<MyObserver>() };
+						std::shared_ptr<IObserverMsg> iobserver_5{ observer_5 };
+						subject_1->AttachObserver(iobserver_5);
+
+
+						AttachManyExpired<MyObserver, IObserverMsg>(subject_1);
+						subject_1->DetachObserver(iobserver_5);
+
+						int a = 2;
+					};
+				} // !namespace observer_weak_msg
+
+
+				namespace weak_observer_multi {
+					using namespace ::pattern::behavioral::observer_weak_multi;
+					using pattern::behavioral::observer::AttachManyExpired;
+
+                    TEST(ObserverTest, ObserverWeakMultiClass) {
+                        //=========Ref============
+						std::shared_ptr<MySubject<>> subject_0{};
+						auto subject_1{ std::make_shared<MySubject<std::execution::parallel_policy>>() };
+						std::shared_ptr<MySubject<>> subject_2{ std::make_shared<MySubject<>>() };
+						std::shared_ptr<MySubject<>> subject_3{ std::make_shared<MySubject<>>() };
+
+						auto observer_1{ std::make_shared<MyObserver<std::execution::parallel_policy>>() };
+						observer_1->AttachSubject(subject_1);
+						observer_1->AttachSubject(subject_1); // duplicate check
+						std::shared_ptr<MyObserver<>> observer_2{ std::make_shared<MyObserver<>>() };
+						observer_2->AttachSubject(subject_2);
+						std::shared_ptr<MyObserver<>> observer_3{ std::make_shared<MyObserver<>>() };
+						observer_3->AttachSubject(subject_3);
+
+                        subject_1->state_.a_ = 1;
+                        subject_1->state_.b_ = 2;
+                        subject_2->state_.a_ = 3;
+                        subject_2->state_.b_ = 4;
+                        subject_3->state_.a_ = 5;
+                        subject_3->state_.b_ = 6;
+
+                        observer_1->state_.a_ = 1;
+                        observer_1->state_.b_ = 2;
+                        observer_2->state_.a_ = 3;
+                        observer_2->state_.b_ = 4;
+                        observer_3->state_.a_ = 5;
+                        observer_3->state_.b_ = 6;
+
+                        subject_1->AttachObserver(observer_1);
+                        subject_1->AttachObserver(observer_2);
+
+                        subject_2->AttachObserver(observer_2);
+                        subject_2->AttachObserver(observer_3);
+
+                        subject_3->AttachObserver(observer_1);
+                        subject_3->AttachObserver(observer_3);
+
+                        subject_1->NotifyObserversMulti();
+                        subject_2->NotifyObserversMulti();
+                        subject_3->NotifyObserversMulti();
+
+						// TODO: exception on detach
+                        subject_1->DetachObserver(observer_1);
+                        subject_1->DetachObserver(observer_2);
+						subject_1->DetachObserver(observer_3);
+                        subject_1->AttachObserver(observer_3);
+
+                        subject_3->AttachObserver(observer_2);
+
+						std::shared_ptr<MySubject<>> subject_4{ std::make_shared<MySubject<>>() };
+						subject_4->state_.a_ = 44;
+						subject_4->state_.b_ = 44;
+                        { // Destructor test
+							std::shared_ptr<MySubject<>> subject_5{};
+							std::shared_ptr<MyObserver<>> observer_4{ std::make_shared<MyObserver<>>() };
+							observer_4->state_.a_ = 77;
+							observer_4->state_.b_ = 77;
+							observer_4->AttachSubject(subject_4);
+                        }
+						subject_1->DetachNExpired(0, true);
+						observer_1->DetachNExpired(0, true);
+
+						subject_1->AttachObserver(observer_1);
+						subject_1->AttachObserver(observer_2);
+						subject_1->AttachObserver(observer_3);
+						AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
+						subject_1->NotifyObservers();
+
+						AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
+						std::shared_ptr<MyObserver<>> observer_5{ std::make_shared<MyObserver<>>() };
+						subject_1->AttachObserver(observer_5);
+
+
+						AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
+						subject_1->DetachObserver(observer_5);
+
+                        int a = 2;
+                    };
+                } // !namespace weak_observer_multi
+
+
 				namespace observer_ref {
 					using namespace ::pattern::behavioral::observer_ref;
 					TEST(ObserverTest, ObserverRefClass) {
@@ -147,33 +492,40 @@ namespace {
                         observer_3.state_.a_ = 5;
                         observer_3.state_.b_ = 6;
 
-						subject_1.AttachObserver(observer_1);
-						subject_1.AttachObserver(observer_2);
+						subject_1.AttachObserverNSubject(observer_1);
+						subject_1.AttachObserverNSubject(observer_2);
 
-                        subject_2.AttachObserver(observer_2);
-                        subject_2.AttachObserver(observer_3);
+                        subject_2.AttachObserverNSubject(observer_2);
+                        subject_2.AttachObserverNSubject(observer_3);
 
-                        subject_3.AttachObserver(observer_1);
-                        subject_3.AttachObserver(observer_3);
+                        subject_3.AttachObserverNSubject(observer_1);
+                        subject_3.AttachObserverNSubject(observer_3);
 
 						subject_1.NotifyObserversMulti();
 						subject_2.NotifyObserversMulti();
 						subject_3.NotifyObserversMulti();
 
-						subject_1.DetachObserver(observer_1);
-						subject_1.DetachObserver(observer_2);
+						subject_1.DetachObserverNSubject(observer_1);
+						subject_1.DetachObserverNSubject(observer_2);
 						subject_1.ClearAllObservers();
-						subject_1.AttachObserver(observer_3);
+						subject_1.AttachObserverNSubject(observer_3);
 
-						subject_3.AttachObserver(observer_2);
+						subject_3.AttachObserverNSubject(observer_2);
 						subject_3.ClearAllObservers();
+
+
+						MySubject subject_4{};
+						{ // Destructor test
+							MySubject subject_5{};
+							MyObserver observer_4{ subject_4 };
+						}
 
 						int a = 2;
 					};
 				} // !namespace observer_ref
 
 				namespace observer_smart_ptr {
-					using namespace ::pattern::behavioral::observer_ptr;
+					using namespace ::pattern::behavioral::observer_ptr_old;
 					TEST(ObserverTest, ObserverSmartPtrSimpleClass) {
 						//======Simple============
 						Subject subject{};
@@ -205,7 +557,7 @@ namespace {
 
 						int a = 66 - 66;
 					};
-				} // !namespace observer_ptr
+				} // !namespace observer_ptr_old
 			}
 			namespace state {
 				using namespace ::pattern::behavioral::originator_state_;
@@ -317,7 +669,7 @@ namespace {
 					auto& d{ SingletonDynamic<int>::GetSingleton() };
 
 					SingletonDynamic<int>::DestructSingleton();
-					d = SingletonDynamic<int>::GetSingleton();
+					//d = SingletonDynamic<int>::GetSingleton();
 
 					//ConcreteSingleton my_singleton;
                     //EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
@@ -397,57 +749,125 @@ namespace {
 
 		} // !namespace ui
 
-
-		/** https://google.github.io/googletest/primer.html */
-		namespace help {
-			// Info
-			// Test Suite, Test Case
-			// TEST(ObjectPoolTest, ObjectPoolClass) {}
-			// Fixture class for common object for some Test Cases
-
-			struct Foo {
-				int a{};
-			};
-
-			// The fixture for testing class Foo.
-			class FooTest : public testing::Test {
-			protected:
-				// You can remove any or all of the following functions if their bodies would
-				// be empty.
-
-				FooTest() {
-					// You can do set-up work for each test here.
-				}
-
-				~FooTest() override {
-					// You can do clean-up work that doesn't throw exceptions here.
-				}
-
-				// If the constructor and destructor are not enough for setting up
-				// and cleaning up each test, you can define the following methods:
-
-				void SetUp() override {
-					// Code here will be called immediately after the constructor (right
-					// before each test).
-				}
-
-				void TearDown() override {
-					// Code here will be called immediately after each test (right
-					// before the destructor).
-				}
-
-				// Class members declared here can be used by all tests in the test suite
-				// for Foo.
-			};
-
-			// Tests that the Foo::Bar() method does Abc.
-			TEST_F(FooTest, MethodBarDoesAbc) {
-				const std::string input_filepath = "this/package/testdata/myinputfile.dat";
-				const std::string output_filepath = "this/package/testdata/myoutputfile.dat";
-				Foo f;
-				//EXPECT_EQ(f.Bar(input_filepath, output_filepath), 0);
-			}
-		} // !namespace help
-
 	}  // !pattern
+
+
+    namespace refactoring {
+        namespace encapsulate_variable {
+
+			using namespace ::refactoring::encapsulate_variable;
+
+            // Test How to track changes of global variable
+			int abc__{};
+			int abc_fn() {
+				static int abc{};
+				return abc;
+			};
+
+			TEST(EncapsulateVariableTest, EncapsulateVariableTuple) {
+				// How to Track changes of global variable?
+				// You can use data breakpoint to track changes of global variable
+				abc__ = 3;
+				abc__ = abc_fn();
+				using GlobalVarsT = GlobalVariablesTuple<GlobalVariablesEnum,
+																int, // a
+																double // b
+															>;
+
+				constexpr GlobalVariablesEnum a_enum{ GlobalVariablesEnum::a };
+				int a = GlobalVarsT::get_variable<GlobalVariablesEnum::a>();
+				GlobalVarsT::set_variable<GlobalVariablesEnum::a>(-33);
+				GlobalVarsT::set_variable<GlobalVariablesEnum::b>(66.0);
+				int aa = GlobalVarsT::get_variable<a_enum>();
+				int bbb = GlobalVarsT::get_variable<GlobalVariablesEnum::b>();
+
+				//EXPECT_EQ(pool.SizeMaxAvailableResources(), 10) << " Hello World\n";
+				EXPECT_EQ(GlobalVarsT::get_variable<GlobalVariablesEnum::a>(), -33);
+				EXPECT_EQ(GlobalVarsT::get_variable<GlobalVariablesEnum::b>(), 66.0);
+			}
+        } // !namespace encapsulate_variable
+
+    } // !namespace refactoring
+
+
+	namespace common {
+		namespace error {
+			using namespace ::error;
+
+			TEST(ErrorTest, ErrorClass) {
+				Error<ErrorInfoDetailed> my_error{};
+
+				//EXPECT_EQ(GlobalVarsT::get_variable<GlobalVariablesEnum::a>(), -33);
+				//EXPECT_EQ(GlobalVarsT::get_variable<GlobalVariablesEnum::b>(), 66.0);
+			}
+
+			TEST(ErrorTest, ExceptionClass) {
+				GeneralException my_exception{ std::exception{}, ErrorInfoGeneral{FILE_N_LINE, "Hello World"} };
+
+				//EXPECT_EQ(GlobalVarsT::get_variable<GlobalVariablesEnum::a>(), -33);
+				//EXPECT_EQ(GlobalVarsT::get_variable<GlobalVariablesEnum::b>(), 66.0);
+			}
+
+		} // !namespace error
+
+
+		namespace thread {
+			//using namespace ::common::thread;
+
+		} // !namespace thread
+
+	} // !namespace common
+
+
+    /** https://google.github.io/googletest/primer.html */
+    namespace help {
+        // Info
+        // Test Suite, Test Case
+        // TEST(ObjectPoolTest, ObjectPoolClass) {}
+        // Fixture class for common object for some Test Cases
+
+        struct Foo {
+            int a{};
+        };
+
+        // The fixture for testing class Foo.
+        class FooTest : public testing::Test {
+        protected:
+            // You can remove any or all of the following functions if their bodies would
+            // be empty.
+
+            FooTest() {
+                // You can do set-up work for each test here.
+            }
+
+            ~FooTest() override {
+                // You can do clean-up work that doesn't throw exceptions here.
+            }
+
+            // If the constructor and destructor are not enough for setting up
+            // and cleaning up each test, you can define the following methods:
+
+            void SetUp() override {
+                // Code here will be called immediately after the constructor (right
+                // before each test).
+            }
+
+            void TearDown() override {
+                // Code here will be called immediately after each test (right
+                // before the destructor).
+            }
+
+            // Class members declared here can be used by all tests in the test suite
+            // for Foo.
+        };
+
+        // Tests that the Foo::Bar() method does Abc.
+        TEST_F(FooTest, MethodBarDoesAbc) {
+            const std::string input_filepath = "this/package/testdata/myinputfile.dat";
+            const std::string output_filepath = "this/package/testdata/myoutputfile.dat";
+            Foo f;
+            //EXPECT_EQ(f.Bar(input_filepath, output_filepath), 0);
+        }
+    } // !namespace help
+
 }  // !unnamed namespace

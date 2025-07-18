@@ -1,4 +1,4 @@
-#ifndef CPP_IDIOMS_HEADERS_HPP
+﻿#ifndef CPP_IDIOMS_HEADERS_HPP
 #define CPP_IDIOMS_HEADERS_HPP
 
 //https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms
@@ -18,21 +18,21 @@
 12. Clear - and -minimize
 13. Coercion by Member Template
 14. Computational Constructor
-15. Concrete Data Type
+15. Concrete Data T
 16. Construct On First Use
 17. Construction Tracker
 18. Copy - and -swap
 19. Copy - on - write
 20. Thread - safe Copy - on - write
 21. Intrusive reference counting(Counted Body)
-22. Covariant Return Types TODO
+22. Covariant Return Ts TODO
 23. Curiously Recurring Template Pattern(CRTP)
 24. Deprecate and Delete TODO
 25. Empty Base Optimization(EBO)
 26. enable - if
 27. Erase - Remove
 28. Execute - Around Pointer
-29. Exploding Return Type TODO
+29. Exploding Return T TODO
 30. Export Guard Macro TODO
 31. Expression - template
 32. Fake Vtable TODO
@@ -47,7 +47,7 @@
 41. Include Guard Macro
 42. Inline Guard Macro
 43. Inner Class
-44. Int - To - Type
+44. Int - To - T
 45. Interface Class
 46. Iterator Pair
 47. Making New Friends
@@ -73,12 +73,12 @@
 67. Policy Clone(Metafunction wrapper)
 68. Policy - based Design TODO
 69. Polymorphic Exception
-70. Polymorphic Value Types  TODO
-71. Recursive Type Composition TODO
+70. Polymorphic Value Ts  TODO
+71. Recursive T Composition TODO
 72. Requiring or Prohibiting Heap - based Objects
 73. Resource Acquisition Is Initialization(RAII, Execute - Around Object, Scoped Locking)
 74. Resource Return
-75. Return Type Resolver
+75. Return T Resolver
 76. Runtime Static Initialization Order Idioms
 77. Safe bool
 78. Scope Guard
@@ -95,10 +95,10 @@
 89. Thin Template
 90. Thread - Safe Interface TODO
 91. Traits  TODO
-92. Type Erasure
-93. Type Generator(Templated Typedef)
-94. Type Safe Enum
-95. Type Selection
+92. T Erasure
+93. T Generator(Templated Tdef)
+94. T Safe Enum
+95. T Selection
 96. Virtual Constructor
 97. Virtual Friend Function
 */

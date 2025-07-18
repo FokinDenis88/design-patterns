@@ -1,4 +1,4 @@
-#ifndef OBJECT_POOL_HPP
+﻿#ifndef OBJECT_POOL_HPP
 #define OBJECT_POOL_HPP
 
 #include <memory>
@@ -13,6 +13,11 @@
 /** Software Design Patterns */
 namespace pattern {
 	namespace creational {
+
+		namespace object_pool_boost {
+			// https://www.boost.org/doc/libs/1_40_0/libs/pool/doc/index.html
+		}
+
 		namespace object_pool {
 			// https://sourcemaking.com/design_patterns/object_pool/cpp/1
 			// https://gameprogrammingpatterns.com/object-pool.html
@@ -34,15 +39,15 @@ namespace pattern {
 			};
 
 			/** Functor callable object */
-			template<typename ObjectPoolType>
+			template<typename ObjectPoolT>
 			struct ObjectPoolDeleterFunctor {
 				void operator()(IObjectPoolResource* used_resource) const {
-					ObjectPoolType::GetInstance().ReturnResourceToPool(used_resource);
+					ObjectPoolT::GetInstance().ReturnResourceToPool(used_resource);
 				}
 			};
 
 			/** Abstract. Hybrid version CRTP idiom. */
-			template<typename ObjectPoolType>
+			template<typename ObjectPoolT>
 			class IObjectPool {
 			protected:
 				IObjectPool() = default;
@@ -53,19 +58,19 @@ namespace pattern {
 			public:
 				virtual ~IObjectPool() = default;
 
-				using DeleterType = ObjectPoolDeleterFunctor<ObjectPoolType>;
-				using ResourcePtrType = std::unique_ptr<IObjectPoolResource, DeleterType>;
+				using DeleterT = ObjectPoolDeleterFunctor<ObjectPoolT>;
+				using ResourcePtrT = std::unique_ptr<IObjectPoolResource, DeleterT>;
 
 
 				/** Return resource. For Deleter function. */
 				virtual void ReturnResourceToPool(IObjectPoolResource* returning_resource) = 0;
 
 				/** Return resource from object pool */
-				virtual void ReturnResourceToPool(ResourcePtrType&& returning_resource) = 0;
+				virtual void ReturnResourceToPool(ResourcePtrT&& returning_resource) = 0;
 
 
 				/** Get resource from object pool */
-				virtual ResourcePtrType GetResourceFromPool() = 0;
+				virtual ResourcePtrT GetResourceFromPool() = 0;
 			};
 
 
@@ -85,14 +90,14 @@ namespace pattern {
 			};
 
 
-			/** Metafunction for defining Type of Object Pool Container */
-			template<typename ContainerType, bool kIsVectorFlag>
+			/** Metafunction for defining T of Object Pool Container */
+			template<typename ContainerT, bool kIsVectorFlag>
 			struct VectorOrList {
-				using Type = std::vector<ContainerType>;
+				using T = std::vector<ContainerT>;
 			};
-			template<typename ContainerType>
-			struct VectorOrList<ContainerType, false> {
-				using Type = std::list<ContainerType>;
+			template<typename ContainerT>
+			struct VectorOrList<ContainerT, false> {
+				using T = std::list<ContainerT>;
 			};
 
 
@@ -103,20 +108,20 @@ namespace pattern {
 			 *
 			 * @param kIsVector indicates the type of resource storage container
 			 */
-			template<typename ObjectPoolResourceType, bool kIsVector = true>
-			requires std::derived_from<ObjectPoolResourceType, IObjectPoolResource>
-			class ObjectPool : public IObjectPool<ObjectPool<ObjectPoolResourceType, kIsVector>> {
+			template<typename ObjectPoolResourceT, bool kIsVector = true>
+			requires std::derived_from<ObjectPoolResourceT, IObjectPoolResource>
+			class ObjectPool : public IObjectPool<ObjectPool<ObjectPoolResourceT, kIsVector>> {
 			public:
-				using IObjectPoolType	= IObjectPool<ObjectPool<ObjectPoolResourceType, kIsVector>>;
-				/** ObjectPoolDeleterFunctor<ObjectPoolType>; */
-				using DeleterType		= IObjectPoolType::DeleterType;
-				/** std::unique_ptr<IObjectPoolResource, DeleterType>; */
-				using ResourcePtrType	= IObjectPoolType::ResourcePtrType;
+				using IObjectPoolT	= IObjectPool<ObjectPool<ObjectPoolResourceT, kIsVector>>;
+				/** ObjectPoolDeleterFunctor<ObjectPoolT>; */
+				using DeleterT		= IObjectPoolT::DeleterT;
+				/** std::unique_ptr<IObjectPoolResource, DeleterT>; */
+				using ResourcePtrT	= IObjectPoolT::ResourcePtrT;
 
-				using IObjectPoolType::ReturnResourceToPool;
-				using IObjectPoolType::GetResourceFromPool;
+				using IObjectPoolT::ReturnResourceToPool;
+				using IObjectPoolT::GetResourceFromPool;
 
-				using PoolContainerType	= VectorOrList<ResourcePtrType, kIsVector>::Type;
+				using PoolContainerT	= VectorOrList<ResourcePtrT, kIsVector>::T;
 
 
 				/**
@@ -130,20 +135,20 @@ namespace pattern {
 				}
 
 				void ReturnResourceToPool(IObjectPoolResource* used_resource) override {
-					resources_.emplace_back(used_resource, DeleterType());
+					resources_.emplace_back(used_resource, DeleterT());
 				};
 
-				void ReturnResourceToPool(ResourcePtrType&& used_resource) override {
+				void ReturnResourceToPool(ResourcePtrT&& used_resource) override {
 					resources_.emplace_back(std::move(used_resource));
 				};
 
-				ResourcePtrType GetResourceFromPool() override {
+				ResourcePtrT GetResourceFromPool() override {
 					if (resources_.empty() && new_objects_limit_ > 0) { // There is opportunity to add new resource
 						resources_.emplace_back(CreateNewResource());
 						--new_objects_limit_;
 					}
 
-					ResourcePtrType resource_ptr{ (!resources_.empty()) ? std::move(resources_.back()) : nullptr };
+					ResourcePtrT resource_ptr{ (!resources_.empty()) ? std::move(resources_.back()) : nullptr };
 					if (!resources_.empty()) {
 						resources_.pop_back();
 					}
@@ -204,13 +209,13 @@ namespace pattern {
 
 
 				/** Creating new resource, that can be stored in resources_ vector */
-				inline ResourcePtrType CreateNewResource() const noexcept {
-					return ResourcePtrType(new ObjectPoolResourceType, DeleterType());
+				inline ResourcePtrT CreateNewResource() const noexcept {
+					return ResourcePtrT(new ObjectPoolResourceT, DeleterT());
 				}
 
 
 				/** To solve the curse of Fragmentation object pool can be stored in contiguous container */
-				PoolContainerType resources_{};
+				PoolContainerT resources_{};
 
 				/**
 				 * How many objects you can get from Object Pool.

@@ -29,13 +29,13 @@ namespace pattern {
 			 * Class, which can be instantiated only one time. Instance is stored in dynamic memory - heap.
 			 * Code and Data of real class must be inside of Singleton class.
 			 */
-			template<typename SingletonType>
+			template<typename SingletonT>
 			class SingletonDynamic {
 			public:
 
 				/** Defines an class operation that lets clients access its unique instance. */
-				static SingletonType& GetSingleton() { // may be responsible for creating its own unique instance.
-					if (!instance_ptr) { instance_ptr = std::make_unique<SingletonType>(); }
+				static SingletonT& GetSingleton() { // may be responsible for creating its own unique instance.
+					if (!instance_ptr) { instance_ptr = std::make_unique<SingletonT>(); }
 					return (*instance_ptr); // reference
 				};
 
@@ -54,7 +54,7 @@ namespace pattern {
 
 			private:
 				/** Pointer to the only one object of class. Singleton instance. */
-				inline static std::unique_ptr<SingletonType> instance_ptr{ nullptr };
+				inline static std::unique_ptr<SingletonT> instance_ptr{ nullptr };
 			};
 
 
@@ -62,14 +62,14 @@ namespace pattern {
 			 * Class, which can be instantiated only one time. Instance is stored in global memory, static storage duration.
 			 * Code and Data of real class must be inside of Singleton class.
 			 *
-			 * @tparam SingletonType concrete class of singleton object
+			 * @tparam SingletonT concrete class of singleton object
 			 */
-			template<typename SingletonType>
+			template<typename SingletonT>
 			class SingletonStatic {
 			public:
 				/** Get the only one instance of class */
-				static SingletonType& GetSingleton() {
-					static SingletonType instance{};
+				static SingletonT& GetSingleton() {
+					static SingletonT instance{};
 					return (instance);
 				};
 
@@ -89,24 +89,24 @@ namespace pattern {
 			 *
 			 * @return Singleton object, stored statically inside function, in global memory..
 			 */
-            template<typename SingletonType>
-            SingletonType& SingletonFn() {
-                static SingletonType singleton{};
+            template<typename SingletonT>
+            SingletonT& SingletonFn() {
+                static SingletonT singleton{};
                 return (singleton);
             }
 
             /** Class, which can be instantiated only one time.  Instance is stored in global memory. */
-            template<typename SingletonType>
+            template<typename SingletonT>
             class SingletonStaticField {
             public:
-                static SingletonType instance_{};
+                static SingletonT instance_{};
 
             private:
                 SingletonStaticField() = default;
-                SingletonStaticField(const SingletonStaticField<SingletonType>&) = delete;
-				SingletonStaticField& operator=(const SingletonStaticField<SingletonType>&) = delete;
-				SingletonStaticField(SingletonStaticField<SingletonType>&&) noexcept = delete;
-				SingletonStaticField& operator=(SingletonStaticField<SingletonType>&&) noexcept = delete;
+                SingletonStaticField(const SingletonStaticField<SingletonT>&) = delete;
+				SingletonStaticField& operator=(const SingletonStaticField<SingletonT>&) = delete;
+				SingletonStaticField(SingletonStaticField<SingletonT>&&) noexcept = delete;
+				SingletonStaticField& operator=(SingletonStaticField<SingletonT>&&) noexcept = delete;
                 ~SingletonStaticField() = default;
             };
 
@@ -115,9 +115,9 @@ namespace pattern {
 			 * Class, which can be instantiated custom number of time. Instance is stored in global memory, static storage duration.
 			 * Code and Data of real class must be inside of Singleton class.
 			 *
-			 * @tparam SingletonType concrete class of singleton object
+			 * @tparam SingletonT concrete class of singleton object
 			 */
-			template<typename SingletonType>
+			template<typename SingletonT>
 			class SingletonStaticMulti {
 			public:
 				/**
@@ -127,9 +127,9 @@ namespace pattern {
 				 * @param max_size_new - number of singleton instances. [1, +eternity].
 				 * @return
 				 */
-				static SingletonType& GetSingleton(const size_t index = 0,
+				static SingletonT& GetSingleton(const size_t index = 0,
 												   const size_t max_size_new = 0) {
-					static std::vector<SingletonType> instance(1);
+					static std::vector<SingletonT> instance(1);
 					if (max_size_new >= 1) { instance.resize(max_size_new); }
 					if (index <= max_size_new - 1) { return (instance[index]); } // TODO: review different variants of index and max_size
 					return instance[0];
@@ -174,11 +174,11 @@ namespace pattern {
             };
 
 
-   //         template<typename SingletonType>
+   //         template<typename SingletonT>
    //         class SingletonRegistry {
    //         public:
-   //             static SingletonType& GetSingleton() {
-   //                 static SingletonType instance{};
+   //             static SingletonT& GetSingleton() {
+   //                 static SingletonT instance{};
    //                 return (instance);
    //             };
 
@@ -210,11 +210,11 @@ namespace pattern {
 
 			/* TODO: Make SingletonFabric
 			GetSingleton may choose what class to instantiate
-			template<typename SingletonType>
+			template<typename SingletonT>
 			class SingletonFabric {
             public:
-                static SingletonType& GetSingleton(std::string class_type) {
-                    static SingletonType instance{};
+                static SingletonT& GetSingleton(std::string class_type) {
+                    static SingletonT instance{};
                     return (instance);
                 };
 
@@ -292,20 +292,20 @@ namespace pattern {
 		namespace singleton_example {
 
 			/** Class, which can be instantiated only one time. Instance is stored in heap. */
-			template<typename DataType>
+			template<typename DataT>
 			class Singleton {
 			public:
 				/** Get the only one instance of class */
 				static Singleton& Get() {
 					static Singleton instance{};
 					if (!instance.data) {
-						instance.data = std::make_unique<DataType>();
+						instance.data = std::make_unique<DataT>();
 					}
 					return (instance);
 				}
 
 				/** Data to be stored in singleton */
-				std::unique_ptr<DataType> data{};
+				std::unique_ptr<DataT> data{};
 
 			private:
 				/** There must be only one instance of class, so hidden constructor */
@@ -317,9 +317,9 @@ namespace pattern {
 
 
 
-			template<typename SingletonType>
-			SingletonType& SingletonFunction() {
-				static SingletonType singleton{};
+			template<typename SingletonT>
+			SingletonT& SingletonFunction() {
+				static SingletonT singleton{};
 				return (singleton);
 			}
 
@@ -327,20 +327,20 @@ namespace pattern {
 
 
 			/** Class, which can be instantiated only one time.  Instance is stored in global memory. */
-			template<typename SingletonType>
+			template<typename SingletonT>
 			class SingletonStatic {
 			public:
-				static SingletonType instance_{};
+				static SingletonT instance_{};
 
 			private:
 				SingletonStatic() = default;
-				SingletonStatic(const SingletonStatic<SingletonType>&) = default;
-				SingletonStatic& operator=(const SingletonStatic<SingletonType>&) = default;
+				SingletonStatic(const SingletonStatic<SingletonT>&) = default;
+				SingletonStatic& operator=(const SingletonStatic<SingletonT>&) = default;
 				~SingletonStatic() = default;
 			};
 
 			/** Class, which can be instantiated only one time. Instance is stored in heap. */
-			template<typename DataType>
+			template<typename DataT>
 			class Singleton_2 {
 			public:
 				Singleton_2(const Singleton_2&) = delete;
@@ -359,7 +359,7 @@ namespace pattern {
 				}
 
 				/** Data to be stored in singleton */
-				DataType data{};
+				DataT data{};
 
 			private:
 				/** There must be only one instance of class, so hidden constructor */

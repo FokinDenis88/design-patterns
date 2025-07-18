@@ -1,4 +1,4 @@
-#ifndef ATTORNEY_CLIENT_HPP
+﻿#ifndef ATTORNEY_CLIENT_HPP
 #define ATTORNEY_CLIENT_HPP
 
 #include <memory>
@@ -19,10 +19,10 @@ namespace pattern {
 			private:
 				// All private data members and all private non - virtual member functions are placed in the implementation class.
 
-				/** Unspecified Type */
+				/** Unspecified T */
 				struct Impl;
 
-				/** Opaque Pointer to Unspecified Type */
+				/** Opaque Pointer to Unspecified T */
 				std::unique_ptr<Impl> pImpl_;
 			};
 

@@ -5,10 +5,10 @@
 #include <utility>
 
 
-#include "behavioral/observer.hpp"
+#include "behavioral/observer/observer-others.hpp"
 #include "behavioral/strategy.hpp"
-#include "general/ieditor.hpp"
 #include "structural/composite.hpp"
+#include "general-utilities-library/ieditor.hpp"
 
 
 //#include "creational/factory-method.hpp"
@@ -98,9 +98,9 @@ namespace pattern {
 			/** In standard realization model and view are not stored in controller. */
 
 
-
-			using pattern::behavioral::observer_ref::ObserverSetMulti;
-			using pattern::behavioral::observer_ref::SubjectSetMulti;
+			using util::IEditor;
+			using pattern::behavioral::observer_ref::ObserverRefSetMulti;
+			using pattern::behavioral::observer_ref::SubjectRefSetMulti;
 
 			using pattern::structural::composite::NonTerminalComponent;
 			using pattern::structural::composite::TerminalComponent;
@@ -119,7 +119,7 @@ namespace pattern {
 			 * Business logic: validation, data transformation, and calculations.
 			 * One model object may hear from many different controllers.
 			 */
-			class Model : public IEditor, public SubjectSetMulti {
+			class Model : public IEditor, public SubjectRefSetMulti {
 			public:
 				Model() = default;
             protected:
@@ -155,10 +155,10 @@ namespace pattern {
 			 * May communicate with View to change some windows.
 			 * Only one controller, the "active" controller, receives user input at any given time
 			 */
-			class Controller : public IStrategy, public ObserverSetMulti, public SubjectSetMulti {
+			class Controller : public IStrategy, public ObserverRefSetMulti, public SubjectRefSetMulti {
             public:
                 explicit Controller(Model& model) noexcept
-                    : ObserverSetMulti{ model } {
+                    : ObserverRefSetMulti{ model } {
                 };
             protected:
                 Controller(const Controller&) = delete; // C.67	C.21
@@ -188,10 +188,10 @@ namespace pattern {
 			 * The view renders presentation of the model in a particular format.
 			 * Multiple views of the same information are possible.
 			 */
-            class View : public NonTerminalComponent, public ObserverSetMulti {
+            class View : public NonTerminalComponent, public ObserverRefSetMulti {
             public:
                 explicit View(Controller& controller) noexcept
-                    : ObserverSetMulti{ dynamic_cast<ObserverSetMulti::SubjectType&>(controller) } {
+                    : ObserverRefSetMulti{ dynamic_cast<ObserverRefSetMulti::ISubjectT&>(controller) } {
                 };
             protected:
                 View(const View&) = delete; // C.67	C.21
