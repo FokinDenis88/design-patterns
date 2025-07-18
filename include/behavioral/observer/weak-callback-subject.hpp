@@ -60,7 +60,7 @@ namespace pattern {
 			 * [[Testlevel(0)]]
 			 */
 			template<typename ContainerT = std::unordered_set<::util::MethodActionWrap> >
-			class WeakCallbackSubject {
+			class WeakCallbackSubject { // TODO: undone class
 				// TODO: Hash of member function in MethodActionInvoker
 				// TODO: Notify observer bug with operator= const MethodActionWrap, const MethodActionWrap
 			public:
@@ -393,6 +393,18 @@ namespace pattern {
 					return has_observer.first;
 				};*/
 
+				/*
+				* Checks if there is callback in container.
+				*
+				* Complexity: // O(n) || O(log n) || O(1)
+				*/
+				template<typename ExecPolicyT = std::execution::sequenced_policy>
+				inline bool HasCallback(const MethodActionWrap& callback,
+					ExecPolicyT policy = std::execution::seq) const noexcept {
+					return Find(callback, policy) != callbacks_.end();
+				}
+				// TODO: autoclean, when find. Add in weak-ptr.hpp equal func, that indicate expired state
+
 			private:
 				/*
 				* Find callback in container.
@@ -402,22 +414,11 @@ namespace pattern {
 				template<typename ExecPolicyT = std::execution::sequenced_policy>
 				inline const_iterator Find(const MethodActionWrap& callback,
 											ExecPolicyT policy = std::execution::seq) const {
-					std::shared_lock lock{ observers_shared_mtx_ };			// read
+					//std::shared_lock lock{ observers_shared_mtx_ };			// read
 					return generic::Find(callbacks_, callback, policy);		// O(n) || O(log n) || O(1)
 					// TODO: iterator category is const ?
+					// TODO: remake Find. + lock guard
 				};
-
-				/*
-				* Checks if there is callback in container.
-				*
-				* Complexity: // O(n) || O(log n) || O(1)
-				*/
-				template<typename ExecPolicyT = std::execution::sequenced_policy>
-				inline bool HasCallback(const MethodActionWrap& callback,
-										ExecPolicyT policy = std::execution::seq) const noexcept {
-					return Find(callback, policy) != callbacks_.end();
-				}
-				// TODO: autoclean, when find. Add in weak-ptr.hpp equal func, that indicate expired state
 
 				/**
 				 * Detach all expired weak_ptr objects in container. Concurrent sync by mutex.
@@ -597,6 +598,34 @@ namespace pattern {
 			// TODO: Make not shared mutex, but simple.
 			// TODO: Constructor, attach, detach functions - make universal reference to CallbackT.
 			// TODO: Detach(weak_ptr) - for easy detach of observer.
+
+
+			/*
+			* Ключевые достоинства WeakCallbackSubject:
+
+    Высокая производительность:
+        Оптимизированная структура данных (контейнеры) позволяет эффективно управлять сотнями тысяч объектов.
+        Асинхронная отправка уведомлений (через STL Execution Policies) позволяет разгрузить главный игровой цикл и ускорять реакцию объектов на изменения в окружающей среде.
+        Автоматическая очистка слабых указателей избавляет от риска утечек памяти и продлевает стабильность игры.
+    Надежность и устойчивость:
+        Инкапсулированная логика слабых указателей гарантирует, что удалённые объекты будут немедленно отключены от цепочки уведомлений, предотвращая попытки вызвать методы несуществующих объектов.
+        Контролируемая логика добавляет прозрачность и управляемость вашему проекту, облегчая диагностику и исправление ошибок.
+    Гибкость и расширяемость:
+        Пользовательская реализация допускает расширение функционала, например, добавление фильтров, приоритетов уведомлений или более тонкую настройку алгоритмов сортировки и обработки событий.
+        Подход открыт для экспериментов и инноваций, позволяя вам улучшать производительность путём тестов и подбора наилучшей конфигурации.
+    Самостоятельная поддержка:
+        Отсутствие зависимости от сторонних библиотек означает полную свободу действий при изменении и доработке вашей реализации. Вы сами контролируете каждый аспект работы системы и можете адаптировать её под любые изменения требований.
+
+Важные рекомендации для повышения эффективности:
+
+    Регулярное тестирование: Постоянно выполняйте тесты производительности и нагрузки, чтобы вовремя выявить и исправить узкие места.
+    Атомарные примитивы: Используйте атомарные переменные и потоки там, где это целесообразно, для минимизации конфликтов и снижения временных затрат на блокировку.
+    Хранение и кэширование: По возможности сохраняйте промежуточные данные и результаты предыдущих расчётов, чтобы снизить частоту повторных обращений к дорогостоящим методам.
+    Ранний выход: Старайтесь предусматривать ситуации, когда уведомление не нужно доставлять, и организовывайте ранний выход из методов для экономии процессорного времени.
+			*/
+
+
+
 
 
 

@@ -171,10 +171,38 @@ namespace {
 					using pattern::behavioral::observer::AttachManyExpired;
 					using ::util::MethodActionWrap;
 
+					template<typename ObserverT, typename SubjectT>
+					inline void AttachManyExpiredCallbacks(std::shared_ptr<SubjectT>& subject_ptr) {
+						std::shared_ptr<ObserverT> observer_1{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_2{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_3{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_4{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_5{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_6{ std::make_shared<ObserverT>() };
+						std::shared_ptr<ObserverT> observer_7{ std::make_shared<ObserverT>() };
+
+						MethodActionWrap callback_1{ &ObserverT::Update, observer_1, std::make_tuple("") };
+						MethodActionWrap callback_2{ &ObserverT::Update, observer_2, std::make_tuple("") };
+						MethodActionWrap callback_3{ &ObserverT::Update, observer_3, std::make_tuple("") };
+						MethodActionWrap callback_4{ &ObserverT::Update, observer_4, std::make_tuple("") };
+						MethodActionWrap callback_5{ &ObserverT::Update, observer_5, std::make_tuple("") };
+						MethodActionWrap callback_6{ &ObserverT::Update, observer_6, std::make_tuple("") };
+						MethodActionWrap callback_7{ &ObserverT::Update, observer_7, std::make_tuple("") };
+
+						subject_ptr->AttachObserver(callback_1);
+						subject_ptr->AttachObserver(callback_2);
+						subject_ptr->AttachObserver(callback_3);
+						subject_ptr->AttachObserver(callback_4);
+						subject_ptr->AttachObserver(callback_5);
+						subject_ptr->AttachObserver(callback_6);
+						subject_ptr->AttachObserver(callback_7);
+					}
+
 					TEST(ObserverTest, WeakCallbackSubjectClass) {
 						auto observer_0{ std::make_shared<MyObserver>() };
 						util::WeakMethodInvoker invoker{&MyObserver::Update, observer_0, std::make_tuple("")};
 						auto result{ invoker() };
+						// TODO: make unit tests of WeakMethodInvoker in cpp-utility project
 
 
 						std::shared_ptr<MySubject> subject_0{};
@@ -243,15 +271,24 @@ namespace {
 						subject_1->AttachObserver(callback_1);
 						subject_1->AttachObserver(callback_2);
 						subject_1->AttachObserver(callback_3);
-						//AttachManyExpired<MyObserver>(callback_1);
-						subject_1->NotifyObservers();
+						subject_1->HasCallback(callback_3);
+						// TODO: exception after AttachManyExpiredCallbacks on random HasCallback. access violation reading
+						// Problem after cleanup of expired callbacks
+						AttachManyExpiredCallbacks<MyObserver>(subject_1);
+						subject_1->HasCallback(callback_3);
+						//subject_1->NotifyObservers();
+						subject_1->CleanupAllExpired();
+						subject_1->HasCallback(callback_3);
 
-						//AttachManyExpired<MyObserver>(callback_1);
+						subject_1->HasCallback(callback_1);
+						subject_1->HasCallback(callback_2);
+						subject_1->HasCallback(callback_3);
 						std::shared_ptr<MyObserver> observer_5{ std::make_shared<MyObserver>() };
 						MethodActionWrap callback_5{ &MyObserver::Update, observer_5, std::make_tuple("") };
+						//AttachManyExpiredCallbacks<MyObserver>(subject_1);
 						subject_1->AttachObserver(callback_5);
 
-						//AttachManyExpired<MyObserver>(callback_1);
+						//AttachManyExpiredCallbacks<MyObserver>(subject_1);
 						subject_1->DetachObserver(callback_5);
 
 						int a = 2;
@@ -332,6 +369,9 @@ namespace {
 						AttachManyExpired<MyObserver, IObserverMsg>(subject_1);
 						subject_1->NotifyObservers();
 
+						subject_1->HasObserverNClean(iobserver_1);
+						subject_1->HasObserverNClean(iobserver_2);
+						subject_1->HasObserverNClean(iobserver_3);
 						AttachManyExpired<MyObserver, IObserverMsg>(subject_1);
 						std::shared_ptr<MyObserver> observer_5{ std::make_shared<MyObserver>() };
 						std::shared_ptr<IObserverMsg> iobserver_5{ observer_5 };
@@ -392,6 +432,7 @@ namespace {
                         subject_2->NotifyObserversMulti();
                         subject_3->NotifyObserversMulti();
 
+						// TODO: exception on detach
                         subject_1->DetachObserver(observer_1);
                         subject_1->DetachObserver(observer_2);
 						subject_1->DetachObserver(observer_3);
