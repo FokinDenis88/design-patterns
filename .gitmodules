@@ -1,4 +1,0 @@
-[submodule "external/cpp-general"]
-	path = external/cpp-general
-	url = https://gitlab.com/FokinDenis88/cpp-general.git
-	branch = develop
