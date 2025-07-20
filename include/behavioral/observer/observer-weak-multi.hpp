@@ -209,9 +209,10 @@ namespace pattern {
 			 * [[Testlevel(35, Hand debug)]]
 			 */
 			template<typename ExecPolicyT = std::execution::sequenced_policy,
-				typename ContainerT_t = std::forward_list<std::weak_ptr<ISubjectWeakMulti>>>
+				typename ContainerT_t = std::list<std::weak_ptr<ISubjectWeakMulti>>>
 			requires std::is_execution_policy_v<ExecPolicyT>
-			class ObserverWeakMulti : public IObserverWeakMulti,
+			class [[deprecated("Very rare use case of class. Old code.")]]
+				ObserverWeakMulti : public IObserverWeakMulti,
 									public std::enable_shared_from_this<ObserverWeakMulti<typename ExecPolicyT,
 																						typename ContainerT_t>>
 				// weak_from_this is for creating shared_ptr from
@@ -301,12 +302,13 @@ namespace pattern {
 					if (subject_ptr.expired()) { return; } // precondition
 
 					if (!HasSubject(subject_ptr)) { // Duplicate control. Mustn't duplicate weak_ptr
-						if constexpr (std::is_same_v<ContainerT_t, ContainerForwardListT>) {
-							subjects_.emplace_after(subjects_.cbefore_begin(), subject_ptr);
-						}
-						else { // All other types of containers, except forward_list
-							subjects_.emplace(subject_ptr);
-						}
+						generic::Emplace(subjects_, subject_ptr);
+						//if constexpr (std::is_same_v<ContainerT_t, ContainerForwardListT>) {
+						//	subjects_.emplace_after(subjects_.cbefore_begin(), subject_ptr);
+						//}
+						//else { // All other types of containers, except forward_list
+						//	subjects_.emplace(subject_ptr);
+						//}
 					}
 					if (recursion_depth < kRecursDepthForSingleOperation) { // pair operation Observer-Subject
 						if (auto subject_shared{ subject_ptr.lock() }) {
@@ -418,7 +420,7 @@ namespace pattern {
 			 * [[Testlevel(35, Hand debug)]]
 			 */
 			template<typename ExecPolicyT = std::execution::sequenced_policy,
-				typename ContainerT_t = std::forward_list<std::weak_ptr<IObserverWeakMulti>> >
+				typename ContainerT_t = std::list<std::weak_ptr<IObserverWeakMulti>> >
 				requires std::is_execution_policy_v<ExecPolicyT>
 			class SubjectWeakMulti : public ISubjectWeakMulti,
 				public std::enable_shared_from_this<SubjectWeakMulti<typename ExecPolicyT,
@@ -505,12 +507,13 @@ namespace pattern {
 					if (observer_ptr.expired()) { return; } // precondition
 
 					if (!HasObserver(observer_ptr)) { // Duplicate control. Mustn't duplicate weak_ptr
-						if constexpr (std::is_same_v<ContainerT_t, ContainerForwardListT>) { // if ForwardList
-							observers_.emplace_after(observers_.cbefore_begin(), observer_ptr);
-						}
-						else { // All other types of containers, except forward_list
-							observers_.emplace(observer_ptr);
-						}
+						generic::Emplace(observers_, observer_ptr);
+						//if constexpr (std::is_same_v<ContainerT_t, ContainerForwardListT>) { // if ForwardList
+						//	observers_.emplace_after(observers_.cbefore_begin(), observer_ptr);
+						//}
+						//else { // All other types of containers, except forward_list
+						//	observers_.emplace(observer_ptr);
+						//}
 					}
 
 					if (recursion_depth < kRecursDepthForSingleOperation) { // pair operation Observer-Subject
