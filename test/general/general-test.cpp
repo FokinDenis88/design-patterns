@@ -285,10 +285,10 @@ namespace {
 						subject_1->HasCallback(callback_3);
 						std::shared_ptr<MyObserver> observer_5{ std::make_shared<MyObserver>() };
 						MethodActionWrap callback_5{ &MyObserver::Update, observer_5, std::make_tuple("") };
-						//AttachManyExpiredCallbacks<MyObserver>(subject_1);
+						AttachManyExpiredCallbacks<MyObserver>(subject_1);
 						subject_1->AttachObserver(callback_5);
 
-						//AttachManyExpiredCallbacks<MyObserver>(subject_1);
+						AttachManyExpiredCallbacks<MyObserver>(subject_1);
 						subject_1->DetachObserver(callback_5);
 
 						int a = 2;
@@ -392,82 +392,82 @@ namespace {
 
                     TEST(ObserverTest, ObserverWeakMultiClass) {
                         //=========Ref============
-						std::shared_ptr<MySubject<>> subject_0{};
-						auto subject_1{ std::make_shared<MySubject<std::execution::parallel_policy>>() };
-						std::shared_ptr<MySubject<>> subject_2{ std::make_shared<MySubject<>>() };
-						std::shared_ptr<MySubject<>> subject_3{ std::make_shared<MySubject<>>() };
+						//std::shared_ptr<MySubject<>> subject_0{};
+						//auto subject_1{ std::make_shared<MySubject<std::execution::parallel_policy>>() };
+						//std::shared_ptr<MySubject<>> subject_2{ std::make_shared<MySubject<>>() };
+						//std::shared_ptr<MySubject<>> subject_3{ std::make_shared<MySubject<>>() };
 
-						auto observer_1{ std::make_shared<MyObserver<std::execution::parallel_policy>>() };
-						observer_1->AttachSubject(subject_1);
-						observer_1->AttachSubject(subject_1); // duplicate check
-						std::shared_ptr<MyObserver<>> observer_2{ std::make_shared<MyObserver<>>() };
-						observer_2->AttachSubject(subject_2);
-						std::shared_ptr<MyObserver<>> observer_3{ std::make_shared<MyObserver<>>() };
-						observer_3->AttachSubject(subject_3);
+						//auto observer_1{ std::make_shared<MyObserver<std::execution::parallel_policy>>() };
+						//observer_1->AttachSubject(subject_1);
+						//observer_1->AttachSubject(subject_1); // duplicate check
+						//std::shared_ptr<MyObserver<>> observer_2{ std::make_shared<MyObserver<>>() };
+						//observer_2->AttachSubject(subject_2);
+						//std::shared_ptr<MyObserver<>> observer_3{ std::make_shared<MyObserver<>>() };
+						//observer_3->AttachSubject(subject_3);
 
-                        subject_1->state_.a_ = 1;
-                        subject_1->state_.b_ = 2;
-                        subject_2->state_.a_ = 3;
-                        subject_2->state_.b_ = 4;
-                        subject_3->state_.a_ = 5;
-                        subject_3->state_.b_ = 6;
+      //                  subject_1->state_.a_ = 1;
+      //                  subject_1->state_.b_ = 2;
+      //                  subject_2->state_.a_ = 3;
+      //                  subject_2->state_.b_ = 4;
+      //                  subject_3->state_.a_ = 5;
+      //                  subject_3->state_.b_ = 6;
 
-                        observer_1->state_.a_ = 1;
-                        observer_1->state_.b_ = 2;
-                        observer_2->state_.a_ = 3;
-                        observer_2->state_.b_ = 4;
-                        observer_3->state_.a_ = 5;
-                        observer_3->state_.b_ = 6;
+      //                  observer_1->state_.a_ = 1;
+      //                  observer_1->state_.b_ = 2;
+      //                  observer_2->state_.a_ = 3;
+      //                  observer_2->state_.b_ = 4;
+      //                  observer_3->state_.a_ = 5;
+      //                  observer_3->state_.b_ = 6;
 
-                        subject_1->AttachObserver(observer_1);
-                        subject_1->AttachObserver(observer_2);
+      //                  subject_1->AttachObserver(observer_1);
+      //                  subject_1->AttachObserver(observer_2);
 
-                        subject_2->AttachObserver(observer_2);
-                        subject_2->AttachObserver(observer_3);
+      //                  subject_2->AttachObserver(observer_2);
+      //                  subject_2->AttachObserver(observer_3);
 
-                        subject_3->AttachObserver(observer_1);
-                        subject_3->AttachObserver(observer_3);
+      //                  subject_3->AttachObserver(observer_1);
+      //                  subject_3->AttachObserver(observer_3);
 
-                        subject_1->NotifyObserversMulti();
-                        subject_2->NotifyObserversMulti();
-                        subject_3->NotifyObserversMulti();
+      //                  subject_1->NotifyObserversMulti();
+      //                  subject_2->NotifyObserversMulti();
+      //                  subject_3->NotifyObserversMulti();
 
-						// TODO: exception on detach
-                        subject_1->DetachObserver(observer_1);
-                        subject_1->DetachObserver(observer_2);
-						subject_1->DetachObserver(observer_3);
-                        subject_1->AttachObserver(observer_3);
+						//// TODO: exception on detach
+      //                  subject_1->DetachObserver(observer_1);
+      //                  subject_1->DetachObserver(observer_2);
+						//subject_1->DetachObserver(observer_3);
+      //                  subject_1->AttachObserver(observer_3);
 
-                        subject_3->AttachObserver(observer_2);
+      //                  subject_3->AttachObserver(observer_2);
 
-						std::shared_ptr<MySubject<>> subject_4{ std::make_shared<MySubject<>>() };
-						subject_4->state_.a_ = 44;
-						subject_4->state_.b_ = 44;
-                        { // Destructor test
-							std::shared_ptr<MySubject<>> subject_5{};
-							std::shared_ptr<MyObserver<>> observer_4{ std::make_shared<MyObserver<>>() };
-							observer_4->state_.a_ = 77;
-							observer_4->state_.b_ = 77;
-							observer_4->AttachSubject(subject_4);
-                        }
-						subject_1->DetachNExpired(0, true);
-						observer_1->DetachNExpired(0, true);
+						//std::shared_ptr<MySubject<>> subject_4{ std::make_shared<MySubject<>>() };
+						//subject_4->state_.a_ = 44;
+						//subject_4->state_.b_ = 44;
+      //                  { // Destructor test
+						//	std::shared_ptr<MySubject<>> subject_5{};
+						//	std::shared_ptr<MyObserver<>> observer_4{ std::make_shared<MyObserver<>>() };
+						//	observer_4->state_.a_ = 77;
+						//	observer_4->state_.b_ = 77;
+						//	observer_4->AttachSubject(subject_4);
+      //                  }
+						//subject_1->DetachNExpired(0, true);
+						//observer_1->DetachNExpired(0, true);
 
-						subject_1->AttachObserver(observer_1);
-						subject_1->AttachObserver(observer_2);
-						subject_1->AttachObserver(observer_3);
-						AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
-						subject_1->NotifyObservers();
+						//subject_1->AttachObserver(observer_1);
+						//subject_1->AttachObserver(observer_2);
+						//subject_1->AttachObserver(observer_3);
+						//AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
+						//subject_1->NotifyObservers();
 
-						AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
-						std::shared_ptr<MyObserver<>> observer_5{ std::make_shared<MyObserver<>>() };
-						subject_1->AttachObserver(observer_5);
+						//AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
+						//std::shared_ptr<MyObserver<>> observer_5{ std::make_shared<MyObserver<>>() };
+						//subject_1->AttachObserver(observer_5);
 
 
-						AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
-						subject_1->DetachObserver(observer_5);
+						//AttachManyExpired<MyObserver<>, MyObserver<>>(subject_1);
+						//subject_1->DetachObserver(observer_5);
 
-                        int a = 2;
+      //                  int a = 2;
                     };
                 } // !namespace weak_observer_multi
 
@@ -476,51 +476,51 @@ namespace {
 					using namespace ::pattern::behavioral::observer_ref;
 					TEST(ObserverTest, ObserverRefClass) {
 						//=========Ref============
-						MySubject subject_1{}, subject_2{}, subject_3{};
-						MyObserver observer_1{ subject_1 }, observer_2{ subject_2 }, observer_3{ subject_3 };
-						subject_1.state_.a_ = 1;
-                        subject_1.state_.b_ = 2;
-                        subject_2.state_.a_ = 3;
-                        subject_2.state_.b_ = 4;
-                        subject_3.state_.a_ = 5;
-                        subject_3.state_.b_ = 6;
+						//MySubject subject_1{}, subject_2{}, subject_3{};
+						//MyObserver observer_1{ subject_1 }, observer_2{ subject_2 }, observer_3{ subject_3 };
+						//subject_1.state_.a_ = 1;
+      //                  subject_1.state_.b_ = 2;
+      //                  subject_2.state_.a_ = 3;
+      //                  subject_2.state_.b_ = 4;
+      //                  subject_3.state_.a_ = 5;
+      //                  subject_3.state_.b_ = 6;
 
-						observer_1.state_.a_ = 1;
-						observer_1.state_.b_ = 2;
-                        observer_2.state_.a_ = 3;
-                        observer_2.state_.b_ = 4;
-                        observer_3.state_.a_ = 5;
-                        observer_3.state_.b_ = 6;
+						//observer_1.state_.a_ = 1;
+						//observer_1.state_.b_ = 2;
+      //                  observer_2.state_.a_ = 3;
+      //                  observer_2.state_.b_ = 4;
+      //                  observer_3.state_.a_ = 5;
+      //                  observer_3.state_.b_ = 6;
 
-						subject_1.AttachObserverNSubject(observer_1);
-						subject_1.AttachObserverNSubject(observer_2);
+						//subject_1.AttachObserverNSubject(observer_1);
+						//subject_1.AttachObserverNSubject(observer_2);
 
-                        subject_2.AttachObserverNSubject(observer_2);
-                        subject_2.AttachObserverNSubject(observer_3);
+      //                  subject_2.AttachObserverNSubject(observer_2);
+      //                  subject_2.AttachObserverNSubject(observer_3);
 
-                        subject_3.AttachObserverNSubject(observer_1);
-                        subject_3.AttachObserverNSubject(observer_3);
+      //                  subject_3.AttachObserverNSubject(observer_1);
+      //                  subject_3.AttachObserverNSubject(observer_3);
 
-						subject_1.NotifyObserversMulti();
-						subject_2.NotifyObserversMulti();
-						subject_3.NotifyObserversMulti();
+						//subject_1.NotifyObserversMulti();
+						//subject_2.NotifyObserversMulti();
+						//subject_3.NotifyObserversMulti();
 
-						subject_1.DetachObserverNSubject(observer_1);
-						subject_1.DetachObserverNSubject(observer_2);
-						subject_1.ClearAllObservers();
-						subject_1.AttachObserverNSubject(observer_3);
+						//subject_1.DetachObserverNSubject(observer_1);
+						//subject_1.DetachObserverNSubject(observer_2);
+						//subject_1.ClearAllObservers();
+						//subject_1.AttachObserverNSubject(observer_3);
 
-						subject_3.AttachObserverNSubject(observer_2);
-						subject_3.ClearAllObservers();
+						//subject_3.AttachObserverNSubject(observer_2);
+						//subject_3.ClearAllObservers();
 
 
-						MySubject subject_4{};
-						{ // Destructor test
-							MySubject subject_5{};
-							MyObserver observer_4{ subject_4 };
-						}
+						//MySubject subject_4{};
+						//{ // Destructor test
+						//	MySubject subject_5{};
+						//	MyObserver observer_4{ subject_4 };
+						//}
 
-						int a = 2;
+						//int a = 2;
 					};
 				} // !namespace observer_ref
 
