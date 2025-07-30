@@ -114,5 +114,6 @@
 #include "cpp-idiom/opaque-pointer.hpp"
 #include "cpp-idiom/pimpl.hpp"
 #include "cpp-idiom/pimpl-macros.hpp"
+#include "cpp-idiom/sfinae.hpp"
 
 #endif // !CPP_IDIOMS_HEADERS_HPP

@@ -119,7 +119,9 @@ set(HEADERS_FILTER_CPP-IDIOMS
 	${INCLUDE_CPP_IDIOM}/non-virtual-interface.hpp
 	${INCLUDE_CPP_IDIOM}/opaque-pointer.hpp
 	${INCLUDE_CPP_IDIOM}/pimpl.hpp
-	${INCLUDE_CPP_IDIOM}/pimpl-macros.hpp)
+	${INCLUDE_CPP_IDIOM}/pimpl-macros.hpp
+	${INCLUDE_CPP_IDIOM}/sfinae.hpp
+)
 set(SRC_CPP_IDIOM ${SOURCES_FOLDER}/cpp-idiom)
 set(SOURCES_FILTER_CPP-IDIOMS
 	${SRC_CPP_IDIOM}/d-pointer.cpp
